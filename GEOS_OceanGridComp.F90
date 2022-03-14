@@ -8,9 +8,11 @@ module GEOS_OceanGridCompMod
 ! !MODULE: GEOS_OceanGridCompMod -- Implements ESMF wrapper to invoke the DATASEA/MIT/MOM ocean models.
 
 ! !USES:
-
   use ESMF
   use MAPL
+#ifdef BUILD_MIT_OCEAN
+  use MIT_GEOS5PlugMod, only: MITSetServices => SetServices  ! this sets IRF
+#endif
   use GEOS_DataSeaGridCompMod, only: DataSeaSetServices  => SetServices
 
   implicit none
@@ -116,16 +118,20 @@ contains
     else
        call MAPL_GetResource ( MAPL, OCEAN_NAME, Label="OCEAN_NAME:", DEFAULT="MOM", __RC__ )
        select case (trim(OCEAN_NAME))
+#ifndef BUILD_MIT_OCEAN
           case ("MOM")
              call MAPL_GetResource ( MAPL, sharedObj,  Label="MOM_GEOS5PLUGMOD:", DEFAULT="libMOM_GEOS5PlugMod.so", __RC__ )
              OCN = MAPL_AddChild(OCEAN_NAME,'setservices_', parentGC=GC, sharedObj=sharedObj,  __RC__)
           case ("MOM6")
              call MAPL_GetResource ( MAPL, sharedObj,  Label="MOM6_GEOSPLUG:", DEFAULT="libMOM6_GEOSPlug.so", __RC__ )
              OCN = MAPL_AddChild(OCEAN_NAME,'setservices_', parentGC=GC, sharedObj=sharedObj,  __RC__)
+#else
+          case ("MIT")
+             OCN = MAPL_AddChild(GC, NAME=OCEAN_NAME, SS=MITSetServices, __RC__)
+#endif
           case default
              charbuf_ = "OCEAN_NAME: " // trim(OCEAN_NAME) // " is not implemented, ABORT!"
-             call WRITE_PARALLEL(charbuf_)
-             VERIFY_(999)
+             _ASSERT(.false., charbuf_)
        end select
     endif
 
@@ -817,6 +823,9 @@ contains
              MASK => MASK3D(:,:,1)
           case ("MOM6")
              call MAPL_GetPointer(GEX(OCN), MASK, 'MOM_2D_MASK', __RC__)
+          case ("MIT")
+             call MAPL_GetPointer(GEX(OCN), MASK3D, 'MIT_3D_MASK', __RC__)
+             MASK => MASK3D(:,:,1)
        end select
        if(associated(MASKO)) MASKO = MASK
     end if
@@ -1045,6 +1054,9 @@ contains
           select case(trim(OCEAN_NAME))
              case ("MOM")
                 call MAPL_GetPointer(GEX(OCN), MASK3D, 'MOM_3D_MASK', __RC__)
+                MASK => MASK3D(:,:,1)
+             case ("MIT")
+                call MAPL_GetPointer(GEX(OCN), MASK3D, 'MIT_3D_MASK', __RC__)
                 MASK => MASK3D(:,:,1)
              case ("MOM6")
                 call MAPL_GetPointer(GEX(OCN), MASK, 'MOM_2D_MASK', __RC__)
