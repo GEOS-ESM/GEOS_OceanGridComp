@@ -25,6 +25,9 @@ list( APPEND MOM6_SRCS
    src/ALE/coord_slight.F90
    src/ALE/coord_zlike.F90
    src/ALE/MOM_ALE.F90
+   src/ALE/MOM_hybgen_regrid.F90
+   src/ALE/MOM_hybgen_remap.F90
+   src/ALE/MOM_hybgen_unmix.F90
    src/ALE/MOM_regridding.F90
    src/ALE/MOM_remapping.F90
    src/ALE/P1M_functions.F90
@@ -40,6 +43,7 @@ list( APPEND MOM6_SRCS
    src/ALE/regrid_solvers.F90
    src/core/MOM_barotropic.F90
    src/core/MOM_boundary_update.F90
+   src/core/MOM_check_scaling.F90
    src/core/MOM_checksum_packages.F90
    src/core/MOM_continuity.F90
    src/core/MOM_continuity_PPM.F90
@@ -134,8 +138,11 @@ list( APPEND MOM6_SRCS
    src/framework/MOM_restart.F90
    src/framework/MOM_safe_alloc.F90
    src/framework/MOM_string_functions.F90
+   src/framework/MOM_unique_scales.F90
    src/framework/MOM_unit_scaling.F90
    src/framework/MOM_write_cputime.F90
+   src/framework/posix.F90
+   src/framework/posix.h
    src/ice_shelf/MOM_ice_shelf_diag_mediator.F90
    src/ice_shelf/MOM_ice_shelf_dynamics.F90
    src/ice_shelf/MOM_ice_shelf.F90
@@ -484,6 +491,7 @@ list( APPEND MOM6_SRCS
    config_src/external/drifters/MOM_particles.F90
    config_src/external/drifters/MOM_particles_types.F90
    # stochastic physics
+   config_src/external/stochastic_physics/get_stochy_pattern.F90
    config_src/external/stochastic_physics/stochastic_physics.F90
 )
 
