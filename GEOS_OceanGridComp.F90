@@ -143,6 +143,7 @@ contains
 
 !BOS
 
+! MAPL_AddSpec calls
 #include "GEOS_Ocean_Import___.h"
 #include "GEOS_Ocean_Export___.h"
 #include "GEOS_Ocean_Internal___.h"
@@ -811,7 +812,8 @@ contains
     call MAPL_GenericInitialize( GC, IMPORT, EXPORT, CLOCK, RC=status )
     VERIFY_(STATUS)
     call MAPL_TimerOn (STATE,"TOTAL"     )
-
+  
+    ! This may not be suitable for ACG GetPointer include files. WDB
     if(DO_DATASEA==0) then
        call MAPL_GetPointer(EXPORT, MASKO, 'MASKO'  , alloc=.true.,__RC__)
 
@@ -871,84 +873,87 @@ contains
     type (ESMF_State       ), pointer   :: GIM(:)
     type (ESMF_State       ), pointer   :: GEX(:)
 
+! Pointers to Imports, Exports, Internal
+#include "GEOS_Ocean_DeclarePointers___.h"
+
 ! Pointers to Imports
 
-    real, pointer :: FROCEAN(:,:)
-    real, pointer :: TAUXi(:,:)
-    real, pointer :: TAUYi(:,:)
-    real, pointer :: PENUVRi(:,:)
-    real, pointer :: PENPARi(:,:)
-    real, pointer :: PENUVFi(:,:)
-    real, pointer :: PENPAFi(:,:)
-    real, pointer :: DRNIRi(:,:)
-    real, pointer :: DFNIRi(:,:)
-    real, pointer :: HEATi(:,:,:)
-    real, pointer :: DISCHARGEi(:,:)
-    real, pointer :: LWFLXi(:,:)
-    real, pointer :: SHFLXi(:,:)
-    real, pointer :: QFLUXi(:,:)
-    real, pointer :: SNOWi(:,:)
-    real, pointer :: RAINi(:,:)
-    real, pointer :: FHOCN(:,:)
-    real, pointer :: FRESH(:,:)
-    real, pointer :: FSALT(:,:)
-    real, pointer :: PEN_OCN(:,:)
+!    real, pointer :: FROCEAN(:,:)
+!    real, pointer :: TAUXi(:,:)
+!    real, pointer :: TAUYi(:,:)
+!    real, pointer :: PENUVRi(:,:)
+!    real, pointer :: PENPARi(:,:)
+!    real, pointer :: PENUVFi(:,:)
+!    real, pointer :: PENPAFi(:,:)
+!    real, pointer :: DRNIRi(:,:)
+!    real, pointer :: DFNIRi(:,:)
+!    real, pointer :: HEATi(:,:,:)
+!    real, pointer :: DISCHARGEi(:,:)
+!    real, pointer :: LWFLXi(:,:)
+!    real, pointer :: SHFLXi(:,:)
+!    real, pointer :: QFLUXi(:,:)
+!    real, pointer :: SNOWi(:,:)
+!    real, pointer :: RAINi(:,:)
+!    real, pointer :: FHOCN(:,:)
+!    real, pointer :: FRESH(:,:)
+!    real, pointer :: FSALT(:,:)
+!    real, pointer :: PEN_OCN(:,:)
 
 ! Pointers to Exports
 
-    real, pointer :: TS_FOUND (:,:)
-    real, pointer :: SS_FOUND (:,:)
-    real, pointer :: FRZMLTe(:,:)
+!    real, pointer :: TS_FOUND (:,:)
+!    real, pointer :: SS_FOUND (:,:)
+!    real, pointer :: FRZMLTe(:,:)
 
 ! Diagnostics exports
 
-    real, pointer :: RFLUX (:,:)
-    real, pointer :: TAUXe (:,:)
-    real, pointer :: TAUYe (:,:)
-    real, pointer :: HEATe (:,:,:)
-    real, pointer :: FROCEANe (:,:)
-    real, pointer :: DISCHARGEe(:,:)
-    real, pointer :: LWFLXe(:,:)
-    real, pointer :: SWFLXe(:,:)
-    real, pointer :: SHFLXe(:,:)
-    real, pointer :: QFLUXe(:,:)
-    real, pointer :: RAINe(:,:)
-    real, pointer :: SNOWe(:,:)
-    real, pointer :: SFLXe(:,:)
-    real, pointer :: PEN_OCNe(:,:)
+!    real, pointer :: RFLUX (:,:)
+!    real, pointer :: TAUXe (:,:)
+!    real, pointer :: TAUYe (:,:)
+!    real, pointer :: HEATe (:,:,:)
+!    real, pointer :: FROCEANe (:,:)
+!    real, pointer :: DISCHARGEe(:,:)
+!    real, pointer :: LWFLXe(:,:)
+!    real, pointer :: SWFLXe(:,:)
+!    real, pointer :: SHFLXe(:,:)
+!    real, pointer :: QFLUXe(:,:)
+!    real, pointer :: RAINe(:,:)
+!    real, pointer :: SNOWe(:,:)
+!    real, pointer :: SFLXe(:,:)
+!    real, pointer :: PEN_OCNe(:,:)
 
 
 ! Pointers to imports of child
 
-    real, pointer :: TAUX(:,:)
-    real, pointer :: TAUY(:,:)
-    real, pointer :: PENUVR(:,:)
-    real, pointer :: PENPAR(:,:)
-    real, pointer :: PENUVF(:,:)
-    real, pointer :: PENPAF(:,:)
-    real, pointer :: DRNIR(:,:)
-    real, pointer :: DFNIR(:,:)
-    real, pointer :: HEAT(:,:,:)
-    real, pointer :: DISCHARGE(:,:)
-    real, pointer :: LWFLX(:,:)
-    real, pointer :: SHFLX(:,:)
-    real, pointer :: QFLUX(:,:)
-    real, pointer :: RAIN(:,:)
-    real, pointer :: SNOW(:,:)
-    real, pointer :: SFLX(:,:)
-    real, pointer :: FI(:,:)
-    real, pointer :: FId(:,:)
-
-! Pointers to exports of child
-
-    real, pointer :: TW  (:,:)
-    real, pointer :: SW  (:,:)
-    real, pointer ::   MASK(:,:)
-    real, pointer :: MASK3D(:,:,:)
-    real, pointer :: FRZMLT(:,:)
-
-    real, pointer :: TWd  (:,:)
-    real, pointer :: DEL_TEMP (:,:)
+!    real, pointer :: TAUX(:,:)
+!    real, pointer :: TAUY(:,:)
+!    real, pointer :: PENUVR(:,:)
+!    real, pointer :: PENPAR(:,:)
+!    real, pointer :: PENUVF(:,:)
+!    real, pointer :: PENPAF(:,:)
+!    real, pointer :: DRNIR(:,:)
+!    real, pointer :: DFNIR(:,:)
+!    real, pointer :: HEAT(:,:,:)
+!    real, pointer :: DISCHARGE(:,:)
+!    real, pointer :: LWFLX(:,:)
+!    real, pointer :: SHFLX(:,:)
+!    real, pointer :: QFLUX(:,:)
+!    real, pointer :: RAIN(:,:)
+!    real, pointer :: SNOW(:,:)
+!    real, pointer :: SFLX(:,:)
+!    real, pointer :: FI(:,:)
+!    real, pointer :: FId(:,:)
+!
+!! Pointers to exports of child
+!
+!    real, pointer :: TW  (:,:)
+!    real, pointer :: SW  (:,:)
+!    real, pointer ::   MASK(:,:)
+!    real, pointer :: MASK3D(:,:,:)
+!    real, pointer :: FRZMLT(:,:)
+!
+!    real, pointer :: TWd  (:,:)
+!    real, pointer :: DEL_TEMP (:,:)
 
 ! Locals
 
@@ -1045,6 +1050,7 @@ contains
 
 ! We get the ocean-land mask (now computed in Initialize of Plug)
 ! ---------------------------------------------------------------
+       ! This is a special case of GetPointer. May not be suitable for ACG include. WDB
        if(DO_DATASEA==0) then
           select case(trim(OCEAN_NAME))
              case ("MOM")
@@ -1068,87 +1074,90 @@ contains
        call MAPL_GetResource(STATE,DT,  Label="OCEAN_DT:",  DEFAULT=DT, RC=STATUS) ! set Default OCEAN_DT to AGCM Heartbeat
        VERIFY_(status)
 
-! Get pointers to imports
-!--------------------------------------------------------------------------------
-       call MAPL_GetPointer(IMPORT, FROCEAN, 'FROCEAN', RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, TAUXi, 'TAUX'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, TAUYi, 'TAUY'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, PENUVRi, 'PENUVR'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, PENPARi, 'PENPAR'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, PENUVFi, 'PENUVF'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, PENPAFi, 'PENPAF'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, DRNIRi, 'DRNIR'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, DFNIRi, 'DFNIR'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, HEATi, 'SWHEAT' , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, DISCHARGEi, 'DISCHARGE'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, LWFLXi, 'LWFLX'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, SHFLXi, 'SHFLX'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, QFLUXi, 'QFLUX'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, SNOWi, 'SNOW'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, RAINi, 'RAIN'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, FHOCN, 'FHOCN'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, FRESH, 'FRESH'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(IMPORT, FSALT, 'FSALT'   , RC=STATUS); VERIFY_(STATUS)
+! ACG GetPointer include
+#include "GEOS_Ocean_GetPointers___.h"
 
-! Get pointers from ImExState
-!----------------------------
-       if(DO_DATASEA==0) then
-          call MAPL_GetPointer(GIM(OCN), TAUX, 'TAUX'  , RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), TAUY, 'TAUY'  , RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), PENUVR, 'PENUVR'  , RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), PENPAR, 'PENPAR'  , RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), PENUVF, 'PENUVF'  , RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), PENPAF, 'PENPAF'  , RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), DRNIR, 'DRNIR'  , RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), DFNIR, 'DFNIR'  , RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), HEAT, 'SWHEAT', RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), DISCHARGE, 'DISCHARGE'  , RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), LWFLX, 'LWFLX'  , RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), SHFLX, 'SHFLX'  , RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), QFLUX, 'QFLUX'  , RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), RAIN, 'RAIN'  , RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), SNOW, 'SNOW'  , RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(GIM(OCN), SFLX, 'SFLX'  , RC=STATUS); VERIFY_(STATUS) ! and do not add import of PEN_OCN here since it is not used in the `plug'
-       end if
-
-       call MAPL_GetPointer(IMPORT, PEN_OCN, 'PEN_OCN',RC=STATUS); VERIFY_(STATUS)
-
-       call MAPL_GetPointer(GEX(OCN), TW,   'TW'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(GEX(OCN), SW,   'SW'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
-
-       if (dual_ocean) then
-          call MAPL_GetPointer(GEX(OCNd), TWd,   'TW'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
-          call MAPL_GetPointer(IMPORT, FId, 'FRACICEd'   , RC=STATUS); VERIFY_(STATUS)
-       end if
-       
-       if(DO_DATASEA==0) then
-          call MAPL_GetPointer(GEX(OCN), FRZMLT,   'FRZMLT'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
-       end if
-
-! Get pointers to exports
-!--------------------------------------------------------
-
-       call MAPL_GetPointer(EXPORT, TS_FOUND,'TS_FOUND', RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, SS_FOUND,'SS_FOUND', RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, FRZMLTe,'FRZMLT', RC=STATUS); VERIFY_(STATUS)
-
-! Diagnostics exports
-!---------------------------------------------------------
-       call MAPL_GetPointer(EXPORT, RFLUX,  'RFLUX' , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, FROCEANe,'FROCEAN', RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, TAUXe, 'TAUX'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, TAUYe, 'TAUY'   , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, HEATe, 'SWHEAT' , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, DISCHARGEe, 'DISCHARGE'  , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, LWFLXe, 'LWFLX'  , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, SWFLXe, 'SWFLX'  , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, SHFLXe, 'SHFLX'  , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, QFLUXe, 'QFLUX'  , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, RAINe, 'RAIN'  , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, SNOWe, 'SNOW'  , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, SFLXe, 'SFLX'  , RC=STATUS); VERIFY_(STATUS)
-       call MAPL_GetPointer(EXPORT, PEN_OCNe,'PEN_OCN', RC=STATUS); VERIFY_(STATUS)
-
+!! Get pointers to imports
+!!--------------------------------------------------------------------------------
+!       call MAPL_GetPointer(IMPORT, FROCEAN, 'FROCEAN', RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, TAUXi, 'TAUX'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, TAUYi, 'TAUY'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, PENUVRi, 'PENUVR'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, PENPARi, 'PENPAR'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, PENUVFi, 'PENUVF'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, PENPAFi, 'PENPAF'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, DRNIRi, 'DRNIR'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, DFNIRi, 'DFNIR'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, HEATi, 'SWHEAT' , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, DISCHARGEi, 'DISCHARGE'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, LWFLXi, 'LWFLX'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, SHFLXi, 'SHFLX'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, QFLUXi, 'QFLUX'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, SNOWi, 'SNOW'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, RAINi, 'RAIN'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, FHOCN, 'FHOCN'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, FRESH, 'FRESH'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(IMPORT, FSALT, 'FSALT'   , RC=STATUS); VERIFY_(STATUS)
+!
+!! Get pointers from ImExState
+!!----------------------------
+!       if(DO_DATASEA==0) then
+!          call MAPL_GetPointer(GIM(OCN), TAUX, 'TAUX'  , RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), TAUY, 'TAUY'  , RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), PENUVR, 'PENUVR'  , RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), PENPAR, 'PENPAR'  , RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), PENUVF, 'PENUVF'  , RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), PENPAF, 'PENPAF'  , RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), DRNIR, 'DRNIR'  , RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), DFNIR, 'DFNIR'  , RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), HEAT, 'SWHEAT', RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), DISCHARGE, 'DISCHARGE'  , RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), LWFLX, 'LWFLX'  , RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), SHFLX, 'SHFLX'  , RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), QFLUX, 'QFLUX'  , RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), RAIN, 'RAIN'  , RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), SNOW, 'SNOW'  , RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(GIM(OCN), SFLX, 'SFLX'  , RC=STATUS); VERIFY_(STATUS) ! and do not add import of PEN_OCN here since it is not used in the `plug'
+!       end if
+!
+!       call MAPL_GetPointer(IMPORT, PEN_OCN, 'PEN_OCN',RC=STATUS); VERIFY_(STATUS)
+!
+!       call MAPL_GetPointer(GEX(OCN), TW,   'TW'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(GEX(OCN), SW,   'SW'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
+!
+!       if (dual_ocean) then
+!          call MAPL_GetPointer(GEX(OCNd), TWd,   'TW'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
+!          call MAPL_GetPointer(IMPORT, FId, 'FRACICEd'   , RC=STATUS); VERIFY_(STATUS)
+!       end if
+!       
+!       if(DO_DATASEA==0) then
+!          call MAPL_GetPointer(GEX(OCN), FRZMLT,   'FRZMLT'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
+!       end if
+!
+!! Get pointers to exports
+!!--------------------------------------------------------
+!
+!       call MAPL_GetPointer(EXPORT, TS_FOUND,'TS_FOUND', RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, SS_FOUND,'SS_FOUND', RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, FRZMLTe,'FRZMLT', RC=STATUS); VERIFY_(STATUS)
+!
+!! Diagnostics exports
+!!---------------------------------------------------------
+!       call MAPL_GetPointer(EXPORT, RFLUX,  'RFLUX' , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, FROCEANe,'FROCEAN', RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, TAUXe, 'TAUX'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, TAUYe, 'TAUY'   , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, HEATe, 'SWHEAT' , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, DISCHARGEe, 'DISCHARGE'  , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, LWFLXe, 'LWFLX'  , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, SWFLXe, 'SWFLX'  , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, SHFLXe, 'SHFLX'  , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, QFLUXe, 'QFLUX'  , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, RAINe, 'RAIN'  , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, SNOWe, 'SNOW'  , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, SFLXe, 'SFLX'  , RC=STATUS); VERIFY_(STATUS)
+!       call MAPL_GetPointer(EXPORT, PEN_OCNe,'PEN_OCN', RC=STATUS); VERIFY_(STATUS)
+!
        if(associated(FROCEANe)) FROCEANe = FROCEAN
 
 ! Allocate space for temporary arrays
@@ -1256,6 +1265,7 @@ contains
              end if
           end if
 
+          ! This may not be suitable for ACG GetPointer include files. WDB
           if (DUAL_OCEAN .and. PHASE == 1) then
              ! calculate temperature correction to send back to MOM
              call MAPL_GetPointer(GIM(OCN), DEL_TEMP, 'DEL_TEMP', RC=STATUS)
@@ -1325,6 +1335,7 @@ contains
           end if          
        end if
 
+       ! This may not be suitable for ACG GetPointer include files. WDB
        if (DUAL_OCEAN) then
           !ALT we might not have FI yet, so let get it again
           call MAPL_GetPointer(GIM(OCNd), FI , 'FRACICE'  , RC=STATUS)
