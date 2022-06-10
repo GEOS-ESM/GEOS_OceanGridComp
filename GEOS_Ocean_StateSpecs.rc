@@ -63,21 +63,21 @@ RAIN        |   kg m-2 s-1   |   xy     |   N      |   ocean_rainfall
 SNOW        |   kg m-2 s-1   |   xy     |   N      |   ocean_snowfall  
 PEN_OCN     |   W m-2        |   xy     |   N      |   penetrated_shortwave_flux_at_the_bottom_of_first_ocean_model_layer  
 
-! category: EXPORT
+#category: EXPORT
 #---------------------------------------------------------------------------------------------
 #  VARIABLE           |          Additional Metadata
 #---------------------------------------------------------------------------------------------
 NAME   |   CHILD_ID   |   COND
 #---------------------------------------------------------------------------------------------
-TW     |   OCN        |   
-SW     |   OCN        |   
-UW     |   OCN        |   
-VW     |   OCN        |   
-DH     |   OCN        |   DO_DATASEA==0
-UWB    |   OCN        |   DO_DATASEA==0
-VWB    |   OCN        |   DO_DATASEA==0
-SSH    |   OCN        |   DO_DATASEA==0 .AND. trim(OCEAN_NAME) == 'MOM'
-SLV    |   OCN        |   DO_DATASEA==0
-PBO    |   OCN        |   DO_DATASEA==0 .AND. trim(OCEAN_NAME) == 'MOM'
-T      |   OCN        |   DO_DATASEA==0
-S      |   OCN        |   DO_DATASEA==0
+#TW     |   OCN        |   
+#SW     |   OCN        |   
+#UW     |   OCN        |   
+#VW     |   OCN        |   
+#DH     |   OCN        |   DO_DATASEA==0
+#UWB    |   OCN        |   DO_DATASEA==0
+#VWB    |   OCN        |   DO_DATASEA==0
+#SSH    |   OCN        |   DO_DATASEA==0 .AND. trim(OCEAN_NAME) == 'MOM'
+#SLV    |   OCN        |   DO_DATASEA==0
+#PBO    |   OCN        |   DO_DATASEA==0 .AND. trim(OCEAN_NAME) == 'MOM'
+#T      |   OCN        |   DO_DATASEA==0
+#S      |   OCN        |   DO_DATASEA==0
