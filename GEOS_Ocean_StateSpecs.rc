@@ -45,7 +45,7 @@ category: EXPORT
 #---------------------------------------------------------------------------------------------
 NAME        |   UNITS        |   DIMS   |   VLOC   |   LONG_NAME
 #---------------------------------------------------------------------------------------------
-MASKO       |   1            |   xy     |   N      |   ocean_mask  
+#MASKO       |   1            |   xy     |   N      |   ocean_mask  
 SS_FOUND    |   PSU          |   xy     |   N      |   foundation_salinity_for_interface_layer  
 FRZMLT      |   W m-2        |   xy     |   N      |   freeze_melt_potential  
 TAUX        |   N m-2        |   xy     |   N      |   Agrid_eastward_stress_on_ocean  
