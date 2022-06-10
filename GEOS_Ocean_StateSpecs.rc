@@ -1,0 +1,83 @@
+schema_version: 2.0.0
+component: Ocean
+
+category: IMPORT
+#---------------------------------------------------------------------------------------------------------------------
+#  VARIABLE                  |   DIMENSIONS        |          Additional Metadata
+#---------------------------------------------------------------------------------------------------------------------
+NAME        |   UNITS        |   DIMS   |   VLOC   |   COND                        |   DATATYPE          |   LONG_NAME 
+#---------------------------------------------------------------------------------------------------------------------
+FROCEAN     |   1            |   xy     |   N      |                               |                     |   fraction_of_gridbox_covered_by_ocean 
+TAUX        |   N m-2        |   xy     |   N      |                               |                     |   Agrid_eastward_stress_on_ocean 
+TAUY        |   N m-2        |   xy     |   N      |                               |                     |   Agrid_northward_stress_on_ocean 
+PENUVR      |   W m-2        |   xy     |   N      |                               |                     |   net_downward_penetrating_direct_UV_flux 
+PENPAR      |   W m-2        |   xy     |   N      |                               |                     |   net_downward_penetrating_direct_PAR_flux 
+PENUVF      |   W m-2        |   xy     |   N      |                               |                     |   net_downward_penetrating_diffuse_UV_flux 
+PENPAF      |   W m-2        |   xy     |   N      |                               |                     |   net_downward_penetrating_diffuse_PAR_flux 
+DRNIR       |   W m-2        |   xy     |   N      |                               |                     |   net_surface_downwelling_nir_beam_flux 
+DFNIR       |   W m-2        |   xy     |   N      |                               |                     |   net_surface_downwelling_nir_diffuse_flux 
+SWHEAT      |   W m-2        |   xyz    |   C      |                               |                     |   solar_heating_rate 
+DISCHARGE   |   kg m-2 s-1   |   xy     |   N      |                               |                     |   river_discharge_at_ocean_points 
+TR          |   1            |   xyz    |   C      |   trim(OCEAN_NAME) == 'MOM'   |   MAPL_BundleItem   |   tracer_mixing_ratios 
+TRFLUX      |   X            |   xy     |   N      |   trim(OCEAN_NAME) == 'MOM'   |   MAPL_BundleItem   |   surface_fluxes_of_tracers 
+LWFLX       |   W m-2        |   xy     |   N      |                               |                     |   surface_net_downward_longwave_flux 
+SHFLX       |   W m-2        |   xy     |   N      |                               |                     |   upward_sensible_heat_flux 
+QFLUX       |   kg m-2 s-1   |   xy     |   N      |                               |                     |   evaporation 
+SNOW        |   kg m-2 s-1   |   xy     |   N      |                               |                     |   ocean_snowfall 
+RAIN        |   kg m-2 s-1   |   xy     |   N      |                               |                     |   ocean_rainfall 
+FRESH       |   kg m-2 s-1   |   xy     |   N      |                               |                     |   fresh_water_flux_due_to_ice_dynamics 
+FSALT       |   kg m-2 s-1   |   xy     |   N      |                               |                     |   salt_flux_due_to_ice_dynamics 
+FHOCN       |   W m-2        |   xy     |   N      |                               |                     |   heat_flux_due_to_ice_dynamics 
+PEN_OCN     |   W m-2        |   xy     |   N      |                               |                     |   penetrated_shortwave_flux_at_the_bottom_of_first_ocean_model_layer 
+FRACICEd    |   1            |   xy     |   N      |   dual_ocean                  |                     |   fractional_cover_of_seaice 
+
+category: INTERNAL
+#---------------------------------------------------------------------------------------------
+#  VARIABLE            |   DIMENSIONS        |          Additional Metadata
+#---------------------------------------------------------------------------------------------
+NAME       |   UNITS   |   DIMS   |   VLOC   |   FRIENDLYTO        |   DEFAULT   |   LONG_NAME  
+#---------------------------------------------------------------------------------------------
+TS_FOUND   |   K       |   xy     |   N      |   trim(COMP_NAME)   |   280.0     |   foundation_temperature_for_interface_layer  
+
+category: EXPORT
+#---------------------------------------------------------------------------------------------
+#  VARIABLE                  |   DIMENSIONS        |   Additional Metadata
+#---------------------------------------------------------------------------------------------
+NAME        |   UNITS        |   DIMS   |   VLOC   |   LONG_NAME
+#---------------------------------------------------------------------------------------------
+MASKO       |   1            |   xy     |   N      |   ocean_mask  
+SS_FOUND    |   PSU          |   xy     |   N      |   foundation_salinity_for_interface_layer  
+FRZMLT      |   W m-2        |   xy     |   N      |   freeze_melt_potential  
+TAUX        |   N m-2        |   xy     |   N      |   Agrid_eastward_stress_on_ocean  
+TAUY        |   N m-2        |   xy     |   N      |   Agrid_northward_stress_on_ocean  
+SWHEAT      |   W m-2        |   xyz    |   C      |   solar_heating_rate  
+RFLUX       |   W m-2        |   xy     |   N      |   downward_radiative_heat_flux_at_ocean_bottom  
+DISCHARGE   |   kg m-2 s-1   |   xy     |   N      |   river_discharge_at_ocean_points  
+FROCEAN     |   1            |   xy     |   N      |   fraction_of_gridbox_covered_by_ocean  
+LWFLX       |   W m-2        |   xy     |   N      |   surface_net_downward_longwave_flux  
+SWFLX       |   W m-2        |   xy     |   N      |   surface_net_downward_shortwave_flux  
+SHFLX       |   W m-2        |   xy     |   N      |   upward_sensible_heat_flux  
+QFLUX       |   kg m-2 s-1   |   xy     |   N      |   evaporation  
+SFLX        |   kg m-2 s-1   |   xy     |   N      |   salt_flux_due_to_ice_dynamics  
+RAIN        |   kg m-2 s-1   |   xy     |   N      |   ocean_rainfall  
+SNOW        |   kg m-2 s-1   |   xy     |   N      |   ocean_snowfall  
+PEN_OCN     |   W m-2        |   xy     |   N      |   penetrated_shortwave_flux_at_the_bottom_of_first_ocean_model_layer  
+
+! category: EXPORT
+#---------------------------------------------------------------------------------------------
+#  VARIABLE           |          Additional Metadata
+#---------------------------------------------------------------------------------------------
+NAME   |   CHILD_ID   |   COND
+#---------------------------------------------------------------------------------------------
+TW     |   OCN        |   
+SW     |   OCN        |   
+UW     |   OCN        |   
+VW     |   OCN        |   
+DH     |   OCN        |   DO_DATASEA==0
+UWB    |   OCN        |   DO_DATASEA==0
+VWB    |   OCN        |   DO_DATASEA==0
+SSH    |   OCN        |   DO_DATASEA==0 .AND. trim(OCEAN_NAME) == 'MOM'
+SLV    |   OCN        |   DO_DATASEA==0
+PBO    |   OCN        |   DO_DATASEA==0 .AND. trim(OCEAN_NAME) == 'MOM'
+T      |   OCN        |   DO_DATASEA==0
+S      |   OCN        |   DO_DATASEA==0
