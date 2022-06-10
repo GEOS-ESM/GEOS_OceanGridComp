@@ -535,77 +535,77 @@ contains
 !          VLOCATION          = MAPL_VLocationNone,                  &    
 !          RC=STATUS  )
 !     VERIFY_(STATUS)
-!
-!! Exports of child
-!
-!    call MAPL_AddExportSpec ( GC   ,                          &
-!         SHORT_NAME = 'TW',                                        &
-!         CHILD_ID   = OCN,                                         &
-!                                                        RC=STATUS  )
-!    VERIFY_(STATUS)
-!    call MAPL_AddExportSpec ( GC   ,                          &
-!         SHORT_NAME = 'SW',                                        &
-!         CHILD_ID   = OCN,                                         &
-!                                                        RC=STATUS  )
-!    VERIFY_(STATUS)
-!    call MAPL_AddExportSpec ( GC   ,                          &
-!         SHORT_NAME = 'UW',                                        &
-!         CHILD_ID   = OCN,                                         &
-!                                                        RC=STATUS  )
-!    VERIFY_(STATUS)
-!    call MAPL_AddExportSpec ( GC   ,                          &
-!         SHORT_NAME = 'VW',                                        &
-!         CHILD_ID   = OCN,                                         &
-!                                                        RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    if(DO_DATASEA==0) then
-!       call MAPL_AddExportSpec ( GC   ,                          &
-!            SHORT_NAME = 'DH',                                        &
-!            CHILD_ID   = OCN,                                         &
-!            RC=STATUS  )
-!       VERIFY_(STATUS)
-!       call MAPL_AddExportSpec ( GC   ,                          &
-!            SHORT_NAME = 'UWB',                                        &
-!            CHILD_ID   = OCN,                                         &
-!            RC=STATUS  )
-!       VERIFY_(STATUS)
-!       call MAPL_AddExportSpec ( GC   ,                          &
-!            SHORT_NAME = 'VWB',                                        &
-!            CHILD_ID   = OCN,                                         &
-!            RC=STATUS  )
-!       VERIFY_(STATUS)
-!       if (trim(OCEAN_NAME) == "MOM") then
-!          call MAPL_AddExportSpec ( GC   ,                          &
-!               SHORT_NAME = 'SSH',                                       &
-!               CHILD_ID   = OCN,                                         &
-!               RC=STATUS  )
-!          VERIFY_(STATUS)
-!       endif
-!       call MAPL_AddExportSpec ( GC   ,                          &
-!            SHORT_NAME = 'SLV',                                       &
-!            CHILD_ID   = OCN,                                         &
-!            RC=STATUS  )
-!       VERIFY_(STATUS)
-!       if (trim(OCEAN_NAME) == "MOM") then
-!          call MAPL_AddExportSpec ( GC   ,                               &
-!               SHORT_NAME = 'PBO',                                       &
-!               CHILD_ID   = OCN,                                         &
-!               RC=STATUS  )
-!          VERIFY_(STATUS)
-!       endif
-!
-!       call MAPL_AddExportSpec ( GC   ,                          &
-!            SHORT_NAME = 'T',                                         &
-!            CHILD_ID   = OCN,                                         &
-!            RC=STATUS  )
-!       VERIFY_(STATUS)
-!       call MAPL_AddExportSpec ( GC   ,                          &
-!            SHORT_NAME = 'S',                                         &
-!            CHILD_ID   = OCN,                                         &
-!            RC=STATUS  )
-!       VERIFY_(STATUS)
-!    end if
+
+! Exports of child
+
+    call MAPL_AddExportSpec ( GC   ,                          &
+         SHORT_NAME = 'TW',                                        &
+         CHILD_ID   = OCN,                                         &
+                                                        RC=STATUS  )
+    VERIFY_(STATUS)
+    call MAPL_AddExportSpec ( GC   ,                          &
+         SHORT_NAME = 'SW',                                        &
+         CHILD_ID   = OCN,                                         &
+                                                        RC=STATUS  )
+    VERIFY_(STATUS)
+    call MAPL_AddExportSpec ( GC   ,                          &
+         SHORT_NAME = 'UW',                                        &
+         CHILD_ID   = OCN,                                         &
+                                                        RC=STATUS  )
+    VERIFY_(STATUS)
+    call MAPL_AddExportSpec ( GC   ,                          &
+         SHORT_NAME = 'VW',                                        &
+         CHILD_ID   = OCN,                                         &
+                                                        RC=STATUS  )
+    VERIFY_(STATUS)
+
+    if(DO_DATASEA==0) then
+       call MAPL_AddExportSpec ( GC   ,                          &
+            SHORT_NAME = 'DH',                                        &
+            CHILD_ID   = OCN,                                         &
+            RC=STATUS  )
+       VERIFY_(STATUS)
+       call MAPL_AddExportSpec ( GC   ,                          &
+            SHORT_NAME = 'UWB',                                        &
+            CHILD_ID   = OCN,                                         &
+            RC=STATUS  )
+       VERIFY_(STATUS)
+       call MAPL_AddExportSpec ( GC   ,                          &
+            SHORT_NAME = 'VWB',                                        &
+            CHILD_ID   = OCN,                                         &
+            RC=STATUS  )
+       VERIFY_(STATUS)
+       if (trim(OCEAN_NAME) == "MOM") then
+          call MAPL_AddExportSpec ( GC   ,                          &
+               SHORT_NAME = 'SSH',                                       &
+               CHILD_ID   = OCN,                                         &
+               RC=STATUS  )
+          VERIFY_(STATUS)
+       endif
+       call MAPL_AddExportSpec ( GC   ,                          &
+            SHORT_NAME = 'SLV',                                       &
+            CHILD_ID   = OCN,                                         &
+            RC=STATUS  )
+       VERIFY_(STATUS)
+       if (trim(OCEAN_NAME) == "MOM") then
+          call MAPL_AddExportSpec ( GC   ,                               &
+               SHORT_NAME = 'PBO',                                       &
+               CHILD_ID   = OCN,                                         &
+               RC=STATUS  )
+          VERIFY_(STATUS)
+       endif
+
+       call MAPL_AddExportSpec ( GC   ,                          &
+            SHORT_NAME = 'T',                                         &
+            CHILD_ID   = OCN,                                         &
+            RC=STATUS  )
+       VERIFY_(STATUS)
+       call MAPL_AddExportSpec ( GC   ,                          &
+            SHORT_NAME = 'S',                                         &
+            CHILD_ID   = OCN,                                         &
+            RC=STATUS  )
+       VERIFY_(STATUS)
+    end if
 
 !EOS
 
@@ -813,7 +813,6 @@ contains
     VERIFY_(STATUS)
     call MAPL_TimerOn (STATE,"TOTAL"     )
   
-    ! This may not be suitable for ACG GetPointer include files. WDB
     if(DO_DATASEA==0) then
        call MAPL_GetPointer(EXPORT, MASKO, 'MASKO'  , alloc=.true.,__RC__)
 
@@ -943,17 +942,17 @@ contains
 !    real, pointer :: SFLX(:,:)
 !    real, pointer :: FI(:,:)
 !    real, pointer :: FId(:,:)
-!
-!! Pointers to exports of child
-!
-!    real, pointer :: TW  (:,:)
-!    real, pointer :: SW  (:,:)
-!    real, pointer ::   MASK(:,:)
-!    real, pointer :: MASK3D(:,:,:)
-!    real, pointer :: FRZMLT(:,:)
-!
-!    real, pointer :: TWd  (:,:)
-!    real, pointer :: DEL_TEMP (:,:)
+
+! Pointers to exports of child
+
+    real, pointer :: TW  (:,:)
+    real, pointer :: SW  (:,:)
+    real, pointer ::   MASK(:,:)
+    real, pointer :: MASK3D(:,:,:)
+    real, pointer :: FRZMLT(:,:)
+
+    real, pointer :: TWd  (:,:)
+    real, pointer :: DEL_TEMP (:,:)
 
 ! Locals
 
@@ -1050,7 +1049,6 @@ contains
 
 ! We get the ocean-land mask (now computed in Initialize of Plug)
 ! ---------------------------------------------------------------
-       ! This is a special case of GetPointer. May not be suitable for ACG include. WDB
        if(DO_DATASEA==0) then
           select case(trim(OCEAN_NAME))
              case ("MOM")
@@ -1122,18 +1120,18 @@ contains
 !
 !       call MAPL_GetPointer(IMPORT, PEN_OCN, 'PEN_OCN',RC=STATUS); VERIFY_(STATUS)
 !
-!       call MAPL_GetPointer(GEX(OCN), TW,   'TW'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(GEX(OCN), SW,   'SW'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
-!
-!       if (dual_ocean) then
-!          call MAPL_GetPointer(GEX(OCNd), TWd,   'TW'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(IMPORT, FId, 'FRACICEd'   , RC=STATUS); VERIFY_(STATUS)
-!       end if
-!       
-!       if(DO_DATASEA==0) then
-!          call MAPL_GetPointer(GEX(OCN), FRZMLT,   'FRZMLT'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
-!       end if
-!
+       call MAPL_GetPointer(GEX(OCN), TW,   'TW'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(GEX(OCN), SW,   'SW'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
+
+       if (dual_ocean) then
+          call MAPL_GetPointer(GEX(OCNd), TWd,   'TW'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(IMPORT, FId, 'FRACICEd'   , RC=STATUS); VERIFY_(STATUS)
+       end if
+       
+       if(DO_DATASEA==0) then
+          call MAPL_GetPointer(GEX(OCN), FRZMLT,   'FRZMLT'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
+       end if
+
 !! Get pointers to exports
 !!--------------------------------------------------------
 !
@@ -1265,7 +1263,6 @@ contains
              end if
           end if
 
-          ! This may not be suitable for ACG GetPointer include files. WDB
           if (DUAL_OCEAN .and. PHASE == 1) then
              ! calculate temperature correction to send back to MOM
              call MAPL_GetPointer(GIM(OCN), DEL_TEMP, 'DEL_TEMP', RC=STATUS)
