@@ -873,7 +873,7 @@ contains
     type (ESMF_State       ), pointer   :: GEX(:)
 
 ! Pointers to Imports, Exports, Internal
-#include "GEOS_Ocean_DeclarePointers___.h"
+#include "GEOS_Ocean_DeclarePointer___.h"
 
 ! Pointers to Imports
 
@@ -1073,7 +1073,7 @@ contains
        VERIFY_(status)
 
 ! ACG GetPointer include
-#include "GEOS_Ocean_GetPointers___.h"
+#include "GEOS_Ocean_GetPointer___.h"
 
 !! Get pointers to imports
 !!--------------------------------------------------------------------------------
