@@ -484,9 +484,6 @@ contains
     type (ESMF_State       ), pointer   :: GIM(:)
     type (ESMF_State       ), pointer   :: GEX(:)
 
-! Pointers to Imports, Exports, Internal
-!#include "GEOS_Ocean_DeclarePointer___.h"
-
 ! Pointers to Imports
 
     real, pointer :: FROCEAN(:,:)
@@ -683,9 +680,6 @@ contains
        VERIFY_(status)
        call MAPL_GetResource(STATE,DT,  Label="OCEAN_DT:",  DEFAULT=DT, RC=STATUS) ! set Default OCEAN_DT to AGCM Heartbeat
        VERIFY_(status)
-
-! ACG GetPointer include
-#include "GEOS_Ocean_GetPointer___.h"
 
 ! Get pointers to imports
 !--------------------------------------------------------------------------------
