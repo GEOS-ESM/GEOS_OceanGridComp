@@ -148,394 +148,6 @@ contains
 #include "GEOS_Ocean_Export___.h"
 #include "GEOS_Ocean_Internal___.h"
 
-!  !IMPORT STATE:
-
-!    call MAPL_AddImportSpec(GC,                               &
-!         SHORT_NAME         = 'FROCEAN',                           &
-!         LONG_NAME          = 'fraction_of_gridbox_covered_by_ocean',&
-!         UNITS              = '1',                                 &
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddImportSpec(GC,                               &
-!         SHORT_NAME         = 'TAUX',                              &
-!         LONG_NAME          = 'Agrid_eastward_stress_on_ocean',     &
-!         UNITS              = 'N m-2',                             &
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddImportSpec(GC,                               &
-!         SHORT_NAME         = 'TAUY',                              &
-!         LONG_NAME          = 'Agrid_northward_stress_on_ocean',    &
-!         UNITS              = 'N m-2',                             &
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddImportSpec(GC,                               &
-!        SHORT_NAME         = 'PENUVR',                            &
-!        LONG_NAME          = 'net_downward_penetrating_direct_UV_flux',  &
-!        UNITS              = 'W m-2',                             &
-!        DIMS               = MAPL_DimsHorzOnly,                   &
-!        VLOCATION          = MAPL_VLocationNone,                  &
-!        RC=STATUS  )
-!     VERIFY_(STATUS)
-!
-!    call MAPL_AddImportSpec(GC,                            &
-!        SHORT_NAME         = 'PENPAR',                            &
-!        LONG_NAME          = 'net_downward_penetrating_direct_PAR_flux', &
-!        UNITS              = 'W m-2',                             &
-!        DIMS               = MAPL_DimsHorzOnly,                   &
-!        VLOCATION          = MAPL_VLocationNone,                  &
-!                                                   RC=STATUS  )
-!  VERIFY_(STATUS)
-!
-!  call MAPL_AddImportSpec(GC,                                &
-!        SHORT_NAME         = 'PENUVF',                            &
-!        LONG_NAME          = 'net_downward_penetrating_diffuse_UV_flux',  &
-!        UNITS              = 'W m-2',                             &
-!    DIMS               = MAPL_DimsHorzOnly,                   &
-!    VLOCATION          = MAPL_VLocationNone,                  &
-!                                                       RC=STATUS  )
-!  VERIFY_(STATUS)
-!
-!  call MAPL_AddImportSpec(GC,                                &
-!        SHORT_NAME         = 'PENPAF',                            &
-!        LONG_NAME          = 'net_downward_penetrating_diffuse_PAR_flux', &
-!        UNITS              = 'W m-2',                             &
-!    DIMS               = MAPL_DimsHorzOnly,                   &
-!    VLOCATION          = MAPL_VLocationNone,                  &
-!                                                       RC=STATUS  )
-!  VERIFY_(STATUS)
-!
-!    call MAPL_AddImportSpec(GC,                               &
-!          LONG_NAME          = 'net_surface_downwelling_nir_beam_flux',&
-!          UNITS              = 'W m-2'                       ,&
-!          SHORT_NAME         = 'DRNIR'                       ,&
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddImportSpec(GC,                               &
-!          LONG_NAME          = 'net_surface_downwelling_nir_diffuse_flux',&
-!          UNITS              = 'W m-2'                       ,&
-!          SHORT_NAME         = 'DFNIR'                       ,&
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddImportSpec(GC,                               &
-!          SHORT_NAME         = 'SWHEAT',                            &
-!          LONG_NAME          = 'solar_heating_rate',                &
-!          UNITS              = 'W m-2',                             &
-!          DIMS               = MAPL_DimsHorzVert,                   &
-!          VLOCATION          = MAPL_VLocationCenter,                &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddImportSpec(GC,                               &
-!          LONG_NAME          = 'river_discharge_at_ocean_points',&
-!          UNITS              = 'kg m-2 s-1'                ,&
-!          SHORT_NAME         = 'DISCHARGE'                   ,&
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    if (trim(OCEAN_NAME) == "MOM") then
-!       call MAPL_AddImportSpec(GC,                             &
-!           SHORT_NAME         = 'TR',                                &
-!           LONG_NAME          = 'tracer_mixing_ratios',              &
-!           UNITS              = '1',                                 &
-!           DIMS               = MAPL_DimsHorzVert,                   &
-!           VLOCATION          = MAPL_VLocationCenter,                &
-!           DATATYPE           = MAPL_BundleItem,                     &
-!                                                          RC=STATUS  )
-!       VERIFY_(STATUS)
-!   
-!       call MAPL_AddImportSpec(GC,                             &
-!           SHORT_NAME         = 'TRFLUX',                            &
-!           LONG_NAME          = 'surface_fluxes_of_tracers',         &
-!           UNITS              = 'X',                                 &
-!           DIMS               = MAPL_DimsHorzOnly,                   &
-!           VLOCATION          = MAPL_VLocationNone,                  &
-!           DATATYPE           = MAPL_BundleItem,                     &
-!                                                          RC=STATUS  )
-!       VERIFY_(STATUS)
-!    endif
-!
-!    call MAPL_AddImportSpec(GC,                             &
-!        LONG_NAME          = 'surface_net_downward_longwave_flux',&
-!        UNITS              = 'W m-2',                             &
-!        SHORT_NAME         = 'LWFLX'                   ,&
-!        DIMS               = MAPL_DimsHorzOnly,                   &
-!        VLOCATION          = MAPL_VLocationNone,                  &
-!                                                       RC=STATUS  )
-!     VERIFY_(STATUS)
-!
-!     call MAPL_AddImportSpec(GC,                             &
-!        LONG_NAME          = 'upward_sensible_heat_flux' ,&
-!        UNITS              = 'W m-2',                             &
-!        SHORT_NAME         = 'SHFLX'                     ,&
-!        DIMS               = MAPL_DimsHorzOnly,                   &
-!        VLOCATION          = MAPL_VLocationNone,                  &
-!                                                       RC=STATUS  )
-!     VERIFY_(STATUS)
-!
-!     call MAPL_AddImportSpec(GC,                             &
-!        LONG_NAME          = 'evaporation'               ,&
-!        UNITS              = 'kg m-2 s-1'                ,&
-!        SHORT_NAME         = 'QFLUX'                   ,&
-!        DIMS               = MAPL_DimsHorzOnly,                   &
-!        VLOCATION          = MAPL_VLocationNone,                  &
-!                                                       RC=STATUS  )
-!     VERIFY_(STATUS)
-!
-!     call MAPL_AddImportSpec(GC,                             &
-!        LONG_NAME          = 'ocean_snowfall'            ,&
-!        UNITS              = 'kg m-2 s-1'                ,&
-!        SHORT_NAME         = 'SNOW'                   ,&
-!        DIMS               = MAPL_DimsHorzOnly,                   &
-!        VLOCATION          = MAPL_VLocationNone,                  &
-!                                                       RC=STATUS  )
-!     VERIFY_(STATUS)
-!
-!     call MAPL_AddImportSpec(GC,                               &
-!        LONG_NAME          = 'ocean_rainfall'            ,&
-!        UNITS              = 'kg m-2 s-1'                ,&
-!        SHORT_NAME         = 'RAIN'                   ,&
-!        DIMS               = MAPL_DimsHorzOnly           ,&
-!        VLOCATION          = MAPL_VLocationNone          ,&
-!          RC=STATUS  )
-!     VERIFY_(STATUS)
-!
-!     call MAPL_AddImportSpec(GC,                    &
-!        SHORT_NAME         = 'FRESH',                         &
-!        LONG_NAME          = 'fresh_water_flux_due_to_ice_dynamics', &
-!          UNITS              = 'kg m-2 s-1'                ,&
-!          DIMS               = MAPL_DimsHorzOnly           ,&
-!          VLOCATION          = MAPL_VLocationNone          ,&
-!          RC=STATUS  )
-!     VERIFY_(STATUS)
-!
-!     call MAPL_AddImportSpec(GC,                             &
-!        SHORT_NAME         = 'FSALT',                         &
-!        LONG_NAME          = 'salt_flux_due_to_ice_dynamics', &
-!        UNITS              = 'kg m-2 s-1',                            &
-!        DIMS               = MAPL_DimsHorzOnly,                   &
-!        VLOCATION          = MAPL_VLocationNone,                  &
-!                                                       RC=STATUS  )
-!     VERIFY_(STATUS)
-!
-!     call MAPL_AddImportSpec(GC,                             &
-!        SHORT_NAME         = 'FHOCN',                         &
-!        LONG_NAME          = 'heat_flux_due_to_ice_dynamics', &
-!        UNITS              = 'W m-2',                            &
-!        DIMS               = MAPL_DimsHorzOnly,                   &
-!        VLOCATION          = MAPL_VLocationNone,                  &
-!        RC=STATUS  )
-!     VERIFY_(STATUS)
-!
-!     call MAPL_AddImportSpec(GC,                                  &
-!        SHORT_NAME         = 'PEN_OCN',                           &
-!        LONG_NAME          = 'penetrated_shortwave_flux_at_the_bottom_of_first_ocean_model_layer',     &
-!        UNITS              = 'W m-2',                             &
-!        DIMS               = MAPL_DimsHorzOnly,                   &
-!        VLOCATION          = MAPL_VLocationNone,                  &
-!        RC=STATUS  )
-!     VERIFY_(STATUS)
-!
-!    if (dual_ocean) then
-!       call MAPL_AddImportSpec(GC,                            &
-!         SHORT_NAME         = 'FRACICEd',                           &
-!         LONG_NAME          = 'fractional_cover_of_seaice',        &
-!         UNITS              = '1',                                 &
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!       VERIFY_(STATUS)
-!    endif
-!
-!!  ! Need to have this internal state to fill in orphan points:
-!
-!    call MAPL_AddInternalSpec(GC,                                 &
-!         SHORT_NAME         = 'TS_FOUND',                          &
-!         LONG_NAME          = 'foundation_temperature_for_interface_layer',&
-!         UNITS              = 'K',                                 &
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         FRIENDLYTO         = trim(COMP_NAME), &
-!         DEFAULT            = 280.0, &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!!ALT Note the FRACICE from datasea is inhereted (in AMIP or dual_ocean)
-!
-!!  !EXPORT STATE:
-!
-!    call MAPL_AddExportSpec(GC,                                    &
-!         SHORT_NAME         = 'MASKO',                             &
-!         LONG_NAME          = 'ocean_mask',                        &
-!         UNITS              = '1',                                 &
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!
-!    call MAPL_AddExportSpec(GC,                               &
-!         SHORT_NAME         = 'SS_FOUND',                          &
-!         LONG_NAME          = 'foundation_salinity_for_interface_layer',&
-!         UNITS              = 'PSU',                                 &
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddExportSpec(GC,                               &
-!         SHORT_NAME         = 'FRZMLT',                            &
-!         LONG_NAME          = 'freeze_melt_potential',             &
-!         UNITS              = 'W m-2',                             &
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!! Diagnostics exports
-!
-!    call MAPL_AddExportSpec(GC,                               &
-!         SHORT_NAME         = 'TAUX',                              &
-!         LONG_NAME          = 'Agrid_eastward_stress_on_ocean',     &
-!         UNITS              = 'N m-2',                             &
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddExportSpec(GC,                               &
-!         SHORT_NAME         = 'TAUY',                              &
-!         LONG_NAME          = 'Agrid_northward_stress_on_ocean',    &
-!         UNITS              = 'N m-2',                             &
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddExportSpec(GC,                               &
-!         SHORT_NAME         = 'SWHEAT',                            &
-!         LONG_NAME          = 'solar_heating_rate',                &
-!         UNITS              = 'W m-2',                             &
-!         DIMS               = MAPL_DimsHorzVert,                   &
-!         VLOCATION          = MAPL_VLocationCenter,                &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddExportSpec(GC,                               &
-!         SHORT_NAME         = 'RFLUX',                             &
-!         LONG_NAME          = 'downward_radiative_heat_flux_at_ocean_bottom',&
-!         UNITS              = 'W m-2',                             &
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddExportSpec(GC,                               &
-!         LONG_NAME          = 'river_discharge_at_ocean_points',&
-!         UNITS              = 'kg m-2 s-1'                ,&
-!         SHORT_NAME         = 'DISCHARGE'                 ,&
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddExportSpec(GC,                               &
-!         SHORT_NAME         = 'FROCEAN',                           &
-!         LONG_NAME          = 'fraction_of_gridbox_covered_by_ocean',&
-!         UNITS              = '1',                                 &
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddExportSpec(GC,                               &
-!        LONG_NAME          = 'surface_net_downward_longwave_flux',&
-!        UNITS              = 'W m-2'                     ,&
-!        SHORT_NAME         = 'LWFLX'                   ,&
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddExportSpec(GC,                               &
-!        LONG_NAME          = 'surface_net_downward_shortwave_flux',&
-!        UNITS              = 'W m-2'                     ,&
-!        SHORT_NAME         = 'SWFLX'                   ,&
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddExportSpec(GC,                               &
-!        LONG_NAME          = 'upward_sensible_heat_flux' ,&
-!         UNITS              = 'W m-2',                             &
-!        SHORT_NAME         = 'SHFLX'                     ,&
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddExportSpec(GC,                               &
-!        LONG_NAME          = 'evaporation'               ,&
-!        UNITS              = 'kg m-2 s-1'                ,&
-!        SHORT_NAME         = 'QFLUX'                   ,&
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddExportSpec(GC,                               &
-!        SHORT_NAME         = 'SFLX',                         &
-!        LONG_NAME          = 'salt_flux_due_to_ice_dynamics', &
-!        UNITS              = 'kg m-2 s-1',                            &
-!         DIMS               = MAPL_DimsHorzOnly,                   &
-!         VLOCATION          = MAPL_VLocationNone,                  &
-!         RC=STATUS  )
-!    VERIFY_(STATUS)
-!
-!    call MAPL_AddExportSpec(GC,                               &
-!          SHORT_NAME         = 'RAIN',                              &
-!          LONG_NAME          = 'ocean_rainfall',&
-!          UNITS              = 'kg m-2 s-1',                        &
-!          DIMS               = MAPL_DimsHorzOnly,                   &
-!          VLOCATION          = MAPL_VLocationNone,                  &
-!          RC=STATUS  )
-!     VERIFY_(STATUS)
-!
-!    call MAPL_AddExportSpec(GC,                                 &
-!          SHORT_NAME         = 'SNOW',                              &
-!          LONG_NAME          = 'ocean_snowfall',&
-!          UNITS              = 'kg m-2 s-1',                        &
-!          DIMS               = MAPL_DimsHorzOnly,                   &
-!          VLOCATION          = MAPL_VLocationNone,                  &
-!          RC=STATUS  )
-!     VERIFY_(STATUS)
-!
-!    call MAPL_AddExportSpec(GC,                                     &    
-!          SHORT_NAME         = 'PEN_OCN',                           &    
-!          LONG_NAME          = 'penetrated_shortwave_flux_at_the_bottom_of_first_ocean_model_layer',&
-!          UNITS              = 'W m-2',                             &    
-!          DIMS               = MAPL_DimsHorzOnly,                   &    
-!          VLOCATION          = MAPL_VLocationNone,                  &    
-!          RC=STATUS  )
-!     VERIFY_(STATUS)
-
 ! Exports of child
 
     call MAPL_AddExportSpec ( GC   ,                          &
@@ -873,75 +485,75 @@ contains
     type (ESMF_State       ), pointer   :: GEX(:)
 
 ! Pointers to Imports, Exports, Internal
-#include "GEOS_Ocean_DeclarePointer___.h"
+!#include "GEOS_Ocean_DeclarePointer___.h"
 
 ! Pointers to Imports
 
-!    real, pointer :: FROCEAN(:,:)
-!    real, pointer :: TAUXi(:,:)
-!    real, pointer :: TAUYi(:,:)
-!    real, pointer :: PENUVRi(:,:)
-!    real, pointer :: PENPARi(:,:)
-!    real, pointer :: PENUVFi(:,:)
-!    real, pointer :: PENPAFi(:,:)
-!    real, pointer :: DRNIRi(:,:)
-!    real, pointer :: DFNIRi(:,:)
-!    real, pointer :: HEATi(:,:,:)
-!    real, pointer :: DISCHARGEi(:,:)
-!    real, pointer :: LWFLXi(:,:)
-!    real, pointer :: SHFLXi(:,:)
-!    real, pointer :: QFLUXi(:,:)
-!    real, pointer :: SNOWi(:,:)
-!    real, pointer :: RAINi(:,:)
-!    real, pointer :: FHOCN(:,:)
-!    real, pointer :: FRESH(:,:)
-!    real, pointer :: FSALT(:,:)
-!    real, pointer :: PEN_OCN(:,:)
+    real, pointer :: FROCEAN(:,:)
+    real, pointer :: TAUXi(:,:)
+    real, pointer :: TAUYi(:,:)
+    real, pointer :: PENUVRi(:,:)
+    real, pointer :: PENPARi(:,:)
+    real, pointer :: PENUVFi(:,:)
+    real, pointer :: PENPAFi(:,:)
+    real, pointer :: DRNIRi(:,:)
+    real, pointer :: DFNIRi(:,:)
+    real, pointer :: HEATi(:,:,:)
+    real, pointer :: DISCHARGEi(:,:)
+    real, pointer :: LWFLXi(:,:)
+    real, pointer :: SHFLXi(:,:)
+    real, pointer :: QFLUXi(:,:)
+    real, pointer :: SNOWi(:,:)
+    real, pointer :: RAINi(:,:)
+    real, pointer :: FHOCN(:,:)
+    real, pointer :: FRESH(:,:)
+    real, pointer :: FSALT(:,:)
+    real, pointer :: PEN_OCN(:,:)
 
 ! Pointers to Exports
 
-!    real, pointer :: TS_FOUND (:,:)
-!    real, pointer :: SS_FOUND (:,:)
-!    real, pointer :: FRZMLTe(:,:)
+    real, pointer :: TS_FOUND (:,:)
+    real, pointer :: SS_FOUND (:,:)
+    real, pointer :: FRZMLTe(:,:)
 
 ! Diagnostics exports
 
-!    real, pointer :: RFLUX (:,:)
-!    real, pointer :: TAUXe (:,:)
-!    real, pointer :: TAUYe (:,:)
-!    real, pointer :: HEATe (:,:,:)
-!    real, pointer :: FROCEANe (:,:)
-!    real, pointer :: DISCHARGEe(:,:)
-!    real, pointer :: LWFLXe(:,:)
-!    real, pointer :: SWFLXe(:,:)
-!    real, pointer :: SHFLXe(:,:)
-!    real, pointer :: QFLUXe(:,:)
-!    real, pointer :: RAINe(:,:)
-!    real, pointer :: SNOWe(:,:)
-!    real, pointer :: SFLXe(:,:)
-!    real, pointer :: PEN_OCNe(:,:)
+    real, pointer :: RFLUX (:,:)
+    real, pointer :: TAUXe (:,:)
+    real, pointer :: TAUYe (:,:)
+    real, pointer :: HEATe (:,:,:)
+    real, pointer :: FROCEANe (:,:)
+    real, pointer :: DISCHARGEe(:,:)
+    real, pointer :: LWFLXe(:,:)
+    real, pointer :: SWFLXe(:,:)
+    real, pointer :: SHFLXe(:,:)
+    real, pointer :: QFLUXe(:,:)
+    real, pointer :: RAINe(:,:)
+    real, pointer :: SNOWe(:,:)
+    real, pointer :: SFLXe(:,:)
+    real, pointer :: PEN_OCNe(:,:)
 
 
 ! Pointers to imports of child
 
-!    real, pointer :: TAUX(:,:)
-!    real, pointer :: TAUY(:,:)
-!    real, pointer :: PENUVR(:,:)
-!    real, pointer :: PENPAR(:,:)
-!    real, pointer :: PENUVF(:,:)
-!    real, pointer :: PENPAF(:,:)
-!    real, pointer :: DRNIR(:,:)
-!    real, pointer :: DFNIR(:,:)
-!    real, pointer :: HEAT(:,:,:)
-!    real, pointer :: DISCHARGE(:,:)
-!    real, pointer :: LWFLX(:,:)
-!    real, pointer :: SHFLX(:,:)
-!    real, pointer :: QFLUX(:,:)
-!    real, pointer :: RAIN(:,:)
-!    real, pointer :: SNOW(:,:)
-!    real, pointer :: SFLX(:,:)
-!    real, pointer :: FI(:,:)
-!    real, pointer :: FId(:,:)
+    real, pointer :: TAUX(:,:)
+    real, pointer :: TAUY(:,:)
+    real, pointer :: PENUVR(:,:)
+    real, pointer :: PENPAR(:,:)
+    real, pointer :: PENUVF(:,:)
+    real, pointer :: PENPAF(:,:)
+    real, pointer :: DRNIR(:,:)
+    real, pointer :: DFNIR(:,:)
+    real, pointer :: HEAT(:,:,:)
+    real, pointer :: DISCHARGE(:,:)
+    real, pointer :: LWFLX(:,:)
+    real, pointer :: SHFLX(:,:)
+    real, pointer :: QFLUX(:,:)
+    real, pointer :: RAIN(:,:)
+    real, pointer :: SNOW(:,:)
+    real, pointer :: SFLX(:,:)
+    real, pointer :: FI(:,:)
+    real, pointer :: FId(:,:)
 
 ! Pointers to exports of child
 
@@ -1075,51 +687,51 @@ contains
 ! ACG GetPointer include
 #include "GEOS_Ocean_GetPointer___.h"
 
-!! Get pointers to imports
-!!--------------------------------------------------------------------------------
-!       call MAPL_GetPointer(IMPORT, FROCEAN, 'FROCEAN', RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, TAUXi, 'TAUX'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, TAUYi, 'TAUY'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, PENUVRi, 'PENUVR'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, PENPARi, 'PENPAR'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, PENUVFi, 'PENUVF'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, PENPAFi, 'PENPAF'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, DRNIRi, 'DRNIR'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, DFNIRi, 'DFNIR'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, HEATi, 'SWHEAT' , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, DISCHARGEi, 'DISCHARGE'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, LWFLXi, 'LWFLX'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, SHFLXi, 'SHFLX'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, QFLUXi, 'QFLUX'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, SNOWi, 'SNOW'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, RAINi, 'RAIN'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, FHOCN, 'FHOCN'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, FRESH, 'FRESH'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(IMPORT, FSALT, 'FSALT'   , RC=STATUS); VERIFY_(STATUS)
-!
-!! Get pointers from ImExState
-!!----------------------------
-!       if(DO_DATASEA==0) then
-!          call MAPL_GetPointer(GIM(OCN), TAUX, 'TAUX'  , RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), TAUY, 'TAUY'  , RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), PENUVR, 'PENUVR'  , RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), PENPAR, 'PENPAR'  , RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), PENUVF, 'PENUVF'  , RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), PENPAF, 'PENPAF'  , RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), DRNIR, 'DRNIR'  , RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), DFNIR, 'DFNIR'  , RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), HEAT, 'SWHEAT', RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), DISCHARGE, 'DISCHARGE'  , RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), LWFLX, 'LWFLX'  , RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), SHFLX, 'SHFLX'  , RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), QFLUX, 'QFLUX'  , RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), RAIN, 'RAIN'  , RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), SNOW, 'SNOW'  , RC=STATUS); VERIFY_(STATUS)
-!          call MAPL_GetPointer(GIM(OCN), SFLX, 'SFLX'  , RC=STATUS); VERIFY_(STATUS) ! and do not add import of PEN_OCN here since it is not used in the `plug'
-!       end if
-!
-!       call MAPL_GetPointer(IMPORT, PEN_OCN, 'PEN_OCN',RC=STATUS); VERIFY_(STATUS)
-!
+! Get pointers to imports
+!--------------------------------------------------------------------------------
+       call MAPL_GetPointer(IMPORT, FROCEAN, 'FROCEAN', RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, TAUXi, 'TAUX'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, TAUYi, 'TAUY'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, PENUVRi, 'PENUVR'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, PENPARi, 'PENPAR'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, PENUVFi, 'PENUVF'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, PENPAFi, 'PENPAF'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, DRNIRi, 'DRNIR'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, DFNIRi, 'DFNIR'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, HEATi, 'SWHEAT' , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, DISCHARGEi, 'DISCHARGE'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, LWFLXi, 'LWFLX'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, SHFLXi, 'SHFLX'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, QFLUXi, 'QFLUX'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, SNOWi, 'SNOW'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, RAINi, 'RAIN'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, FHOCN, 'FHOCN'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, FRESH, 'FRESH'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(IMPORT, FSALT, 'FSALT'   , RC=STATUS); VERIFY_(STATUS)
+
+! Get pointers from ImExState
+!----------------------------
+       if(DO_DATASEA==0) then
+          call MAPL_GetPointer(GIM(OCN), TAUX, 'TAUX'  , RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), TAUY, 'TAUY'  , RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), PENUVR, 'PENUVR'  , RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), PENPAR, 'PENPAR'  , RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), PENUVF, 'PENUVF'  , RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), PENPAF, 'PENPAF'  , RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), DRNIR, 'DRNIR'  , RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), DFNIR, 'DFNIR'  , RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), HEAT, 'SWHEAT', RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), DISCHARGE, 'DISCHARGE'  , RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), LWFLX, 'LWFLX'  , RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), SHFLX, 'SHFLX'  , RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), QFLUX, 'QFLUX'  , RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), RAIN, 'RAIN'  , RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), SNOW, 'SNOW'  , RC=STATUS); VERIFY_(STATUS)
+          call MAPL_GetPointer(GIM(OCN), SFLX, 'SFLX'  , RC=STATUS); VERIFY_(STATUS) ! and do not add import of PEN_OCN here since it is not used in the `plug'
+       end if
+
+       call MAPL_GetPointer(IMPORT, PEN_OCN, 'PEN_OCN',RC=STATUS); VERIFY_(STATUS)
+
        call MAPL_GetPointer(GEX(OCN), TW,   'TW'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
        call MAPL_GetPointer(GEX(OCN), SW,   'SW'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
 
@@ -1132,30 +744,30 @@ contains
           call MAPL_GetPointer(GEX(OCN), FRZMLT,   'FRZMLT'  , alloc=.true., RC=STATUS); VERIFY_(STATUS)
        end if
 
-!! Get pointers to exports
-!!--------------------------------------------------------
-!
-!       call MAPL_GetPointer(EXPORT, TS_FOUND,'TS_FOUND', RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, SS_FOUND,'SS_FOUND', RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, FRZMLTe,'FRZMLT', RC=STATUS); VERIFY_(STATUS)
-!
-!! Diagnostics exports
-!!---------------------------------------------------------
-!       call MAPL_GetPointer(EXPORT, RFLUX,  'RFLUX' , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, FROCEANe,'FROCEAN', RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, TAUXe, 'TAUX'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, TAUYe, 'TAUY'   , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, HEATe, 'SWHEAT' , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, DISCHARGEe, 'DISCHARGE'  , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, LWFLXe, 'LWFLX'  , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, SWFLXe, 'SWFLX'  , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, SHFLXe, 'SHFLX'  , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, QFLUXe, 'QFLUX'  , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, RAINe, 'RAIN'  , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, SNOWe, 'SNOW'  , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, SFLXe, 'SFLX'  , RC=STATUS); VERIFY_(STATUS)
-!       call MAPL_GetPointer(EXPORT, PEN_OCNe,'PEN_OCN', RC=STATUS); VERIFY_(STATUS)
-!
+! Get pointers to exports
+!--------------------------------------------------------
+
+       call MAPL_GetPointer(EXPORT, TS_FOUND,'TS_FOUND', RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, SS_FOUND,'SS_FOUND', RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, FRZMLTe,'FRZMLT', RC=STATUS); VERIFY_(STATUS)
+
+! Diagnostics exports
+!---------------------------------------------------------
+       call MAPL_GetPointer(EXPORT, RFLUX,  'RFLUX' , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, FROCEANe,'FROCEAN', RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, TAUXe, 'TAUX'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, TAUYe, 'TAUY'   , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, HEATe, 'SWHEAT' , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, DISCHARGEe, 'DISCHARGE'  , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, LWFLXe, 'LWFLX'  , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, SWFLXe, 'SWFLX'  , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, SHFLXe, 'SHFLX'  , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, QFLUXe, 'QFLUX'  , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, RAINe, 'RAIN'  , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, SNOWe, 'SNOW'  , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, SFLXe, 'SFLX'  , RC=STATUS); VERIFY_(STATUS)
+       call MAPL_GetPointer(EXPORT, PEN_OCNe,'PEN_OCN', RC=STATUS); VERIFY_(STATUS)
+
        if(associated(FROCEANe)) FROCEANe = FROCEAN
 
 ! Allocate space for temporary arrays
