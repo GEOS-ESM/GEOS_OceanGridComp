@@ -61,6 +61,7 @@ list( APPEND MOM6_SRCS
    src/core/MOM_PressureForce.F90
    src/core/MOM_PressureForce_FV.F90
    src/core/MOM_PressureForce_Montgomery.F90
+   src/core/MOM_stoch_eos.F90
    src/core/MOM_transcribe_grid.F90
    src/core/MOM_unit_tests.F90
    src/core/MOM_variables.F90
@@ -92,6 +93,7 @@ list( APPEND MOM6_SRCS
 #  src/equation_of_state/TEOS10/gsw_gibbs.f90
 #  src/equation_of_state/TEOS10/gsw_gibbs_ice.f90
 #  src/equation_of_state/TEOS10/gsw_gibbs_pt0_pt0.f90
+#  src/equation_of_state/TEOS10/gsw_mod_error_functions.f90
 #  src/equation_of_state/TEOS10/gsw_mod_freezing_poly_coefficients.f90
 #  src/equation_of_state/TEOS10/gsw_mod_gibbs_ice_coefficients.f90
 #  src/equation_of_state/TEOS10/gsw_mod_kinds.f90
@@ -209,6 +211,7 @@ list( APPEND MOM6_SRCS
    src/tracer/MOM_tracer_flow_control.F90
    src/tracer/MOM_tracer_hor_diff.F90
    src/tracer/MOM_tracer_registry.F90
+   src/tracer/MOM_tracer_types.F90
    src/tracer/MOM_tracer_Z_init.F90
    src/tracer/nw2_tracers.F90
    src/tracer/oil_tracer.F90
