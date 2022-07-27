@@ -4,7 +4,7 @@
 To use this script load appropriate python and ncl modules, edit top of MAPL_Tripolar.cdl file,
 then run it as:
 
-./mk_MAPL_Tripolar MAPL_Tripolar.cdl
+./mk_MAPL_Tripolar.py MAPL_Tripolar.cdl
 
 '''
 
@@ -12,7 +12,7 @@ import os, sys
 import numpy as np
 import netCDF4 as nc
 
-mapl_file='MAPL_Tripolar_test.nc'
+mapl_file='MAPL_Tripolar.nc'
 cdl_file=sys.argv[1]
 os.system(f'ncgen -o {mapl_file} {cdl_file}')
 
