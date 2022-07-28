@@ -35,4 +35,3 @@ data:
 	basin_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/basin_codes.nc" ;
 ```
 
-`Netcdf` version from python module does not work, `ncl` module should be loaded.
