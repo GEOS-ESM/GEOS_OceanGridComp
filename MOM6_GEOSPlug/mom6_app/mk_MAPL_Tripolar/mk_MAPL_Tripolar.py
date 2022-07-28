@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python3 
 
 '''
 To use this script load appropriate python and ncl modules, edit top of MAPL_Tripolar.cdl file,
