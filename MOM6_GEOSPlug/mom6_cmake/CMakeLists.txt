@@ -496,6 +496,9 @@ list( APPEND MOM6_SRCS
    # stochastic physics
    config_src/external/stochastic_physics/get_stochy_pattern.F90
    config_src/external/stochastic_physics/stochastic_physics.F90
+   # database comms
+   config_src/external/database_comms/database_client_interface.F90
+   config_src/external/database_comms/MOM_database_comms.F90
 )
 
 
