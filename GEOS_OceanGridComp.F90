@@ -2,6 +2,65 @@
 
 #include "MAPL_Generic.h"
 
+!# experimental dl stuff
+MODULE DLFCN
+  USE ISO_C_BINDING
+  IMPLICIT NONE
+
+  PRIVATE
+   
+  INTEGER, PARAMETER, PUBLIC :: RTLD_LAZY=1, RTLD_NOW=2, RTLD_GLOBAL=256, RTLD_LOCAL=0
+  PUBLIC :: DLOpen, DLSym, DLClose, DLError, CToFortranString
+   
+  CHARACTER(C_CHAR), DIMENSION(1), SAVE, TARGET, PUBLIC :: dummy_string="?"
+   
+  INTERFACE
+     FUNCTION DLOpen(file,mode) RESULT(handle) BIND(C,NAME="dlopen")
+       ! void *dlopen(const char *file, int mode);
+       USE ISO_C_BINDING
+       CHARACTER(C_CHAR), DIMENSION(*), INTENT(IN) :: file
+       INTEGER(C_INT), VALUE :: mode
+       TYPE(C_PTR) :: handle
+     END FUNCTION DLOpen
+     FUNCTION DLSym(handle,name) RESULT(funptr) BIND(C,NAME="dlsym")
+       ! void *dlsym(void *handle, const char *name);
+       USE ISO_C_BINDING
+       TYPE(C_PTR), VALUE :: handle
+       CHARACTER(C_CHAR), DIMENSION(*), INTENT(IN) :: name
+       TYPE(C_FUNPTR) :: funptr ! A pointer
+     END FUNCTION DLSym
+     FUNCTION DLClose(handle) RESULT(status) BIND(C,NAME="dlclose")
+       ! int dlclose(void *handle);
+       USE ISO_C_BINDING
+       TYPE(C_PTR), VALUE :: handle
+       INTEGER(C_INT) :: status
+     END FUNCTION DLClose
+     FUNCTION DLError() RESULT(error) BIND(C,NAME="dlerror")
+       ! char *dlerror(void);
+       USE ISO_C_BINDING
+       TYPE(C_PTR) :: error
+     END FUNCTION DLError
+  END INTERFACE
+      
+CONTAINS
+   
+  FUNCTION CToFortranString(cstr) RESULT(string)
+    TYPE(C_PTR), VALUE :: cstr
+    CHARACTER(C_CHAR), DIMENSION(:), POINTER :: string
+    
+    CHARACTER(KIND=C_CHAR,LEN=1024), POINTER :: error_string
+    
+    IF(C_ASSOCIATED(cstr)) THEN
+       CALL C_F_POINTER(CPTR=cstr, FPTR=error_string) ! Not really standard-conforming
+       CALL C_F_POINTER(CPTR=cstr, FPTR=string, SHAPE=[INDEX(error_string,C_NULL_CHAR)])
+    ELSE
+       string=>dummy_string
+    END IF
+   
+  END FUNCTION CToFortranString
+
+END MODULE DLFCN
+
 module GEOS_OceanGridCompMod
 
 !BOP
@@ -12,6 +71,8 @@ module GEOS_OceanGridCompMod
   use ESMF
   use MAPL
   use GEOS_DataSeaGridCompMod, only: DataSeaSetServices  => SetServices
+  USE DLFCN
+  USE ISO_C_BINDING
 
   implicit none
   private
@@ -84,6 +145,21 @@ contains
     character(len=ESMF_MAXSTR)         :: charbuf_
     character(len=ESMF_MAXSTR)         :: sharedObj
 
+    type(C_PTR) :: handle
+    type(C_FUNPTR) :: funptr ! A pointer
+    character(KIND=C_CHAR,LEN=ESMF_MAXSTR) :: dll_name, sub_name
+    procedure(SServRtn), pointer :: dll_ss
+
+    INTERFACE
+       SUBROUTINE SServRtn(gc, rc)
+         USE ISO_C_BINDING
+         use ESMF
+         type (ESMF_GridComp) :: gc
+         integer              :: rc
+       END SUBROUTINE SServRtn
+    END INTERFACE
+
+
 ! Begin...
 
 ! Get my name and set-up traceback handle
@@ -121,7 +197,14 @@ contains
              OCN = MAPL_AddChild(OCEAN_NAME,'setservices_', parentGC=GC, sharedObj=sharedObj,  __RC__)
           case ("MOM6")
              call MAPL_GetResource ( MAPL, sharedObj,  Label="MOM6_GEOSPLUG:", DEFAULT="libMOM6_GEOSPlug.so", __RC__ )
-             OCN = MAPL_AddChild(OCEAN_NAME,'setservices_', parentGC=GC, sharedObj=sharedObj,  __RC__)
+             dll_name=TRIM(sharedObj)//C_NULL_CHAR
+             sub_name='setservices_'//C_NULL_CHAR   
+             handle=DLOpen(dll_name, (RTLD_LAZY))
+             funptr=DLSym(handle,sub_name)
+             call C_F_PROCPOINTER(cptr=funptr, fptr=dll_ss)
+
+             OCN = MAPL_AddChild(GC, NAME=OCEAN_NAME, SS=dll_ss, _RC)
+!             OCN = MAPL_AddChild(OCEAN_NAME,'setservices_', parentGC=GC, sharedObj=sharedObj,  __RC__)
           case default
              charbuf_ = "OCEAN_NAME: " // trim(OCEAN_NAME) // " is not implemented, ABORT!"
              call WRITE_PARALLEL(charbuf_)
@@ -1375,3 +1458,4 @@ contains
   end subroutine Run
 
 end module GEOS_OceanGridCompMod
+
