@@ -259,6 +259,8 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
    real, pointer, dimension(:,:) :: data_sst => null()
    real, pointer, dimension(:,:) :: data_sss => null()
 
+   real, pointer :: LATS(:,:)
+
 !  Begin...
 !----------
 
@@ -357,7 +359,13 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
      endif
 
    else ! binary
-     call MAPL_ReadForcing(MAPL,'SST',DATASeaFILE, CURRENTTIME, sst, INIT_ONLY=FCST, __RC__)
+!     call MAPL_ReadForcing(MAPL,'SST',DATASeaFILE, CURRENTTIME, sst, INIT_ONLY=FCST, __RC__)
+      call MAPL_Get(MAPL, LATS = LATS, __RC__)
+      SST = MAPL_TICE ! 0 Celsius
+      where (abs(LATS) < MAPL_PI/3.0)
+         SST = MAPL_TICE + 27.0*(1.0-(SIN(1.5*LATS))**2)
+      end where
+
    endif
 
    call MAPL_TimerOff(MAPL,"-UPDATE" )
