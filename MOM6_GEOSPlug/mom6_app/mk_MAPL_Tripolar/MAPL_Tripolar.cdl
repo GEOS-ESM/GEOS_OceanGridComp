@@ -1,0 +1,74 @@
+netcdf MAPL_Tripolar {
+dimensions:
+	string = 255 ;
+        n_center_x = 1440 ;
+        n_center_y = 1080 ;
+        n_corner_x = 1441 ;
+        n_corner_y = 1081 ;
+	n_levels = 75 ;
+
+variables:
+        float lon_centers(n_center_y,n_center_x) ;
+                lon_centers:long_name = "longitude of cell center" ;
+                lon_centers:units = "degrees_E" ;
+        float lat_centers(n_center_y,n_center_x) ;
+                lat_centers:long_name = "latitude cell center" ;
+                lat_centers:units = "degrees_N" ;
+        float lon_corners(n_corner_y,n_corner_x) ;
+                lon_corners:long_name = "longitude of cell corner" ;
+                lon_corners:units = "degrees_E" ;
+        float lat_corners(n_corner_y,n_corner_x) ;
+                lat_corners:long_name = "latitude of cell corner" ;
+                lat_corners:units = "degrees_N" ;
+	float lev(n_levels) ;
+	        lev:long_name = "depth of layer center" ;
+                lev:units = "meters" ;
+	float mask(n_center_y,n_center_x) ;
+	        mask:long_name = "land/sea mask (0=land) on cell center" ;
+                mask:units = "none" ;
+	double htn(n_center_y,n_center_x) ;
+	        htn:long_name = "length of northern edge of T-Cell" ;
+		htn:units = "meters" ;
+	double hte(n_center_y,n_center_x) ;
+	        hte:long_name = "length of eastern edge of T-Cell" ;
+		hte:units = "meters" ;
+	double hus(n_center_y,n_center_x) ;
+	        hus:long_name = "length of southern edge of U-Cell" ;
+		hus:units = "meters" ;
+	double huw(n_center_y,n_center_x) ;
+	        huw:long_name = "length of western edge of U-Cell" ;
+		huw:units = "meters" ;
+	double areat(n_center_y,n_center_x) ;
+	        areat:long_name = "area of T-Cell" ;
+		areat:units = "m2" ;
+	double areau(n_center_y,n_center_x) ;
+	        areau:long_name = "area of U-Cell" ;
+		areau:units = "m2" ;
+	float anglet(n_center_y,n_center_x) ;
+	        anglet:long_name = "rotation angle centered on T-Cell" ;
+		anglet:units = "degrees_east" ;
+	float angleu(n_center_y,n_center_x) ;
+	        angleu:long_name = "rotation angle centered on U-Cell" ;
+		angleu:units = "degrees_east" ;
+	float basin(n_center_y,n_center_x) ;
+	        basin:long_name = "basin_masks" ;
+	float atl_mask(n_center_y,n_center_x) ;
+	        atl_mask:long_name = "Atlantic_mask" ;
+	char mom_file(string) ;
+	        mom_file:standard_name = "path_to_ocean_hgrid_file" ;
+	char vgrid_file(string) ;
+	        vgrid_file:standard_name = "path_to_vgrid_file" ;
+	char topo_file(string) ;
+	        topo_file:standard_name = "path_to_ocean_topog_file" ;
+	char basin_file(string) ;
+	        vgrid_file:standard_name = "path_to_basin_codes_file" ;
+
+// global attributes:
+		:author = "Yury Vikhliaev" ;
+
+data:
+	mom_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/ocean_hgrid.nc" ;
+	vgrid_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/vgrid.nc" ;
+	topo_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/ocean_topog.nc" ;
+	basin_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/basin_codes.nc" ;
+}
