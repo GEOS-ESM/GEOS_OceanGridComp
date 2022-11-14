@@ -162,11 +162,14 @@ list( APPEND MOM6_SRCS
    src/ocean_data_assim/MOM_oda_incupd.F90
    src/parameterizations/lateral/MOM_hor_visc.F90
    src/parameterizations/lateral/MOM_internal_tides.F90
+   src/parameterizations/lateral/MOM_interface_filter.F90
    src/parameterizations/lateral/MOM_lateral_mixing_coeffs.F90
+   src/parameterizations/lateral/MOM_load_love_numbers.F90
    src/parameterizations/lateral/MOM_MEKE.F90
    src/parameterizations/lateral/MOM_MEKE_types.F90
    src/parameterizations/lateral/MOM_mixed_layer_restrat.F90
    src/parameterizations/lateral/MOM_thickness_diffuse.F90
+   src/parameterizations/lateral/MOM_spherical_harmonics.F90
    src/parameterizations/lateral/MOM_tidal_forcing.F90
    src/parameterizations/vertical/MOM_ALE_sponge.F90
    src/parameterizations/vertical/MOM_bkgnd_mixing.F90
