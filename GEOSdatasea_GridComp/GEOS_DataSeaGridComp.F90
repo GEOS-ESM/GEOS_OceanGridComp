@@ -66,7 +66,6 @@ module GEOS_DataSeaGridCompMod
 !
 ! ErrLog Variables
 
-
     character(len=ESMF_MAXSTR)              :: COMP_NAME
 
 ! Local derived type aliases
@@ -102,59 +101,10 @@ module GEOS_DataSeaGridCompMod
 !BOS
 
 ! !Import state:
+#include "GEOS_DataSea_Import___.h"
 
 !  !Export state:
-!   Its only job is to simply export: SST, SSS, US, VS
-
 #include "GEOS_DataSea_Export___.h"
-
-  if (ocean_sssData) then
-    call MAPL_AddImportSpec(GC,           &
-      SHORT_NAME = 'DATA_SSS',            &
-      LONG_NAME = 'sea_surface_salinity', &
-      UNITS = 'PSU',                      &
-      DIMS = MAPL_DimsHorzOnly,           &
-      VLOCATION = MAPL_VLocationNone, RC=STATUS)
-  endif
-
-  call MAPL_AddExportSpec(GC,                                 &
-    SHORT_NAME         = 'UW',                                &
-    LONG_NAME          = 'zonal_velocity_of_surface_water',   &
-    UNITS              = 'm s-1 ',                            &
-    DIMS               = MAPL_DimsHorzOnly,                   &
-    VLOCATION          = MAPL_VLocationNone,                  &
-                                                   RC=STATUS  )
-  VERIFY_(STATUS)
-
-  call MAPL_AddExportSpec(GC,                                 &
-    SHORT_NAME         = 'VW',                                &
-    LONG_NAME          = 'meridional_velocity_of_surface_water',&
-    UNITS              = 'm s-1 ',                            &
-    DIMS               = MAPL_DimsHorzOnly,                   &
-    VLOCATION          = MAPL_VLocationNone,                  &
-                                                   RC=STATUS  )
-  VERIFY_(STATUS)
-
-  call MAPL_AddExportSpec(GC,                                 &
-    SHORT_NAME         = 'TW',                          &
-    LONG_NAME          = 'foundation_temperature_for_interface_layer',&
-    UNITS              = 'K',                                 &
-    DIMS               = MAPL_DimsHorzOnly,                   &
-    VLOCATION          = MAPL_VLocationNone,                  &
-                                                   RC=STATUS  )
-  VERIFY_(STATUS)
-
-  call MAPL_AddExportSpec(GC,                                 &
-    SHORT_NAME         = 'SW',                          &
-    LONG_NAME          = 'foundation_salinity_for_interface_layer',&
-    UNITS              = 'PSU',                               &
-    DIMS               = MAPL_DimsHorzOnly,                   &
-    VLOCATION          = MAPL_VLocationNone,                  &
-                                                   RC=STATUS  )
-  VERIFY_(STATUS)
-
-! import
-#include "GEOS_DataSea_Import___.h"
 
 !EOS
 
@@ -218,17 +168,7 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
   real, pointer, dimension(:,:)       :: TNEW   => null()
   real, pointer, dimension(:,:)       :: F1     => null()
 
-! pointers to export
-
-   real, pointer, dimension(:,:)  :: UW
-   real, pointer, dimension(:,:)  :: VW
-   real, pointer, dimension(:,:)  :: TW
-   real, pointer, dimension(:,:)  :: SW
-
-! pointers to import
-
-   real, pointer, dimension(:,:) :: data_sss => null()
-
+! Pointers to imports and exports
 #include "GEOS_DataSea_DeclarePointer___.h"
 
    __Iam__('Run')
@@ -253,22 +193,9 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
    call MAPL_TimerOn(MAPL,"TOTAL")
    call MAPL_TimerOn(MAPL,"RUN" )
 
+! Get pointers to imports and exports
+!------------------------------------
 #include "GEOS_DataSea_GetPointer___.h"
-
-! Pointers to Imports
-!--------------------
-
-!  Pointers to Exports
-!---------------------
-
-   call MAPL_GetPointer(EXPORT,      UW  , 'UW'       , RC=STATUS)
-   VERIFY_(STATUS)
-   call MAPL_GetPointer(EXPORT,      VW  , 'VW'       , RC=STATUS)
-   VERIFY_(STATUS)
-   call MAPL_GetPointer(EXPORT,      TW  , 'TW'       , RC=STATUS)
-   VERIFY_(STATUS)
-   call MAPL_GetPointer(EXPORT,      SW  , 'SW'       , RC=STATUS)
-   VERIFY_(STATUS)
 
 ! Set current time and calendar
 !------------------------------
@@ -313,11 +240,9 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
 !------------------------------
 
    if (ocean_extData) then
-!    call MAPL_GetPointer(import, data_sst, 'DATA_SST', _RC)
      sst = data_sst ! netcdf variable
 
      if (ocean_sssData) then  ! and bulk SSS (from retrieval)
-       call MAPL_GetPointer(import, data_sss, 'DATA_SSS', _RC)
        SSS = data_sss ! netcdf variable
      endif
 
