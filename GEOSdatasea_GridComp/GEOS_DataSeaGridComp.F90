@@ -1,5 +1,3 @@
-!  $Id$
-
 #include "MAPL_Generic.h"
 
 !=============================================================================
@@ -69,39 +67,34 @@ module GEOS_DataSeaGridCompMod
 ! ErrLog Variables
 
 
-    character(len=ESMF_MAXSTR)              :: IAm
-    integer                                 :: STATUS
     character(len=ESMF_MAXSTR)              :: COMP_NAME
 
 ! Local derived type aliases
-
     type (MAPL_MetaComp    ), pointer   :: MAPL => null()
 
 !=============================================================================
 
+    __Iam__('SetServices')
+
+!****************************************************************************
 ! Begin...
 
 ! Get my name and set-up traceback handle
 ! ---------------------------------------
 
-    Iam = "SetServices"
-    call ESMF_GridCompGet( GC, NAME=COMP_NAME, RC=STATUS )
-    VERIFY_(STATUS)
-    Iam = trim(COMP_NAME) // Iam
+    Iam = trim(comp_name)//'::'//'SetServices'
 
-! Set the Run entry point
-! -----------------------
+! Set the Initialize, Run, Finalize entry points
+! ----------------------------------------------
 
-    call MAPL_GridCompSetEntryPoint ( GC, ESMF_METHOD_RUN,  Run, RC=STATUS)
-    VERIFY_(STATUS)
+    call MAPL_GridCompSetEntryPoint (GC, ESMF_Method_Run,  Run, _RC)
 
-    call MAPL_GetObjectFromGC ( GC, MAPL, RC=STATUS)
-    VERIFY_(STATUS)
+    call MAPL_GetObjectFromGC ( GC, MAPL, _RC)
 
-    call MAPL_GetResource (MAPL,   ocean_extData, Label="OCEAN_EXT_DATA:",   DEFAULT=.FALSE., __RC__ ) ! .TRUE. or .FALSE.
+    call MAPL_GetResource (MAPL,   ocean_extData, Label="OCEAN_EXT_DATA:",   DEFAULT=.FALSE., _RC ) ! .TRUE. or .FALSE.
 
     ! This new SSS data feature will be ExtData based ONLY; No SSS data would set sss=30, as it was done with binary SST data
-    call MAPL_GetResource (MAPL,   ocean_sssData,  Label="OCEAN_SSS_DATA:",  DEFAULT=.FALSE.,   __RC__ ) ! .TRUE. or .FALSE.
+    call MAPL_GetResource (MAPL,   ocean_sssData,  Label="OCEAN_SSS_DATA:",  DEFAULT=.FALSE.,   _RC ) ! .TRUE. or .FALSE.
 
 ! Set the state variable specs.
 ! -----------------------------
@@ -109,18 +102,11 @@ module GEOS_DataSeaGridCompMod
 !BOS
 
 ! !Import state:
-! None. Its only job is to simply export: SST, SSS, US, VS
 
 !  !Export state:
+!   Its only job is to simply export: SST, SSS, US, VS
 
-  if (ocean_extData) then
-    call MAPL_AddImportSpec(GC,              &
-      SHORT_NAME = 'DATA_SST',               &
-      LONG_NAME = 'sea_surface_temperature', &
-      UNITS = 'K',                           &
-      DIMS = MAPL_DimsHorzOnly,              &
-      VLOCATION = MAPL_VLocationNone, RC=STATUS)
-  endif
+#include "GEOS_DataSea_Export___.h"
 
   if (ocean_sssData) then
     call MAPL_AddImportSpec(GC,           &
@@ -168,28 +154,17 @@ module GEOS_DataSeaGridCompMod
   VERIFY_(STATUS)
 
 ! import
-
-  call MAPL_AddImportSpec(GC,                            &
-        SHORT_NAME         = 'FRACICE',                           &
-        LONG_NAME          = 'fractional_cover_of_seaice',        &
-        UNITS              = '1',                                 &
-        DIMS               = MAPL_DimsHorzOnly,                   &
-        VLOCATION          = MAPL_VLocationNone,                  &
-                                                   RC=STATUS  )
-  VERIFY_(STATUS)
+#include "GEOS_DataSea_Import___.h"
 
 !EOS
 
-    call MAPL_TimerAdd(GC,    name="RUN"     ,RC=STATUS)
-    VERIFY_(STATUS)
-    call MAPL_TimerAdd(GC,    name="-UPDATE" ,RC=STATUS)
-    VERIFY_(STATUS)
+    call MAPL_TimerAdd(GC,    name="RUN"     ,_RC)
+    call MAPL_TimerAdd(GC,    name="-UPDATE" ,_RC)
 
 ! Set generic init and final methods
 ! ----------------------------------
 
-    call MAPL_GenericSetServices    ( GC, RC=STATUS)
-    VERIFY_(STATUS)
+    call MAPL_GenericSetServices ( GC, _RC)
 
     RETURN_(ESMF_SUCCESS)
   
@@ -221,8 +196,6 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
 
 ! ErrLog Variables
 
-  character(len=ESMF_MAXSTR)          :: IAm
-  integer                             :: STATUS
   character(len=ESMF_MAXSTR)          :: COMP_NAME
 
 ! Locals
@@ -254,27 +227,25 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
 
 ! pointers to import
 
-   real, pointer, dimension(:,:)  :: FI
-
-   real, pointer, dimension(:,:) :: data_sst => null()
    real, pointer, dimension(:,:) :: data_sss => null()
 
+#include "GEOS_DataSea_DeclarePointer___.h"
+
+   __Iam__('Run')
+
+!****************************************************************************
 !  Begin...
-!----------
 
 ! Get the target components name and set-up traceback handle.
 ! -----------------------------------------------------------
 
-    Iam = "Run"
-    call ESMF_GridCompGet( GC, name=COMP_NAME, RC=STATUS )
-    VERIFY_(STATUS)
-    Iam = trim(COMP_NAME) // Iam
+    call ESMF_GridCompGet( GC, NAME=COMP_NAME, _RC)
+    Iam = trim(COMP_NAME)//'::'//Iam
 
 ! Get my internal MAPL_Generic state
 !----------------------------------
 
-    call MAPL_GetObjectFromGC(GC, MAPL, STATUS)
-    VERIFY_(STATUS)
+    call MAPL_GetObjectFromGC(GC, MAPL, _RC)
 
 ! Start Total timer
 !------------------
@@ -282,10 +253,10 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
    call MAPL_TimerOn(MAPL,"TOTAL")
    call MAPL_TimerOn(MAPL,"RUN" )
 
+#include "GEOS_DataSea_GetPointer___.h"
+
 ! Pointers to Imports
 !--------------------
-   call MAPL_GetPointer(IMPORT,      FI  , 'FRACICE'  , RC=STATUS)
-   VERIFY_(STATUS)
 
 !  Pointers to Exports
 !---------------------
@@ -302,8 +273,7 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
 ! Set current time and calendar
 !------------------------------
 
-   call ESMF_ClockGet(CLOCK, currTime=CurrentTime, RC=STATUS)
-   VERIFY_(STATUS)
+   call ESMF_ClockGet(CLOCK, currTime=CurrentTime, _RC)
 
    if (.not. ocean_extData) then
      ! Get the SST bcs file name from the resource file
@@ -315,28 +285,23 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
 ! In atmospheric forecast mode we do not have future SST and SSS
 !--------------------------------------------------------------
 
-   call MAPL_GetResource(MAPL,IFCST,LABEL="IS_FCST:",default=0,    RC=STATUS)
-   VERIFY_(STATUS)
-
-   call MAPL_GetResource(MAPL,adjSST,LABEL="SST_ADJ_UND_ICE:",default=0,    RC=STATUS)
-   VERIFY_(STATUS)
+   call MAPL_GetResource(MAPL,IFCST, LABEL="IS_FCST:",        default=0,    _RC)
+   call MAPL_GetResource(MAPL,adjSST,LABEL="SST_ADJ_UND_ICE:",default=0,    _RC)
 
    FCST = IFCST==1
 
-   call MAPL_Get(MAPL, IM=IM, JM=JM, RC=STATUS)
-   VERIFY_(STATUS)
+   call MAPL_Get(MAPL, IM=IM, JM=JM, _RC)
 
 ! SST is usually Reynolds/OSTIA SST or bulk SST
 !------------------------------------------------
 
-   allocate(SST(IM,JM), stat=STATUS)
-   VERIFY_(STATUS)
+   allocate(SST(IM,JM), __STAT__)
 
 ! SSS is usually bulk SSS
 !-------------------------
 
   if (ocean_sssData) then
-    allocate(SSS(IM, JM), stat=STATUS); VERIFY_(STATUS)
+    allocate(SSS(IM, JM), __STAT__)
   endif
 
 !  Update data
@@ -348,16 +313,16 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
 !------------------------------
 
    if (ocean_extData) then
-     call MAPL_GetPointer(import, data_sst, 'DATA_SST', __RC__)
+!    call MAPL_GetPointer(import, data_sst, 'DATA_SST', _RC)
      sst = data_sst ! netcdf variable
 
      if (ocean_sssData) then  ! and bulk SSS (from retrieval)
-       call MAPL_GetPointer(import, data_sss, 'DATA_SSS', __RC__)
+       call MAPL_GetPointer(import, data_sss, 'DATA_SSS', _RC)
        SSS = data_sss ! netcdf variable
      endif
 
    else ! binary
-     call MAPL_ReadForcing(MAPL,'SST',DATASeaFILE, CURRENTTIME, sst, INIT_ONLY=FCST, __RC__)
+     call MAPL_ReadForcing(MAPL,'SST',DATASeaFILE, CURRENTTIME, sst, INIT_ONLY=FCST, _RC)
    endif
 
    call MAPL_TimerOff(MAPL,"-UPDATE" )
@@ -372,23 +337,17 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
 
    if (adjSST == 1) then
       SST = max(SST, TICE)
-      SST = (1.-FI)*SST+FI*TICE
+      SST = (1.-FRACICE)*SST+FRACICE*TICE
    endif
 
    if (adjSST == 2) then
 
-      call MAPL_GetResource(MAPL,CTB    , LABEL="CTB:"   , default=1.0e-4, RC=STATUS)
-      VERIFY_(STATUS)
+      call MAPL_GetResource(MAPL,CTB    , LABEL="CTB:"   , default=1.0e-4, _RC)
+      call MAPL_GetResource(MAPL,RUN_DT , LABEL="RUN_DT:",                 _RC)
+      call MAPL_GetResource(MAPL,DT     , LABEL="DT:"    , default=RUN_DT, _RC)
 
-      call MAPL_GetResource(MAPL,RUN_DT , LABEL="RUN_DT:" ,                 RC=STATUS)
-      VERIFY_(STATUS)
-      call MAPL_GetResource(MAPL,DT     , LABEL="DT:"    , default=RUN_DT, RC=STATUS)
-      VERIFY_(STATUS)
-
-      allocate(TNEW(size(TW,1),size(TW,2)), stat=STATUS)
-      VERIFY_(STATUS)
-      allocate(F1  (size(TW,1),size(TW,2)), stat=STATUS)
-      VERIFY_(STATUS)
+      allocate(TNEW(size(TW,1),size(TW,2)), __STAT__)
+      allocate(F1  (size(TW,1),size(TW,2)), __STAT__)
 
       TNEW=0.0
       F1  =0.0
@@ -396,18 +355,18 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
 !     ! SST below freezing point is set to freezing temperature
       TNEW   = max( SST,TICE)
 
-      where(FI == 1.0)
+      where(FRACICE == 1.0)
 !     ! if fraction of ice is 1, set SST to freezing temperature        
         TNEW   =  TICE
       elsewhere
-        F1=FI*CTB/(2.0*(1.0-FI))
+        F1=FRACICE*CTB/(2.0*(1.0-FRACICE))
         TNEW=(TNEW+TICE*F1*DT)/(1.0+F1*DT)
       end where
 
       SST = TNEW
 
-      deallocate( TNEW)
-      deallocate( F1)
+      deallocate( TNEW, __STAT__)
+      deallocate( F1,   __STAT__)
    endif
 
    if(associated(TW)) then
@@ -425,9 +384,9 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
 ! Clean-up
 !---------
 
-   deallocate(SST,     STAT=STATUS); VERIFY_(STATUS)
+   deallocate(SST,     __STAT__)
    if (ocean_sssData) then
-     deallocate(SSS,   STAT=STATUS); VERIFY_(STATUS)
+     deallocate(SSS,   __STAT__)
    endif
 
 !  All done
