@@ -3,19 +3,24 @@ component: DataSea
 
 category: IMPORT
 #----------------------------------------------------------------------------------------
-#  VARIABLE       | DIMENSIONS  |          Additional Metadata
+#  VARIABLE       | DIMENSIONS          |          Additional Metadata
 #----------------------------------------------------------------------------------------
-     NAME | UNITS | DIMS | VLOC | COND                | LONG NAME
+ NAME           | UNITS   | DIMS        | VLOC | COND                | LONG NAME
 #----------------------------------------------------------------------------------------
-FRACICE   | 1     | xy   | N    |                     | fractional_cover_of_seaice
-DATA_SST  | K     | xy   | N    | ocean_extData       | sea_surface_temperature
+ FRACICE        | 1       | xy          | N    |                     | fractional_cover_of_seaice
+ DATA_SST       | K       | xy          | N    | ocean_extData       | sea_surface_temperature
+ DATA_SSS       | PSU     | xy          | N    | ocean_sssData       | sea_surface_salinity
 
 category: EXPORT
 #----------------------------------------------------------------------------------------
 #  VARIABLE               | DIMENSIONS  |          Additional Metadata
 #----------------------------------------------------------------------------------------
- NAME           | UNITS      | DIMS | VLOC | COND                | LONG NAME
+ NAME           | UNITS   | DIMS        | VLOC        | LONG NAME
 #----------------------------------------------------------------------------------------
+ UW             | m s-1   | xy          | N           | zonal_velocity_of_surface_water
+ VW             | m s-1   | xy          | N           | meridional_velocity_of_surface_water
+ TW             | K       | xy          | N           | foundation_temperature_for_interface_layer
+ SW             | PSU     | xy          | N           | foundation_salinity_for_interface_layer
 
 category: INTERNAL
 #----------------------------------------------------------------------------------------
