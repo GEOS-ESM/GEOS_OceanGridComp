@@ -156,9 +156,6 @@ contains
 
     call MAPL_GenericSetServices    ( GC, _RC )
 
-! All done
-! --------
-
     RETURN_(ESMF_SUCCESS)
 
   end subroutine SetServices
@@ -182,8 +179,6 @@ contains
     integer, optional,       intent(  OUT) :: RC     ! Error code:
 
 !EOP
-
-! ErrLog Variables
 
 ! Locals
 
@@ -225,11 +220,10 @@ contains
     REAL_, pointer                         :: TW  (:,:)        => null()
     REAL_, pointer                         :: SW  (:,:)        => null()
     REAL_, pointer                         :: AREA(:,:)        => null()
-    REAL_, pointer                         :: MASK(:,:)        => null()
+    REAL_, pointer                         :: MOM_2D_MASK(:,:) => null()
+    REAL_, pointer                         :: SLV(:,:)         => null()
 
     real, allocatable                      :: Tmp2(:,:)
-
-    REAL_, pointer, dimension(:, :)        :: sea_lev          => null()
 
     integer                                :: DT_OCEAN
     character(len=7)                       :: wind_stagger     ! 'AGRID' or 'BGRID' or 'CGRID'
@@ -457,32 +451,28 @@ contains
 ! Make sure exports neede by the parent prior to our run call are initialized
 !----------------------------------------------------------------------------
 
-    call MAPL_GetPointer(EXPORT, MASK,     'MOM_2D_MASK', alloc=.true., _RC)
-    call MAPL_GetPointer(EXPORT, TW,       'TW'  ,        alloc=.true., _RC)
-    VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, SW,       'SW'  ,        alloc=.true., RC=STATUS)
-    VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, AREA,     'AREA',        alloc=.true., RC=STATUS)
-    VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, sea_lev,  'SLV',         alloc=.true., RC=STATUS)
-    VERIFY_(STATUS)
+    call MAPL_GetPointer(EXPORT, MOM_2D_MASK, 'MOM_2D_MASK', alloc=.true., _RC)
+    call MAPL_GetPointer(EXPORT, TW,          'TW'  ,        alloc=.true., _RC)
+    call MAPL_GetPointer(EXPORT, SW,          'SW'  ,        alloc=.true., _RC)
+    call MAPL_GetPointer(EXPORT, AREA,        'AREA',        alloc=.true., _RC)
+    call MAPL_GetPointer(EXPORT, SLV,         'SLV',         alloc=.true., _RC)
 
 ! Get the 2-D MOM data
 !---------------------
     allocate(Tmp2(IM,JM), __STAT__)
 
     call ocean_model_data_get(Ocean_State, Ocean, 'mask', Tmp2, isc, jsc)
-    MASK = real(Tmp2, kind=GeosKind)
+    MOM_2D_MASK = real(Tmp2, kind=GeosKind)
 
     call ocean_model_data_get(Ocean_State, Ocean, 't_surf', Tmp2, g_isc, g_jsc) ! this comes to us in deg C
-    where(MASK(:,:) > 0.0)
+    where(MOM_2D_MASK(:,:) > 0.0)
        TW = real(Tmp2, kind=GeosKind) + MAPL_TICE                                 ! because C to K was subtracted in MOM
     elsewhere
        TW = MAPL_UNDEF
     end where
 
     call ocean_model_data_get(Ocean_State, Ocean, 's_surf', Tmp2, g_isc, g_jsc) ! comes to us in PSU
-    where(MASK(:,:) > 0.0)
+    where(MOM_2D_MASK(:,:) > 0.0)
        SW = real(Tmp2, kind=GeosKind)
     elsewhere
        SW = MAPL_UNDEF
@@ -542,6 +532,7 @@ contains
 
 !   type(ocean_grid_type),         pointer :: Ocean_grid               => null()
 
+!#include "MOM6_GEOSPlug_DeclarePointer___.h" ! Because these are "real(kind=GeosKind)" not using ACG.
 ! Exports
     REAL_, pointer                     :: TW    (:,:)        => null()
     REAL_, pointer                     :: SW    (:,:)        => null()
@@ -553,7 +544,7 @@ contains
     REAL_, pointer                     :: FRAZIL(:,:)        => null()
     REAL_, pointer                     :: MELT_POT(:,:)      => null()
     REAL_, pointer                     :: FRZMLT(:,:)        => null()
-    REAL_, pointer                     :: MASK  (:,:)        => null()
+    REAL_, pointer                     :: MOM_2D_MASK  (:,:) => null()
     REAL_, pointer                     :: AREA  (:,:)        => null()
 
 ! Imports
@@ -616,7 +607,7 @@ contains
 ! Get my internal MAPL_Generic state
 !-----------------------------------
 
-    call MAPL_GetObjectFromGC ( GC, MAPL, _RC)
+    call MAPL_GetObjectFromGC( GC, MAPL, _RC)
 
     call MAPL_Get(MAPL,                      &
          INTERNAL_ESMF_STATE = INTERNAL,     &
@@ -668,8 +659,9 @@ contains
     allocate(cos_rot(IM,JM), __STAT__)
     allocate(sin_rot(IM,JM), __STAT__)
 
-! Get IMPORT pointers
-!--------------------
+! Get pointers to imports and exports
+!------------------------------------
+!#include "MOM6_GEOSPlug_GetPointer___.h" ! Because connectivities across MOM5 and MOM6 are messy, do these manually :(
 
     call MAPL_GetPointer(IMPORT, TAUX,     'TAUX'  ,    RC=STATUS); VERIFY_(STATUS)
     call MAPL_GetPointer(IMPORT, TAUY,     'TAUY'  ,    RC=STATUS); VERIFY_(STATUS)
@@ -707,15 +699,14 @@ contains
     call MAPL_GetPointer(EXPORT, MELT_POT,'MELT_POT', alloc=.true., RC=STATUS); VERIFY_(STATUS)
     call MAPL_GetPointer(EXPORT, FRZMLT,  'FRZMLT',                 RC=STATUS); VERIFY_(STATUS)
 
-    call MAPL_GetPointer(EXPORT, MASK, 'MOM_2D_MASK', RC=STATUS); VERIFY_(STATUS)
+    call MAPL_GetPointer(EXPORT, MOM_2D_MASK, 'MOM_2D_MASK', RC=STATUS); VERIFY_(STATUS)
     call MAPL_GetPointer(EXPORT, AREA, 'AREA',        RC=STATUS); VERIFY_(STATUS)
-
-    call MAPL_GetResource(MAPL, pice_scaling, Label = "MOM_PICE_SCALING:", default = 1.0, _RC)
 
 ! Fill in ocean boundary fluxes/forces
 !-------------------------------------
 
-    call MAPL_GetResource( MAPL, pres_loading, Label="pres_loading:", DEFAULT="NO", _RC)
+    call MAPL_GetResource(MAPL, pice_scaling, Label="MOM_PICE_SCALING:", DEFAULT= 1.0, _RC)
+    call MAPL_GetResource(MAPL, pres_loading, Label="pres_loading:",     DEFAULT="NO", _RC)
 
     ! NOTE: PICE that is available here is all = 0. This should be made realistic, for now it is from MOM5 legacy
     !       Need to study with zero pressure loading (CTL: as now), exp1 ( with PS only), exp2 (with PS and PICE), exp3 (PICE only).
@@ -798,12 +789,12 @@ contains
 !   mask
     U = 0.0
     call ocean_model_data_get(Ocean_State, Ocean, 'mask', U, isc, jsc)
-    MASK = real(U, kind=GeosKind)
+    MOM_2D_MASK = real(U, kind=GeosKind)
 
 !   surface (potential) temperature (K)
     U = 0.0
     call ocean_model_data_get(Ocean_State, Ocean, 't_surf', U, isc, jsc) ! this comes to us in deg C
-    where(MASK(:,:) > 0.0)
+    where(MOM_2D_MASK(:,:) > 0.0)
        TW = real(U, kind=GeosKind) + MAPL_TICE                             ! because C to K was subtracted in MOM
     elsewhere
        TW = MAPL_UNDEF
@@ -812,7 +803,7 @@ contains
 !   surface salinity (PSU)
     U = 0.0
     call ocean_model_data_get(Ocean_State, Ocean, 's_surf', U, isc, jsc) ! this comes to us in PSU
-    where(MASK(:,:) > 0.0)
+    where(MOM_2D_MASK(:,:) > 0.0)
        SW = real(U, kind=GeosKind)
     elsewhere
        SW = MAPL_UNDEF
@@ -822,7 +813,7 @@ contains
     U = 0.0
     if(associated(SLV)) then
        call ocean_model_data_get(Ocean_State, Ocean, 'sea_lev', U, isc, jsc) ! this comes to us in m
-       where(MASK(:,:)>0.0)
+       where(MOM_2D_MASK(:,:)>0.0)
           SLV = real(U, kind = GeosKind)
        elsewhere
           SLV = 0.0
@@ -833,7 +824,7 @@ contains
     U = 0.0
     if(associated(FRAZIL)) then
        call ocean_model_data_get(Ocean_State, Ocean, 'frazil',   U, isc, jsc)  ! this comes to us in J/m2
-       where(MASK(:,:)>0.0)
+       where(MOM_2D_MASK(:,:)>0.0)
           FRAZIL =  real( (U)/dt_ocean, kind = GeosKind) ! relying on fortran to promote the int (dt_ocean) to real
        elsewhere
           FRAZIL =  0.0
@@ -844,7 +835,7 @@ contains
     U = 0.0
     if(associated(MELT_POT)) then
        call ocean_model_data_get(Ocean_State, Ocean, 'melt_pot', U, isc, jsc)  ! this comes to us in J/m2
-       where(MASK(:,:)>0.0)
+       where(MOM_2D_MASK(:,:)>0.0)
           MELT_POT = -real( (U)/dt_ocean, kind = GeosKind) ! relying on fortran to promote the int (dt_ocean) to real
        elsewhere
           MELT_POT =  0.0
@@ -859,7 +850,7 @@ contains
          ASSERT_(.false.)
        endif
 
-       where(MASK(:,:)>0.0)
+       where(MOM_2D_MASK(:,:)>0.0)
           FRZMLT = FRAZIL + MELT_POT
        elsewhere
           FRZMLT = 0.0
@@ -874,7 +865,7 @@ contains
     call ocean_model_get_UV_surf(Ocean_State, Ocean, 'va', V, isc, jsc) ! this comes to us in m/s
 
     if(associated(UW )) then
-      where(MASK(:,:) > 0.0)
+      where(MOM_2D_MASK(:,:) > 0.0)
         UW = real(U, kind=GeosKind)
       elsewhere
         UW=0.0
@@ -882,7 +873,7 @@ contains
     endif
 
     if(associated(VW )) then
-      where(MASK(:,:) > 0.0)
+      where(MOM_2D_MASK(:,:) > 0.0)
         VW = real(V, kind=GeosKind)
       elsewhere
         VW=0.0
@@ -895,7 +886,7 @@ contains
     call ocean_model_get_UV_surf(Ocean_State, Ocean, 'vb', V, isc, jsc) ! this comes to us in m/s
 
     if(associated(UWB )) then
-      where(MASK(:,:) > 0.0)
+      where(MOM_2D_MASK(:,:) > 0.0)
         UWB = real(U, kind=GeosKind)
       elsewhere
         UWB =0.0
@@ -903,7 +894,7 @@ contains
     endif
 
     if(associated(VWB )) then
-      where(MASK(:,:) > 0.0)
+      where(MOM_2D_MASK(:,:) > 0.0)
         VWB = real(V, kind=GeosKind)
       elsewhere
         VWB =0.0
@@ -914,9 +905,9 @@ contains
 !-----------------------------------
 ! none
 !   3d exports with MOM6, such as depths, T, S, U, V, etc
-!   will not be exported. If needed, write them on tri-polar grid directly from MOM6
+!   will not be exported. If needed, write them directly from MOM6
 
-    deallocate(U, V, __STAT__)
+    deallocate(U, V,            __STAT__)
     deallocate(cos_rot,sin_rot, __STAT__)
 
     call MAPL_TimerOff(MAPL,"RUN"   )
@@ -986,7 +977,7 @@ contains
 ! Get the Plug private internal state
 !--------------------------------------
 
-    CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS )
+    CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS)
     VERIFY_(STATUS)
 
     MOM_MAPL_internal_state => WRAP%PTR
@@ -1049,7 +1040,7 @@ contains
 ! Generic Finalize
 ! ------------------
 
-    call MAPL_GenericFinalize( GC, IMPORT, EXPORT, CLOCK, _RC )
+    call MAPL_GenericFinalize( GC, IMPORT, EXPORT, CLOCK, _RC)
 
     call mpp_exit()
 
@@ -1065,7 +1056,7 @@ contains
 
 ! !INTERFACE:
 
-  subroutine Record ( gc, import, export, clock, rc )
+  subroutine Record ( GC, IMPORT, EXPORT, CLOCK, RC )
 
 ! !ARGUMENTS:
 
@@ -1115,7 +1106,7 @@ contains
 ! Get the Plug private internal state
 !--------------------------------------
 
-       CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS )
+       CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS)
        VERIFY_(STATUS)
 
        MOM_MAPL_internal_state => WRAP%PTR
@@ -1147,4 +1138,3 @@ subroutine SetServices(GC, RC)
    integer, intent(out) :: RC
    call mySetServices(GC, rc=RC)
 end subroutine
-
