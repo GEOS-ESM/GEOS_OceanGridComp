@@ -1,5 +1,5 @@
 schema_version: 2.0.0
-component: Ocean
+component: MOM6_GEOSPlug
 
 category: IMPORT
 #------------------------------------------------------------------------------------
@@ -56,3 +56,40 @@ NAME          | UNITS         | DIMS | VLOC | LONG_NAME
 'T'           | 'K'           | xyz  | C    | 'potential_temperature' 
 'S'           | 'psu'         | xyz  | C    | 'salinity' 
 'SWFRAC'      | '1'           | xyz  | C    | 'shortwave_fractional_decay' 
+
+category: INTERNAL
+#----------------------------------------------------------------------------------------
+#  VARIABLE    | DIMENSION               |          Additional Metadata
+#----------------------------------------------------------------------------------------
+  NAME | UNITS | DIMS | VLOC | UNGRIDDED | RESTART | ADD2EXPORT | FRIENDLYTO | LONG NAME
+#----------------------------------------------------------------------------------------
+
+
+
+#********************************************************
+#
+# Legend
+#
+#------------------------------------------------------------------
+# Column label | MAPL keyword/interpretation |  Default
+#--------------|---------------------------------------------------
+# NAME         | short_name                  |
+# UNITS        | units                       |
+# DIMS         | dims                        |
+# VLOC         | VLocation                   | MAPL_VLocationNone
+# LONG NAME    | long_name                   |
+# COND         | if (<logical-expr>) then    |  .FALSE.
+# NUM_SUBTILES | num_subtiles
+# ...
+#------------------------------------------------------------------
+#
+#--------------------------------------------
+# Entry alias  | Column | MAPL keyword/interpretation
+#--------------|-----------------------------
+# xyz          | DIMS   | MAPL_HorzVert
+# xy           | DIMS   | MAPL_HorzOnly
+# z            | DIMS   | MAPL_VertOnly  (plus ungridded)
+# C            | VLOC   | MAPL_VlocationCenter
+# E            | VLOC   | MAPL_VlocationEdge
+# N            | VLOC   | MAPL_VlocationNone
+#--------------------------------------------
