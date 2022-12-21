@@ -135,395 +135,12 @@ contains
     call MAPL_GridCompSetEntryPoint ( GC, ESMF_Method_WriteRestart, Record,     _RC)
 
 !BOS
+
 ! !Import state:
-!#include "MOM6_GEOSPlug_Import___.h"
+#include "MOM6_GEOSPlug_Import___.h"
 
 !  !Export state:
-!#include "MOM6_GEOSPlug_Export___.h"
-
-!  !IMPORT STATE:
-
-    call MAPL_AddImportSpec(GC,                                    &
-         SHORT_NAME         = 'TAUX',                              &
-         LONG_NAME          = 'Agrid_eastward_stress_on_ocean',    &
-         UNITS              = 'N m-2',                             &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC,                                    &
-         SHORT_NAME         = 'TAUY',                              &
-         LONG_NAME          = 'Agrid_northward_stress_on_ocean',   &
-         UNITS              = 'N m-2',                             &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC,                                    &
-         SHORT_NAME         = 'PS',                                &
-         LONG_NAME          = 'Surface Atmospheric Pressure',      &
-         UNITS              = 'Pa',                                &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC,                                    &
-         SHORT_NAME         = 'PICE',                              &
-         LONG_NAME          = 'pressure due to ice weight',        &
-         UNITS              = 'Pa',                                &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC,                                    &
-         SHORT_NAME         = 'SWHEAT',                            &
-         LONG_NAME          = 'solar_heating_rate',                &
-         UNITS              = 'W m-2',                             &
-         DIMS               = MAPL_DimsHorzVert,                   &
-         VLOCATION          = MAPL_VLocationCenter,                &
-         RC=STATUS  )
-     VERIFY_(STATUS)
-
-     call MAPL_AddImportSpec(GC                     ,             &
-        LONG_NAME          = 'surface_net_downward_longwave_flux',&
-        UNITS              = 'W m-2'                     ,        &
-        SHORT_NAME         = 'LWFLX'                   ,          &
-        DIMS               = MAPL_DimsHorzOnly           ,        &
-        VLOCATION          = MAPL_VLocationNone          ,        &
-        RC=STATUS  )
-     VERIFY_(STATUS)
-
-     call MAPL_AddImportSpec(GC,                          &
-        LONG_NAME          = 'upward_sensible_heat_flux' ,&
-        UNITS              = 'W m-2'                     ,&
-        SHORT_NAME         = 'SHFLX'                     ,&
-        DIMS               = MAPL_DimsHorzOnly           ,&
-        VLOCATION          = MAPL_VLocationNone          ,&
-        RC=STATUS  )
-     VERIFY_(STATUS)
-
-     call MAPL_AddImportSpec(GC,                          &
-        LONG_NAME          = 'evaporation'               ,&
-        UNITS              = 'kg m-2 s-1'                ,&
-        SHORT_NAME         = 'QFLUX'                   ,  &
-        DIMS               = MAPL_DimsHorzOnly           ,&
-        VLOCATION          = MAPL_VLocationNone          ,&
-        RC=STATUS  )
-     VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC,                                    &
-         SHORT_NAME         = 'RAIN',                              &
-         LONG_NAME          = 'ocean_rainfall',                    &
-         UNITS              = 'kg m-2 s-1',                        &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC,                                    &
-         SHORT_NAME         = 'SNOW',                              &
-         LONG_NAME          = 'ocean_snowfall',                    &
-         UNITS              = 'kg m-2 s-1',                        &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC,                                    &
-         SHORT_NAME         = 'SFLX',                              &
-         LONG_NAME          = 'salt_flux_from_sea_ice_to_ocean',   &
-         UNITS              = 'kg m-2 s-1',                        &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC,                               &
-        SHORT_NAME         = 'PENUVR',                            &
-        LONG_NAME          = 'net_downward_penetrating_direct_UV_flux',  &
-        UNITS              = 'W m-2',                             &
-        DIMS               = MAPL_DimsHorzOnly,                   &
-        VLOCATION          = MAPL_VLocationNone,                  &
-                                                       RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC,                                  &
-        SHORT_NAME         = 'PENPAR',                            &
-        LONG_NAME          = 'net_downward_penetrating_direct_PAR_flux', &
-        UNITS              = 'W m-2',                             &
-        DIMS               = MAPL_DimsHorzOnly,                   &
-        VLOCATION          = MAPL_VLocationNone,                  &
-                                                       RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC,                                  &
-        SHORT_NAME         = 'PENUVF',                            &
-        LONG_NAME          = 'net_downward_penetrating_diffuse_UV_flux',  &
-        UNITS              = 'W m-2',                             &
-        DIMS               = MAPL_DimsHorzOnly,                   &
-        VLOCATION          = MAPL_VLocationNone,                  &
-                                                       RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC,                                  &
-        SHORT_NAME         = 'PENPAF',                            &
-        LONG_NAME          = 'net_downward_penetrating_diffuse_PAR_flux', &
-        UNITS              = 'W m-2',                             &
-        DIMS               = MAPL_DimsHorzOnly,                   &
-        VLOCATION          = MAPL_VLocationNone,                  &
-                                                       RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC                         ,     &
-          LONG_NAME          = 'net_surface_downwelling_nir_beam_flux',&
-          UNITS              = 'W m-2'                       ,&
-          SHORT_NAME         = 'DRNIR'                       ,&
-          DIMS               = MAPL_DimsHorzOnly             ,&
-          VLOCATION          = MAPL_VLocationNone            ,&
-          RC=STATUS  )
-     VERIFY_(STATUS)
-
-     call MAPL_AddImportSpec(GC                         ,     &
-          LONG_NAME          = 'net_surface_downwelling_nir_diffuse_flux',&
-          UNITS              = 'W m-2'                       ,&
-          SHORT_NAME         = 'DFNIR'                       ,&
-          DIMS               = MAPL_DimsHorzOnly             ,&
-          VLOCATION          = MAPL_VLocationNone            ,&
-                                                  RC=STATUS  )
-     VERIFY_(STATUS)
-
-     call MAPL_AddImportSpec(GC,                            &
-          LONG_NAME          = 'river_discharge_at_ocean_points',&
-          UNITS              = 'kg m-2 s-1'                ,&
-          SHORT_NAME         = 'DISCHARGE'                 ,&
-          DIMS               = MAPL_DimsHorzOnly           ,&
-          VLOCATION          = MAPL_VLocationNone          ,&
-          RC=STATUS  )
-     VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC,                                    &
-          SHORT_NAME         = 'AICE',                             &
-          LONG_NAME          = 'ice_concentration_of_grid_cell',   &
-          UNITS              = '1',                                &
-          DIMS               = MAPL_DimsHorzOnly,                  &
-          VLOCATION          = MAPL_VLocationNone,                 &
-          RC=STATUS  )
-     VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC,                                    &
-        SHORT_NAME         = 'TAUXBOT',                            &
-        LONG_NAME          = 'eastward_stress_at_base_of_ice_Agrid',    &
-        UNITS              = 'N m-2',                              &
-        DIMS               = MAPL_DimsHorzOnly,                    &
-        VLOCATION          = MAPL_VLocationNone,                   &
-        RC=STATUS  )
-     VERIFY_(STATUS)
-
-    call MAPL_AddImportSpec(GC,                                    &
-        SHORT_NAME         = 'TAUYBOT',                            &
-        LONG_NAME          = 'northward_stress_at_base_of_ice_Agrid',    &
-        UNITS              = 'N m-2',                              &
-        DIMS               = MAPL_DimsHorzOnly,                    &
-        VLOCATION          = MAPL_VLocationNone,                   &
-        RC=STATUS  )
-     VERIFY_(STATUS)
-
-!  !EXPORT STATE:
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'UW',                                &
-         LONG_NAME          = 'surface_Agrid_eastward_velocity',   &
-         UNITS              = 'm s-1 ',                            &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'VW',                                &
-         LONG_NAME          = 'surface_Agrid_northward_velocity',  &
-         UNITS              = 'm s-1 ',                            &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'UWB',                               &
-         LONG_NAME          = 'surface_Bgrid_X_velocity',          &
-         UNITS              = 'm s-1 ',                            &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'VWB',                               &
-         LONG_NAME          = 'surface_Bgrid_Y_velocity',          &
-         UNITS              = 'm s-1 ',                            &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'TW',                                &
-         LONG_NAME          = 'surface_temperature',               &
-         UNITS              = 'K',                                 &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'SW',                                &
-         LONG_NAME          = 'surface_salinity',                  &
-         UNITS              = 'psu',                               &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'MOM_2D_MASK',                       &
-         LONG_NAME          = 'MOM_ocean_mask_at_t-points',        &
-         UNITS              = '1',                                 &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'AREA',                              &
-         LONG_NAME          = 'MOM_ocean_area_at_t-points',        &
-         UNITS              = 'm+2',                               &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                   &
-         SHORT_NAME         = 'SLV',                              &
-         LONG_NAME          = 'sea_level_with_ice_loading_and_invBaro',       &
-         UNITS              = 'm',                                &
-         DIMS               = MAPL_DimsHorzOnly,                  &
-         VLOCATION          = MAPL_VLocationNone,                 &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                   &
-         SHORT_NAME         = 'FRAZIL',                           &
-         LONG_NAME          = 'heating_from_frazil_formation',    &
-         UNITS              = 'W m-2',                            &
-         DIMS               = MAPL_DimsHorzOnly,                  &
-         VLOCATION          = MAPL_VLocationNone,                 &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                   &
-         SHORT_NAME         = 'MELT_POT',                         &
-         LONG_NAME          = 'heat_that_can_be_used_to_melt_sea_ice',    &
-         UNITS              = 'W m-2',                            &
-         DIMS               = MAPL_DimsHorzOnly,                  &
-         VLOCATION          = MAPL_VLocationNone,                 &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                   &
-         SHORT_NAME         = 'FRZMLT',                           &
-         LONG_NAME          = 'freeze_melt_potential',            &
-         UNITS              = 'W m-2',                            &
-         DIMS               = MAPL_DimsHorzOnly,                  &
-         VLOCATION          = MAPL_VLocationNone,                 &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'DUM1',                              &
-         LONG_NAME          = 'dummy_export1',        &
-         UNITS              = '1',                               &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'DUM2',                              &
-         LONG_NAME          = 'dummy_export2',        &
-         UNITS              = '1',                               &
-         DIMS               = MAPL_DimsHorzOnly,                   &
-         VLOCATION          = MAPL_VLocationNone,                  &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-!  !Diagnostic exports
-!Get rid of following 3D exports
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'U',                                 &
-         LONG_NAME          = 'eastward_current',                  &
-         UNITS              = 'm s-1',                             &
-         DIMS               = MAPL_DimsHorzVert,                   &
-         VLOCATION          = MAPL_VLocationCenter,                &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'V',                                 &
-         LONG_NAME          = 'northward_current',                 &
-         UNITS              = 'm s-1',                             &
-         DIMS               = MAPL_DimsHorzVert,                   &
-         VLOCATION          = MAPL_VLocationCenter,                &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'DH',                                &
-         LONG_NAME          = 'layer_thickness',                   &
-         UNITS              = 'm OR kg m-2',                       &
-         DIMS               = MAPL_DimsHorzVert,                   &
-         VLOCATION          = MAPL_VLocationCenter,                &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                    & 
-         SHORT_NAME         = 'DEPTH',                             &
-         LONG_NAME          = 'layer_depth',                       &
-         UNITS              = 'm',                                 &
-         DIMS               = MAPL_DimsHorzVert,                   &
-         VLOCATION          = MAPL_VLocationCenter,                &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'T',                                 &
-         LONG_NAME          = 'potential_temperature',             &
-         UNITS              = 'K',                                 &
-         DIMS               = MAPL_DimsHorzVert,                   &
-         VLOCATION          = MAPL_VLocationCenter,                &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'S',                                 &
-         LONG_NAME          = 'salinity',                          &
-         UNITS              = 'psu',                               &
-         DIMS               = MAPL_DimsHorzVert,                   &
-         VLOCATION          = MAPL_VLocationCenter,                &
-         RC=STATUS  )
-    VERIFY_(STATUS)
-
-    call MAPL_AddExportSpec(GC,                                    &
-         SHORT_NAME         = 'SWFRAC',                            &
-         LONG_NAME          = 'shortwave_fractional_decay',        &
-         UNITS              = '1',                                 &
-         DIMS               = MAPL_DimsHorzVert,                   &
-         VLOCATION          = MAPL_VLocationCenter,                &
-         RC=STATUS  )
-    VERIFY_(STATUS)
+#include "MOM6_GEOSPlug_Export___.h"
 
 !EOS
 
@@ -568,11 +185,9 @@ contains
 
 ! ErrLog Variables
 
-    character(len=ESMF_MAXSTR)         :: IAm
-    integer                            :: STATUS
-    character(len=ESMF_MAXSTR)         :: COMP_NAME
-
 ! Locals
+
+    character(len=ESMF_MAXSTR)             :: COMP_NAME
 
     integer                                :: counts(7)
     integer                                :: Comm
@@ -620,22 +235,20 @@ contains
     character(len=7)                       :: wind_stagger     ! 'AGRID' or 'BGRID' or 'CGRID'
     integer                                ::iwind_stagger     !  AGRID  or  BGRID  or  CGRID : integer values
 
+    __Iam__('Initialize')
+
 ! Begin...
 
 ! Get the target components name and set-up traceback handle.
 ! -----------------------------------------------------------
 
-    Iam = "Initialize"
-    call ESMF_GridCompGet( gc, NAME=comp_name, RC=status )
-    VERIFY_(STATUS)
-    Iam = trim(comp_name) // trim(Iam)
-
+    call ESMF_GridCompGet( GC, NAME=COMP_NAME, _RC)
+    Iam = trim(COMP_NAME)//'::'//'Initialize'
 
 ! Get my internal MAPL_Generic state
 !-----------------------------------
 
-    call MAPL_GetObjectFromGC ( GC, MAPL, RC=STATUS)
-    VERIFY_(STATUS)
+    call MAPL_GetObjectFromGC ( GC, MAPL, _RC)
 
 ! Profilers
 !----------
@@ -646,46 +259,39 @@ contains
 ! Get the grid, configuration
 !----------------------------
 
-    call ESMF_GridCompGet( GC, grid=Grid,  RC=status )
-    VERIFY_(STATUS)
+    call ESMF_GridCompGet( GC, grid=Grid,  _RC)
 
 ! Get the layout from the grid
 !-----------------------------
 
-    call ESMF_VMGetCurrent(VM, rc=STATUS)
-    VERIFY_(STATUS)
+    call ESMF_VMGetCurrent(VM, _RC)
 
 ! Set the time for MOM
 !---------------------
 
-    call ESMF_ClockGet(CLOCK, currTIME=MyTime, TimeStep=TINT,  RC=STATUS)
-    VERIFY_(STATUS)
+    call ESMF_ClockGet(CLOCK, currTIME=MyTime, TimeStep=TINT,  _RC)
 
     call ESMF_TimeGet (MyTime,                    &
                        YY=YEAR, MM=MONTH, DD=DAY, &
                        H=HR,    M =MN,    S =SC,  &
-                                        RC=STATUS )
-    VERIFY_(STATUS)
+                       _RC)
 
-    CALL ESMF_TimeIntervalGet(TINT, S=DT_OCEAN, RC=status)
-    VERIFY_(status)
+    CALL ESMF_TimeIntervalGet(TINT, S=DT_OCEAN, _RC)
 
 ! Allocate this instance of the internal state and wrap
 ! -----------------------------------------------------
 
-    allocate ( MOM_MAPL_internal_state, stat=status )
-    VERIFY_(STATUS)
+    allocate ( MOM_MAPL_internal_state, __STAT__)
 
     wrap%ptr => MOM_MAPL_internal_state
 
 ! Save pointer to the wrapped internal state in the GC
 ! ----------------------------------------------------
 
-    call ESMF_UserCompSetInternalState ( GC, 'MOM_MAPL_state', WRAP, STATUS )
-    VERIFY_(STATUS)
+    call ESMF_UserCompSetInternalState ( GC, 'MOM_MAPL_state', WRAP, _RC)
 
-    allocate ( Boundary, stat=STATUS); VERIFY_(STATUS)
-    allocate ( Ocean,    stat=STATUS); VERIFY_(STATUS)
+    allocate ( Boundary, __STAT__)
+    allocate ( Ocean,    __STAT__)
 
     MOM_MAPL_internal_state%Ice_ocean_boundary => Boundary
     MOM_MAPL_internal_state%Ocean              => Ocean
@@ -693,8 +299,7 @@ contains
 ! FMS initialization using the communicator from the VM
 !------------------------------------------------------
 
-    call ESMF_VMGet(VM, mpiCommunicator=Comm, rc=STATUS)
-    VERIFY_(STATUS)
+    call ESMF_VMGet(VM, mpiCommunicator=Comm, _RC)
 
     call fms_init(Comm)
 
@@ -704,7 +309,7 @@ contains
     call constants_init
     call field_manager_init
     call set_calendar_type ( JULIAN)
-    call diag_manager_init                                   !SA: could pass time_init, not available before (MOM5)
+    call diag_manager_init !SA: could pass time_init, not available before (MOM5)
 
     DT   = set_time (DT_OCEAN, 0)
     Time = set_date (YEAR,MONTH,DAY,HR,MN,SC)
@@ -713,8 +318,7 @@ contains
 ! to make sure it matches what is expected here
 !----------------------------------------------------
 
-    call MAPL_GetResource( MAPL, wind_stagger, Label="ocean_wind_stagger:", DEFAULT="AGRID", RC=STATUS)
-    VERIFY_(STATUS)
+    call MAPL_GetResource( MAPL, wind_stagger, Label="ocean_wind_stagger:", DEFAULT="AGRID", _RC)
 
     if ( trim(wind_stagger) == "AGRID") then
       iwind_stagger = AGRID
@@ -760,8 +364,7 @@ contains
 
 ! Check local sizes of horizontal dimensions
 !--------------------------------------------
-    call MAPL_GridGet(GRID, localCellCountPerDim=counts, RC=status)
-    VERIFY_(STATUS)
+    call MAPL_GridGet(GRID, localCellCountPerDim=counts, _RC)
 
     IM=iec-isc+1
     JM=jec-jsc+1
@@ -811,8 +414,7 @@ contains
                Boundary% p               (g_isd:g_ied,g_jsd:g_jed), &
                Boundary% mi              (g_isd:g_ied,g_jsd:g_jed), &
                Boundary% ice_rigidity    (g_isd:g_ied,g_jsd:g_jed), &
-                                                stat=STATUS )
-    VERIFY_(STATUS)
+               __STAT__)
 
 ! Clear the fluxes we will not be using
 !--------------------------------------
@@ -850,15 +452,13 @@ contains
 ! Generic initialize
 ! ------------------
 
-    call MAPL_GenericInitialize( GC, IMPORT, EXPORT, CLOCK, RC=status )
-    VERIFY_(STATUS)
+    call MAPL_GenericInitialize( GC, IMPORT, EXPORT, CLOCK, _RC )
 
 ! Make sure exports neede by the parent prior to our run call are initialized
 !----------------------------------------------------------------------------
 
-    call MAPL_GetPointer(EXPORT, MASK,     'MOM_2D_MASK', alloc=.true., RC=STATUS)
-    VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, TW,       'TW'  ,        alloc=.true., RC=STATUS)
+    call MAPL_GetPointer(EXPORT, MASK,     'MOM_2D_MASK', alloc=.true., _RC)
+    call MAPL_GetPointer(EXPORT, TW,       'TW'  ,        alloc=.true., _RC)
     VERIFY_(STATUS)
     call MAPL_GetPointer(EXPORT, SW,       'SW'  ,        alloc=.true., RC=STATUS)
     VERIFY_(STATUS)
@@ -869,7 +469,7 @@ contains
 
 ! Get the 2-D MOM data
 !---------------------
-    allocate(Tmp2(IM,JM), stat=status); VERIFY_(STATUS)
+    allocate(Tmp2(IM,JM), __STAT__)
 
     call ocean_model_data_get(Ocean_State, Ocean, 'mask', Tmp2, isc, jsc)
     MASK = real(Tmp2, kind=GeosKind)
@@ -893,7 +493,7 @@ contains
        AREA = real(Tmp2, kind=GeosKind)
     end if
 
-    deallocate(Tmp2)
+    deallocate(Tmp2, __STAT__)
 
 ! All Done
 !---------
@@ -924,8 +524,6 @@ contains
 
 ! ErrLog Variables
 
-    character(len=ESMF_MAXSTR)         :: IAm
-    integer                            :: STATUS
     character(len=ESMF_MAXSTR)         :: COMP_NAME
 
 ! Locals with ESMF and MAPL types
@@ -944,8 +542,7 @@ contains
 
 !   type(ocean_grid_type),         pointer :: Ocean_grid               => null()
 
-! Required exports
-
+! Exports
     REAL_, pointer                     :: TW    (:,:)        => null()
     REAL_, pointer                     :: SW    (:,:)        => null()
     REAL_, pointer                     :: UW    (:,:)        => null()
@@ -958,9 +555,6 @@ contains
     REAL_, pointer                     :: FRZMLT(:,:)        => null()
     REAL_, pointer                     :: MASK  (:,:)        => null()
     REAL_, pointer                     :: AREA  (:,:)        => null()
-
-! Optional Exports
-! none
 
 ! Imports
     REAL_, pointer                     :: TAUX(:,:)          => null()
@@ -1006,33 +600,29 @@ contains
     real                               :: pice_scaling = 1.0
     integer                            :: DT_OCEAN
 
-
     REAL_, pointer, dimension(:,:)     :: LATS  => null()
     REAL_, pointer, dimension(:,:)     :: LONS  => null()
+
+    __Iam__('Run')
 
 ! Begin
 !------
 
 ! Get the component name and set-up traceback handle.
 ! -----------------------------------------------------
-    Iam = "Run"
-    call ESMF_GridCompGet( gc, NAME=comp_name, RC=status )
-    VERIFY_(status)
-    Iam = trim(comp_name) // Iam
+    call ESMF_GridCompGet( GC, NAME=COMP_NAME, _RC)
+    Iam = trim(COMP_NAME)//'::'//Iam
 
 ! Get my internal MAPL_Generic state
 !-----------------------------------
 
-    call MAPL_GetObjectFromGC ( GC, MAPL, RC=status)
-    VERIFY_(STATUS)
-
+    call MAPL_GetObjectFromGC ( GC, MAPL, _RC)
 
     call MAPL_Get(MAPL,                      &
          INTERNAL_ESMF_STATE = INTERNAL,     &
          LATS  = LATS ,                      &
          LONS  = LONS ,                      &
-                                RC=STATUS )
-    VERIFY_(STATUS)
+         _RC)
 
 ! Profilers
 !----------
@@ -1043,7 +633,7 @@ contains
 ! Get the Plug private internal state
 !--------------------------------------
 
-    CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS )
+    CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS)
     VERIFY_(STATUS)
 
     MOM_MAPL_internal_state => WRAP%PTR
@@ -1073,10 +663,10 @@ contains
 ! Temporaries with MOM default reals
 !-----------------------------------
 
-    allocate(U(IM,JM   ),    stat=STATUS); VERIFY_(STATUS)
-    allocate(V(IM,JM   ),    stat=STATUS); VERIFY_(STATUS)
-    allocate(cos_rot(IM,JM), stat=STATUS); VERIFY_(STATUS)
-    allocate(sin_rot(IM,JM), stat=STATUS); VERIFY_(STATUS)
+    allocate(U(IM,JM   ),    __STAT__)
+    allocate(V(IM,JM   ),    __STAT__)
+    allocate(cos_rot(IM,JM), __STAT__)
+    allocate(sin_rot(IM,JM), __STAT__)
 
 ! Get IMPORT pointers
 !--------------------
@@ -1120,13 +710,12 @@ contains
     call MAPL_GetPointer(EXPORT, MASK, 'MOM_2D_MASK', RC=STATUS); VERIFY_(STATUS)
     call MAPL_GetPointer(EXPORT, AREA, 'AREA',        RC=STATUS); VERIFY_(STATUS)
 
-    call MAPL_GetResource(MAPL, pice_scaling, Label = "MOM_PICE_SCALING:", default = 1.0, rc = status); VERIFY_(status)
+    call MAPL_GetResource(MAPL, pice_scaling, Label = "MOM_PICE_SCALING:", default = 1.0, _RC)
 
 ! Fill in ocean boundary fluxes/forces
 !-------------------------------------
 
-    call MAPL_GetResource( MAPL, pres_loading, Label="pres_loading:", DEFAULT="NO", RC=STATUS)
-    VERIFY_(STATUS)
+    call MAPL_GetResource( MAPL, pres_loading, Label="pres_loading:", DEFAULT="NO", _RC)
 
     ! NOTE: PICE that is available here is all = 0. This should be made realistic, for now it is from MOM5 legacy
     !       Need to study with zero pressure loading (CTL: as now), exp1 ( with PS only), exp2 (with PS and PICE), exp3 (PICE only).
@@ -1176,17 +765,14 @@ contains
 ! Set the time for MOM
 !---------------------
 
-    call ESMF_ClockGet(CLOCK, currTIME=MyTime, TimeStep=TINT,  RC=STATUS)
-    VERIFY_(STATUS)
+    call ESMF_ClockGet(CLOCK, currTIME=MyTime, TimeStep=TINT,  _RC)
 
     call ESMF_TimeGet (MyTime,                    &
                        YY=YEAR, MM=MONTH, DD=DAY, &
                        H=HR,    M =MN,    S =SC,  &
-                                        RC=STATUS )
-    VERIFY_(STATUS)
+                       _RC)
 
-    CALL ESMF_TimeIntervalGet(TINT, S=DT_OCEAN, RC=status)
-    VERIFY_(status)
+    CALL ESMF_TimeIntervalGet(TINT, S=DT_OCEAN, _RC)
 
     DT   = set_time (DT_OCEAN, 0)
     Time = set_date (YEAR,MONTH,DAY,HR,MN,SC)
@@ -1196,7 +782,7 @@ contains
 
     ! set following to non-zero only if the coupled model becomes unstable 
     ! (inconsistent atmosphere or bad restart! or some instabilities) - per Atanas T
-    call MAPL_GetResource(MAPL, steady_state_ocean, Label = "steady_state_ocean:", default = 0, rc = status); VERIFY_(status)
+    call MAPL_GetResource(MAPL, steady_state_ocean, Label = "steady_state_ocean:", default = 0, _RC)
 
     if(steady_state_ocean == 0) then
       call update_ocean_model(Boundary, Ocean_State, Ocean, Time, DT)
@@ -1330,8 +916,8 @@ contains
 !   3d exports with MOM6, such as depths, T, S, U, V, etc
 !   will not be exported. If needed, write them on tri-polar grid directly from MOM6
 
-    deallocate(U, V)
-    deallocate(cos_rot,sin_rot)
+    deallocate(U, V, __STAT__)
+    deallocate(cos_rot,sin_rot, __STAT__)
 
     call MAPL_TimerOff(MAPL,"RUN"   )
     call MAPL_TimerOff(MAPL,"TOTAL" )
@@ -1371,8 +957,6 @@ contains
 
 ! ErrLog Variables
 
-    character(len=ESMF_MAXSTR)       :: IAm
-    integer                          :: STATUS
     character(len=ESMF_MAXSTR)       :: COMP_NAME
 
 ! Locals with MOM types
@@ -1380,19 +964,18 @@ contains
     type(time_type)                  :: Time
     integer                          :: YEAR,MONTH,DAY,HR,MN,SC
 
+    __Iam__('Finalize')
+
 ! Get the target components name and set-up traceback handle.
 ! -----------------------------------------------------------
 
-    Iam = "Finalize"
-    call ESMF_GridCompGet( gc, NAME=comp_name, RC=status )
-    VERIFY_(STATUS)
-    Iam = trim(comp_name) // Iam
+    call ESMF_GridCompGet( GC, NAME=COMP_NAME, _RC)
+    Iam = trim(COMP_NAME)//'::'//Iam
 
 ! Get my internal MAPL_Generic state
 !-----------------------------------
 
-    call MAPL_GetObjectFromGC ( GC, MAPL, RC=status)
-    VERIFY_(STATUS)
+    call MAPL_GetObjectFromGC ( GC, MAPL, _RC)
 
 ! Profilers
 !----------
@@ -1415,14 +998,12 @@ contains
 ! Set the times for MOM
 !----------------------
 
-    call ESMF_ClockGet( CLOCK, currTime=MyTime, RC=STATUS)
-    VERIFY_(status)
+    call ESMF_ClockGet( CLOCK, currTime=MyTime, _RC)
 
     call ESMF_TimeGet (MyTime,      &
          YY=YEAR, MM=MONTH, DD=DAY, &
          H=HR,    M =MN,    S =SC,  &
-         RC=STATUS )
-    VERIFY_(STATUS)
+         _RC)
 
     Time = set_date(YEAR,MONTH,DAY,HR,MN,SC)
 
@@ -1455,12 +1036,11 @@ contains
                  Boundary% p               , &
                  Boundary% mi              , &
                  Boundary% ice_rigidity    , &
-                                stat=STATUS )
-    VERIFY_(STATUS)
+                 __STAT__)
 
-    deallocate ( Ocean,                   STAT=STATUS); VERIFY_(STATUS)
-    deallocate ( Boundary,                STAT=STATUS); VERIFY_(STATUS)
-    deallocate ( MOM_MAPL_internal_state, STAT=STATUS); VERIFY_(STATUS)
+    deallocate ( Ocean,                   __STAT__)
+    deallocate ( Boundary,                __STAT__)
+    deallocate ( MOM_MAPL_internal_state, __STAT__)
 !
 
     call MAPL_TimerOff(MAPL,"FINALIZE")
@@ -1469,8 +1049,7 @@ contains
 ! Generic Finalize
 ! ------------------
 
-    call MAPL_GenericFinalize( GC, IMPORT, EXPORT, CLOCK, RC=status )
-    VERIFY_(STATUS)
+    call MAPL_GenericFinalize( GC, IMPORT, EXPORT, CLOCK, _RC )
 
     call mpp_exit()
 
@@ -1505,35 +1084,31 @@ contains
 
 ! ErrLog Variables
 
-    character(len=ESMF_MAXSTR)       :: IAm
-    integer                          :: STATUS
     character(len=ESMF_MAXSTR)       :: COMP_NAME
 
 ! Locals
     character(len=14)                :: timeStamp
     logical                          :: doRecord
 
+    __Iam__('Record')
+
 ! Get the target components name and set-up traceback handle.
 ! -----------------------------------------------------------
 
-    Iam = "Record"
-    call ESMF_GridCompGet( gc, NAME=comp_name, RC=status )
-    VERIFY_(STATUS)
-    Iam = trim(comp_name) // Iam
+    call ESMF_GridCompGet( GC, NAME=COMP_NAME, _RC)
+    Iam = trim(COMP_NAME)//'::'//Iam
 
 ! Get my internal MAPL_Generic state
 !-----------------------------------
 
-    call MAPL_GetObjectFromGC ( GC, MAPL, RC=status)
-    VERIFY_(STATUS)
+    call MAPL_GetObjectFromGC ( GC, MAPL, _RC)
 
 ! Profilers
 !----------
 
     call MAPL_TimerOn(MAPL,"TOTAL")
 
-    doRecord = MAPL_RecordAlarmIsRinging(MAPL, RC=status)
-    VERIFY_(STATUS)
+    doRecord = MAPL_RecordAlarmIsRinging(MAPL, _RC)
 
     if (doRecord) then
 
@@ -1546,8 +1121,7 @@ contains
        MOM_MAPL_internal_state => WRAP%PTR
        Ocean_State             => MOM_MAPL_internal_state%Ocean_State
 
-       call MAPL_DateStampGet(clock, timeStamp, rc=status)
-       VERIFY_(STATUS)
+       call MAPL_DateStampGet(clock, timeStamp, _RC)
 
 ! Write a restart
 !-----------------
@@ -1566,11 +1140,11 @@ contains
 
 end module MOM6_GEOSPlugMod
 
-subroutine SetServices(gc, rc)
+subroutine SetServices(GC, RC)
    use ESMF
    use MOM6_GEOSPlugMod, only : mySetservices=>SetServices
-   type(ESMF_GridComp) :: gc
-   integer, intent(out) :: rc
-   call mySetServices(gc, rc=rc)
+   type(ESMF_GridComp)  :: GC
+   integer, intent(out) :: RC
+   call mySetServices(GC, rc=RC)
 end subroutine
 
