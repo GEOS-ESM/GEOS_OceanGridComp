@@ -1,11 +1,8 @@
-!  $Id$
-
 #include "MAPL_Generic.h"
 
-! GEOS   default real kind
-
-#define G5KIND      4
-#define REAL_       real(kind=G5KIND)
+! GEOS default real kind
+#define GeosKind      4
+#define REAL_       real(kind=GeosKind)
 
 module MOM6_GEOSPlugMod
 
@@ -111,30 +108,38 @@ contains
 !   respective SetServices.
 
 !EOP
-
 !=============================================================================
 !
 ! ErrLog Variables
 
-    character(len=ESMF_MAXSTR)          :: IAm
-    integer                             :: STATUS
     character(len=ESMF_MAXSTR)          :: COMP_NAME
 
 ! Locals
-
 !=============================================================================
+
+    __Iam__('SetServices')
 
 ! Begin...
 
 ! Get my name and set-up traceback handle
 ! ---------------------------------------
 
-    Iam = 'SetServices'
-    call ESMF_GridCompGet( GC, NAME=COMP_NAME, RC=STATUS )
-    VERIFY_(STATUS)
-    Iam = trim(COMP_NAME) // Iam
+    Iam = trim(comp_name)//'::'//'SetServices'
+
+! Set the Initialize, Run, Finalize entry points
+! ----------------------------------------------
+
+    call MAPL_GridCompSetEntryPoint ( GC, ESMF_Method_Initialize,   Initialize, _RC)
+    call MAPL_GridCompSetEntryPoint ( GC, ESMF_Method_Run,          Run,        _RC)
+    call MAPL_GridCompSetEntryPoint ( GC, ESMF_Method_Finalize,     Finalize,   _RC)
+    call MAPL_GridCompSetEntryPoint ( GC, ESMF_Method_WriteRestart, Record,     _RC)
 
 !BOS
+! !Import state:
+!#include "GEOS_DataSea_Import___.h"
+
+!  !Export state:
+!#include "GEOS_DataSea_Export___.h"
 
 !  !IMPORT STATE:
 
@@ -522,33 +527,17 @@ contains
 
 !EOS
 
-! Set the Initialize, Run, Finalize entry points
-! ----------------------------------------------
-
-    call MAPL_GridCompSetEntryPoint ( GC, ESMF_METHOD_INITIALIZE,   Initialize, RC=status)
-    VERIFY_(STATUS)
-    call MAPL_GridCompSetEntryPoint ( GC, ESMF_METHOD_RUN,          Run,        RC=status)
-    VERIFY_(STATUS)
-    call MAPL_GridCompSetEntryPoint ( GC, ESMF_METHOD_FINALIZE,     Finalize,   RC=status)
-    VERIFY_(STATUS)
-    call MAPL_GridCompSetEntryPoint ( GC, ESMF_METHOD_WRITERESTART, Record,     RC=status)
-    VERIFY_(STATUS)
-
 ! Set the Profiling timers
 ! ------------------------
 
-    call MAPL_TimerAdd(GC,   name="INITIALIZE" ,RC=STATUS)
-    VERIFY_(STATUS)
-    call MAPL_TimerAdd(GC,   name="RUN"        ,RC=STATUS)
-    VERIFY_(STATUS)
-    call MAPL_TimerAdd(GC,   name="FINALIZE"   ,RC=STATUS)
-    VERIFY_(STATUS)
+    call MAPL_TimerAdd(GC,   name="INITIALIZE" , _RC)
+    call MAPL_TimerAdd(GC,   name="RUN"        , _RC)
+    call MAPL_TimerAdd(GC,   name="FINALIZE"   , _RC)
 
 ! Generic SetServices
 ! -------------------
 
-    call MAPL_GenericSetServices    ( GC, RC=STATUS )
-    VERIFY_(STATUS)
+    call MAPL_GenericSetServices    ( GC, _RC )
 
 ! All done
 ! --------
@@ -883,25 +872,25 @@ contains
     allocate(Tmp2(IM,JM), stat=status); VERIFY_(STATUS)
 
     call ocean_model_data_get(Ocean_State, Ocean, 'mask', Tmp2, isc, jsc)
-    MASK = real(Tmp2, kind=G5KIND)
+    MASK = real(Tmp2, kind=GeosKind)
 
     call ocean_model_data_get(Ocean_State, Ocean, 't_surf', Tmp2, g_isc, g_jsc) ! this comes to us in deg C
     where(MASK(:,:) > 0.0)
-       TW = real(Tmp2, kind=G5KIND) + MAPL_TICE                                 ! because C to K was subtracted in MOM
+       TW = real(Tmp2, kind=GeosKind) + MAPL_TICE                                 ! because C to K was subtracted in MOM
     elsewhere
        TW = MAPL_UNDEF
     end where
 
     call ocean_model_data_get(Ocean_State, Ocean, 's_surf', Tmp2, g_isc, g_jsc) ! comes to us in PSU
     where(MASK(:,:) > 0.0)
-       SW = real(Tmp2, kind=G5KIND)
+       SW = real(Tmp2, kind=GeosKind)
     elsewhere
        SW = MAPL_UNDEF
     end where
 
     if(associated(area)) then
        call ocean_model_data_get(Ocean_State, Ocean, 'area', Tmp2, isc, jsc)
-       AREA = real(Tmp2, kind=G5KIND)
+       AREA = real(Tmp2, kind=GeosKind)
     end if
 
     deallocate(Tmp2)
@@ -1223,13 +1212,13 @@ contains
 !   mask
     U = 0.0
     call ocean_model_data_get(Ocean_State, Ocean, 'mask', U, isc, jsc)
-    MASK = real(U, kind=G5KIND)
+    MASK = real(U, kind=GeosKind)
 
 !   surface (potential) temperature (K)
     U = 0.0
     call ocean_model_data_get(Ocean_State, Ocean, 't_surf', U, isc, jsc) ! this comes to us in deg C
     where(MASK(:,:) > 0.0)
-       TW = real(U, kind=G5KIND) + MAPL_TICE                             ! because C to K was subtracted in MOM
+       TW = real(U, kind=GeosKind) + MAPL_TICE                             ! because C to K was subtracted in MOM
     elsewhere
        TW = MAPL_UNDEF
     end where
@@ -1238,7 +1227,7 @@ contains
     U = 0.0
     call ocean_model_data_get(Ocean_State, Ocean, 's_surf', U, isc, jsc) ! this comes to us in PSU
     where(MASK(:,:) > 0.0)
-       SW = real(U, kind=G5KIND)
+       SW = real(U, kind=GeosKind)
     elsewhere
        SW = MAPL_UNDEF
     end where
@@ -1248,7 +1237,7 @@ contains
     if(associated(SLV)) then
        call ocean_model_data_get(Ocean_State, Ocean, 'sea_lev', U, isc, jsc) ! this comes to us in m
        where(MASK(:,:)>0.0)
-          SLV = real(U, kind = G5KIND)
+          SLV = real(U, kind = GeosKind)
        elsewhere
           SLV = 0.0
        end where
@@ -1259,7 +1248,7 @@ contains
     if(associated(FRAZIL)) then
        call ocean_model_data_get(Ocean_State, Ocean, 'frazil',   U, isc, jsc)  ! this comes to us in J/m2
        where(MASK(:,:)>0.0)
-          FRAZIL =  real( (U)/dt_ocean, kind = G5KIND) ! relying on fortran to promote the int (dt_ocean) to real
+          FRAZIL =  real( (U)/dt_ocean, kind = GeosKind) ! relying on fortran to promote the int (dt_ocean) to real
        elsewhere
           FRAZIL =  0.0
        end where
@@ -1270,7 +1259,7 @@ contains
     if(associated(MELT_POT)) then
        call ocean_model_data_get(Ocean_State, Ocean, 'melt_pot', U, isc, jsc)  ! this comes to us in J/m2
        where(MASK(:,:)>0.0)
-          MELT_POT = -real( (U)/dt_ocean, kind = G5KIND) ! relying on fortran to promote the int (dt_ocean) to real
+          MELT_POT = -real( (U)/dt_ocean, kind = GeosKind) ! relying on fortran to promote the int (dt_ocean) to real
        elsewhere
           MELT_POT =  0.0
        end where
@@ -1300,7 +1289,7 @@ contains
 
     if(associated(UW )) then
       where(MASK(:,:) > 0.0)
-        UW = real(U, kind=G5KIND)
+        UW = real(U, kind=GeosKind)
       elsewhere
         UW=0.0
       end where
@@ -1308,7 +1297,7 @@ contains
 
     if(associated(VW )) then
       where(MASK(:,:) > 0.0)
-        VW = real(V, kind=G5KIND)
+        VW = real(V, kind=GeosKind)
       elsewhere
         VW=0.0
       end where
@@ -1321,7 +1310,7 @@ contains
 
     if(associated(UWB )) then
       where(MASK(:,:) > 0.0)
-        UWB = real(U, kind=G5KIND)
+        UWB = real(U, kind=GeosKind)
       elsewhere
         UWB =0.0
       end where
@@ -1329,7 +1318,7 @@ contains
 
     if(associated(VWB )) then
       where(MASK(:,:) > 0.0)
-        VWB = real(V, kind=G5KIND)
+        VWB = real(V, kind=GeosKind)
       elsewhere
         VWB =0.0
       end where
