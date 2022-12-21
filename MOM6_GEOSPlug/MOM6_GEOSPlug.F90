@@ -136,10 +136,10 @@ contains
 
 !BOS
 ! !Import state:
-!#include "GEOS_DataSea_Import___.h"
+!#include "MOM6_GEOSPlug_Import___.h"
 
 !  !Export state:
-!#include "GEOS_DataSea_Export___.h"
+!#include "MOM6_GEOSPlug_Export___.h"
 
 !  !IMPORT STATE:
 

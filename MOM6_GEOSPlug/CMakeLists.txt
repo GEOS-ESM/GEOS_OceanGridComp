@@ -25,3 +25,7 @@ install(
    DESTINATION etc/MOM6
    USE_SOURCE_PERMISSIONS
    )
+
+mapl_acg (${this}   MOM6_GEOSPlug_StateSpecs.rc
+          IMPORT_SPECS EXPORT_SPECS INTERNAL_SPECS
+          GET_POINTERS DECLARE_POINTERS)
