@@ -47,15 +47,9 @@ SLV           | m             | xy   | N    | sea_level_with_ice_loading_and_inv
 FRAZIL        | W m-2         | xy   | N    | heating_from_frazil_formation
 MELT_POT      | W m-2         | xy   | N    | heat_that_can_be_used_to_melt_sea_ice
 FRZMLT        | W m-2         | xy   | N    | freeze_melt_potential
-DUM1          | 1             | xy   | N    | dummy_export1
-DUM2          | 1             | xy   | N    | dummy_export2
-U             | m s-1         | xyz  | C    | eastward_current
-V             | m s-1         | xyz  | C    | northward_current
-DH            | m OR kg m-2   | xyz  | C    | layer_thickness
-DEPTH         | m             | xyz  | C    | layer_depth
-T             | K             | xyz  | C    | potential_temperature
-S             | psu           | xyz  | C    | salinity
-SWFRAC        | 1             | xyz  | C    | shortwave_fractional_decay
+DH            | m OR kg m-2   | xyz  | C    | DUMMY_EXPORT_layer_thickness
+T             | K             | xyz  | C    | DUMMY_EXPORT_potential_temperature
+S             | PSU           | xyz  | C    | DUMMY_EXPORT_salinity
 
 category: INTERNAL
 #----------------------------------------------------------------------------------------
