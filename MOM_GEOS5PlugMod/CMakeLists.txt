@@ -20,3 +20,7 @@ string(REPLACE " " ";" tmp ${FREAL8})
 foreach (flag ${tmp})
   target_compile_options (${this} PRIVATE $<$<COMPILE_LANGUAGE:Fortran>:${flag}>)
 endforeach ()
+
+mapl_acg (${this}   MOM_GEOS5PlugMod_StateSpecs.rc
+          IMPORT_SPECS EXPORT_SPECS
+          GET_POINTERS DECLARE_POINTERS)
