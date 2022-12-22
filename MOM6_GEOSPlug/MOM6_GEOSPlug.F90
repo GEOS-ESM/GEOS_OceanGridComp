@@ -124,7 +124,8 @@ contains
 ! Get my name and set-up traceback handle
 ! ---------------------------------------
 
-    Iam = trim(comp_name)//'::'//'SetServices'
+    call ESMF_GridCompGet( GC, NAME=COMP_NAME, _RC)
+    Iam = trim(COMP_NAME)//'::'//'SetServices'
 
 ! Set the Initialize, Run, Finalize entry points
 ! ----------------------------------------------
