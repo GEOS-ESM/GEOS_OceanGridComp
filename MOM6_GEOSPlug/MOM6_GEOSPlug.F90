@@ -140,7 +140,7 @@ contains
 ! !Import state:
 #include "MOM6_GEOSPlug_Import___.h"
 
-!  !Export state:
+! !Export state:
 #include "MOM6_GEOSPlug_Export___.h"
 
 !EOS
