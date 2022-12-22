@@ -1,0 +1,99 @@
+schema_version: 2.0.0
+component: Ocean
+
+category: IMPORT
+#------------------------------------------------------------------------------------
+# VARIABLE                  | DIMENSIONS  |          Additional Metadata
+#------------------------------------------------------------------------------------
+NAME         | UNITS        | DIMS | VLOC | COND         | DATATYPE        | LONG_NAME
+#------------------------------------------------------------------------------------
+TAUX         | N m-2        | xy   | N    |              |                 | Agrid_eastward_stress_on_ocean
+TAUY         | N m-2        | xy   | N    |              |                 | Agrid_northward_stress_on_ocean
+PS           | Pa           | xy   | N    |              |                 | Surface Atmospheric Pressure
+PICE         | Pa           | xy   | N    |              |                 | pressure due to ice weight
+SWHEAT       | W m-2        | xyz  | C    |              |                 | solar_heating_rate
+LWFLX        | W m-2        | xy   | N    |              |                 | surface_net_downward_longwave_flux
+SHFLX        | W m-2        | xy   | N    |              |                 | upward_sensible_heat_flux
+QFLUX        | kg m-2 s-1   | xy   | N    |              |                 | evaporation
+RAIN         | kg m-2 s-1   | xy   | N    |              |                 | ocean_rainfall
+SNOW         | kg m-2 s-1   | xy   | N    |              |                 | ocean_snowfall 
+SFLX         | kg m-2 s-1   | xy   | N    |              |                 | salt_flux_from_sea_ice_to_ocean
+PENUVR       | W m-2        | xy   | N    |              |                 | net_downward_penetrating_direct_UV_flux
+PENPAR       | W m-2        | xy   | N    |              |                 | net_downward_penetrating_direct_PAR_flux
+PENUVF       | W m-2        | xy   | N    |              |                 | net_downward_penetrating_diffuse_UV_flux
+PENPAF       | W m-2        | xy   | N    |              |                 | net_downward_penetrating_diffuse_PAR_flux
+DRNIR        | W m-2        | xy   | N    |              |                 | net_surface_downwelling_nir_beam_flux
+DFNIR        | W m-2        | xy   | N    |              |                 | net_surface_downwelling_nir_diffuse_flux
+DISCHARGE    | kg m-2 s-1   | xy   | N    |              |                 | river_discharge_at_ocean_points
+STROCNXB     | N m-2        | xy   | N    |              |                 | x_stress_at_base_of_ice_weighted_by_aiu
+STROCNYB     | N m-2        | xy   | N    |              |                 | y_stress_at_base_of_ice_weighted_by_aiu
+AICEU        | 1            | xy   | N    |              |                 | ice_concentration_of_grid_cell_Bgrid
+DEL_TEMP     | K            | xy   | N    | dual_ocean   |                 | temperature correction to top level MOM:Tsst-Tmom
+TR           | 1            | xyz  | C    |              | MAPL_BundleItem | tracer_mixing_ratios
+
+category: EXPORT 
+#------------------------------------------------------------------------------------
+# VARIABLE                    | DIMENSIONS   |          Additional Metadata
+#------------------------------------------------------------------------------------
+NAME           | UNITS        | DIMS | VLOC  | LONG_NAME
+#------------------------------------------------------------------------------------
+UW             | m s-1        | xy   | N     | surface_Agrid_eastward_velocity
+VW             | m s-1        | xy   | N     | surface_Agrid_northward_velocity
+UWB            | m s-1        | xy   | N     | surface_Bgrid_X_velocity
+VWB            | m s-1        | xy   | N     | surface_Bgrid_Y_velocity
+TW             | K            | xy   | N     | surface_temperature
+SW             | psu          | xy   | N     | surface_salinity
+MOM_3D_MASK    | 1            | xyz  | C     | Mom4_ocean_mask_at_t-points
+AREA           | m+2          | xy   | N     | Mom4_ocean_area_at_t-points
+SSH            | m            | xy   | N     | sea_level_height
+SLV            | m            | xy   | N     | sea_level_with_ice_loading
+FRZMLT         | W m-2        | xy   | N     | freeze_melt_potential
+DH             | m            | xyz  | C     | layer_thickness
+RHO            | kg m-3       | xyz  | C     | density
+MASSCELLO      | kg m-2       | xyz  | C     | mass_per_unit_area
+HC             | J m-2        | xyz  | C     | heat_content
+U              | m s-1        | xyz  | C     | eastward_current
+V              | m s-1        | xyz  | C     | northward_current
+UX             | m s-1        | xyz  | C     | x_current
+VX             | m s-1        | xyz  | C     | y_current
+T              | K            | xyz  | C     | potential_temperature
+TCON           | K            | xyz  | C     | conservative_temperature
+S              | psu          | xyz  | C     | salinity
+WMO            | tonne s-1    | xyz  | C     | upward_mass_transport
+WMOSQ          | tonne2 s-2   | xyz  | C     | upward_mass_transport_squared
+TOSSQ          | K2           | xy   | N     | surface_temperature_squared
+PBO            | dbar         | xy   | N     | pressure_at_sea_floor
+OMLDAMAX       | m            | xy   | N     | maximum_mixed_layer_thickness
+DEPTH          | m            | xyz  | C     | layer_depth
+MLD            | m            | xy   | N     | mixed_layer_depth
+PSI            | kg s-1       | xy   | N     | barotropic_streamfunction
+SWFRAC         | 1            | xyz  | C     | shortwave_fractional_decay
+
+
+#********************************************************
+#
+# Legend
+#
+#------------------------------------------------------------------
+# Column label | MAPL keyword/interpretation |  Default
+#--------------|---------------------------------------------------
+# NAME         | short_name                  |
+# UNITS        | units                       |
+# DIMS         | dims                        |
+# VLOC         | VLocation                   | MAPL_VLocationNone
+# LONG NAME    | long_name                   |
+# COND         | if (<logical-expr>) then    |  .FALSE.
+# NUM_SUBTILES | num_subtiles
+# ...
+#------------------------------------------------------------------
+#
+#--------------------------------------------
+# Entry alias  | Column | MAPL keyword/interpretation
+#--------------|-----------------------------
+# xyz          | DIMS   | MAPL_HorzVert
+# xy           | DIMS   | MAPL_HorzOnly
+# z            | DIMS   | MAPL_VertOnly  (plus ungridded)
+# C            | VLOC   | MAPL_VlocationCenter
+# E            | VLOC   | MAPL_VlocationEdge
+# N            | VLOC   | MAPL_VlocationNone
+#--------------------------------------------
