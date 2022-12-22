@@ -11,7 +11,7 @@ TAUX        | N m-2        | xy   | N    | Agrid_eastward_stress_on_ocean
 TAUY        | N m-2        | xy   | N    | Agrid_northward_stress_on_ocean
 PS          | Pa           | xy   | N    | surface_atmospheric_pressure
 PICE        | Pa           | xy   | N    | pressure_due_to_ice_weight
-SWHEAT      | W m-2        | xyz  | C    | solar_heating_rate
+SWHEAT      | W m-2        | xyz  | C    | DUMMY_IMPORT_solar_heating_rate
 LWFLX       | W m-2        | xy   | N    | surface_net_downward_longwave_flux
 SHFLX       | W m-2        | xy   | N    | upward_sensible_heat_flux
 QFLUX       | kg m-2 s-1   | xy   | N    | evaporation
