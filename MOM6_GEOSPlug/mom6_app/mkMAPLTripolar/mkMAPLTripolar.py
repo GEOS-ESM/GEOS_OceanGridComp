@@ -4,7 +4,7 @@
 To use this script load appropriate python and ncl modules, edit top of MAPL_Tripolar.cdl file,
 then run it as:
 
-./mk_MAPL_Tripolar.py MAPL_Tripolar.cdl
+./mkMAPLTripolar.py MAPL_Tripolar.cdl
 
 '''
 
