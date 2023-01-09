@@ -1,4 +1,4 @@
-`mk_MAPL_Tripolar.py` utily creates `MAPL_Tripolar.nc` file from MOM6 mosaic grid. It takes as an argument `MAPL_Tripolar.cdl` file. `MAPL_Tripolar.cdl` file should edited before running `mk_MAPL_Triporal.py`. Metadata section in `MAPL_Tripolar.cdl` defines grid dimentions, variable names, precision and attributes. Example of metadata section:
+`mkMAPLTripolar.py` utily creates `MAPL_Tripolar.nc` file from MOM6 mosaic grid. It takes as an argument `MAPL_Tripolar.cdl` file. `MAPL_Tripolar.cdl` file should edited before running `mkMAPLTriporal.py`. Metadata section in `MAPL_Tripolar.cdl` defines grid dimentions, variable names, precision and attributes. Example of metadata section:
 
 ```
 dimensions:
