@@ -547,6 +547,7 @@ contains
     REAL_, pointer                     :: FRZMLT(:,:)        => null()
     REAL_, pointer                     :: MOM_2D_MASK  (:,:) => null()
     REAL_, pointer                     :: AREA  (:,:)        => null()
+    REAL_, pointer                     :: T_Freeze (:,:)     => null()
 
 ! Imports
     REAL_, pointer                     :: TAUX(:,:)          => null()
@@ -590,6 +591,7 @@ contains
     type(time_type)                    :: DT
 
     real                               :: pice_scaling = 1.0
+    real                               :: dTf_dS
     integer                            :: DT_OCEAN
 
     REAL_, pointer, dimension(:,:)     :: LATS  => null()
@@ -699,15 +701,17 @@ contains
     call MAPL_GetPointer(EXPORT, FRAZIL,  'FRAZIL',   alloc=.true., RC=STATUS); VERIFY_(STATUS)
     call MAPL_GetPointer(EXPORT, MELT_POT,'MELT_POT', alloc=.true., RC=STATUS); VERIFY_(STATUS)
     call MAPL_GetPointer(EXPORT, FRZMLT,  'FRZMLT',                 RC=STATUS); VERIFY_(STATUS)
+    call MAPL_GetPointer(EXPORT, T_Freeze,'T_Freeze',               RC=STATUS); VERIFY_(STATUS)
 
     call MAPL_GetPointer(EXPORT, MOM_2D_MASK, 'MOM_2D_MASK', RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, AREA, 'AREA',        RC=STATUS); VERIFY_(STATUS)
+    call MAPL_GetPointer(EXPORT, AREA, 'AREA',               RC=STATUS); VERIFY_(STATUS)
 
 ! Fill in ocean boundary fluxes/forces
 !-------------------------------------
 
     call MAPL_GetResource(MAPL, pice_scaling, Label="MOM_PICE_SCALING:", DEFAULT= 1.0, _RC)
     call MAPL_GetResource(MAPL, pres_loading, Label="pres_loading:",     DEFAULT="NO", _RC)
+    call MAPL_GetResource(MAPL, dTf_dS,       Label="DTFREEZE_DS:",      DEFAULT= -0.054, _RC) !The derivative of the freezing temperature with salinity in deg_C/PSU
 
     ! NOTE: PICE that is available here is all = 0. This should be made realistic, for now it is from MOM5 legacy
     !       Need to study with zero pressure loading (CTL: as now), exp1 ( with PS only), exp2 (with PS and PICE), exp3 (PICE only).
@@ -855,6 +859,15 @@ contains
           FRZMLT = FRAZIL + MELT_POT
        elsewhere
           FRZMLT = 0.0
+       end where
+    end if
+
+!   freezing temperature (deg C)
+    if(associated(T_Freeze)) then
+       where(MOM_2D_MASK(:,:)>0.0)
+          T_Freeze = 0.0 + dTf_dS * SW ! exactly as in SIS2_ice_thm.F90
+       elsewhere
+          T_Freeze = -1.8
        end where
     end if
 
