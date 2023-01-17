@@ -425,6 +425,7 @@ contains
     real, pointer :: TS_FOUND (:,:)
     real, pointer :: SS_FOUND (:,:)
     real, pointer :: FRZMLTe(:,:)
+    real, pointer :: T_Freeze_e(:,:)
 
 ! Diagnostics exports
 
@@ -471,6 +472,7 @@ contains
     real, pointer ::   MASK(:,:)
     real, pointer :: MASK3D(:,:,:)
     real, pointer :: FRZMLT(:,:)
+    real, pointer :: T_Freeze(:,:) ! in deg C
 
     real, pointer :: TWd  (:,:)
     real, pointer :: DEL_TEMP (:,:)
@@ -638,7 +640,8 @@ contains
        endif
        
        if(DO_DATASEA==0) then
-          call MAPL_GetPointer(GEX(OCN), FRZMLT, 'FRZMLT', alloc=.true., _RC)
+          call MAPL_GetPointer(GEX(OCN), FRZMLT,   'FRZMLT', alloc=.true., _RC)
+          call MAPL_GetPointer(GEX(OCN), T_Freeze, 'T_Freeze',alloc=.true.,_RC)
        end if
 
 ! Get pointers to exports
@@ -647,6 +650,7 @@ contains
        call MAPL_GetPointer(EXPORT, TS_FOUND,'TS_FOUND', _RC)
        call MAPL_GetPointer(EXPORT, SS_FOUND,'SS_FOUND', _RC)
        call MAPL_GetPointer(EXPORT, FRZMLTe, 'FRZMLT',   _RC)
+       call MAPL_GetPointer(EXPORT, T_Freeze_e, 'T_Freeze', _RC)
 
 ! Diagnostics exports
 !---------------------------------------------------------
@@ -827,6 +831,16 @@ contains
           end if          
        end if
 
+       if(associated(T_Freeze_e)) then
+          if(DO_DATASEA == 0) then
+             where(WGHT > 0.0 )
+                T_Freeze_e = T_Freeze
+             end where
+          else
+             T_Freeze_e = -1.8
+          end if          
+       end if
+
        if (DUAL_OCEAN) then
           !ALT we might not have FI yet, so let get it again
           call MAPL_GetPointer(GIM(OCNd), FI , 'FRACICE'  , _RC)
@@ -846,7 +860,7 @@ contains
 ! Update orphan points
        if(DO_DATASEA == 0) then
           WGHT=FROCEAN*(1-MASK)
-          Tfreeze=MAPL_TICE-0.054*OrphanSalinity
+          Tfreeze=MAPL_TICE-0.054*OrphanSalinity ! in K
 
           where(wght>0.0)
              TS_FOUND=TS_FOUND+ &
