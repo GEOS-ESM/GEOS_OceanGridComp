@@ -42,9 +42,9 @@ module MOM6_GEOSPlugMod
 
   use mpp_parameter_mod,        only: AGRID, BGRID_NE, CGRID_NE, SCALAR_PAIR
 
-  use time_manager_mod,         only: set_calendar_type, time_type
-  use time_manager_mod,         only: set_time, set_date
-  use time_manager_mod,         only: JULIAN
+  use MOM_time_manager,         only: set_calendar_type, time_type
+  use MOM_time_manager,         only: set_time, set_date
+  use MOM_time_manager,         only: JULIAN
 
   use ocean_model_mod,          only: ocean_model_init,     &
                                       ocean_model_init_sfc, &
