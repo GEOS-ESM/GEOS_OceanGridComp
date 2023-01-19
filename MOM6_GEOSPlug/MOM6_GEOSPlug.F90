@@ -28,7 +28,7 @@ module MOM6_GEOSPlugMod
 
 ! These MOM dependencies are all we are currently using.
 
-  use diag_manager_mod,         only: diag_manager_init, diag_manager_end
+  use MOM_diag_manager_infra,   only: MOM_diag_manager_init, MOM_diag_manager_end
   use field_manager_mod,        only: field_manager_init, field_manager_end
 
   use mpp_mod,                  only: mpp_exit
@@ -302,7 +302,7 @@ contains
 
     call field_manager_init
     call set_calendar_type ( JULIAN)
-    call diag_manager_init !SA: could pass time_init, not available before (MOM5)
+    call MOM_diag_manager_init
 
     DT   = set_time (DT_OCEAN, 0)
     Time = set_date (YEAR,MONTH,DAY,HR,MN,SC)
@@ -1012,7 +1012,7 @@ contains
 
     call ocean_model_end (Ocean, Ocean_State, Time) ! SA: this also calls ocean_model_save_restart(...)
 
-    call diag_manager_end(Time )
+    call MOM_diag_manager_end(Time )
     call field_manager_end
     call fms_io_exit
 
