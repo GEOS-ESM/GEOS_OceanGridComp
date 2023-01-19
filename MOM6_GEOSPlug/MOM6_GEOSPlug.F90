@@ -32,9 +32,8 @@ module MOM6_GEOSPlugMod
 
 ! MOM dependencies
   use MOM_diag_manager_infra,   only: MOM_diag_manager_init, MOM_diag_manager_end
-
   use MOM_coms_infra,           only: MOM_infra_init
-  use fms_io_mod,               only: fms_io_exit
+  use MOM_io_infra,             only: io_infra_end
 
   use mpp_domains_mod,          only: domain2d, mpp_update_domains, &
                                       mpp_get_compute_domain,       &
@@ -1015,7 +1014,7 @@ contains
 
     call MOM_diag_manager_end(Time )
     call field_manager_end
-    call fms_io_exit
+    call io_infra_end
 
     deallocate ( Boundary% u_flux          , &
                  Boundary% v_flux          , &
