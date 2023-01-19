@@ -28,7 +28,6 @@ module MOM6_GEOSPlugMod
 
 ! These MOM dependencies are all we are currently using.
 
-  use constants_mod,            only: constants_init
   use diag_manager_mod,         only: diag_manager_init, diag_manager_end
   use field_manager_mod,        only: field_manager_init, field_manager_end
 
@@ -301,7 +300,6 @@ contains
 ! Init MOM stuff
 !---------------
 
-    call constants_init
     call field_manager_init
     call set_calendar_type ( JULIAN)
     call diag_manager_init !SA: could pass time_init, not available before (MOM5)
