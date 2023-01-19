@@ -26,13 +26,14 @@ module MOM6_GEOSPlugMod
   use MAPL
   use MAPL_ConstantsMod,        only: MAPL_TICE
 
-! These MOM dependencies are all we are currently using.
-
-  use MOM_diag_manager_infra,   only: MOM_diag_manager_init, MOM_diag_manager_end
+! FMS dependencies
   use field_manager_mod,        only: field_manager_init, field_manager_end
-
   use mpp_mod,                  only: mpp_exit
-  use fms_mod,                  only: fms_init, fms_end
+
+! MOM dependencies
+  use MOM_diag_manager_infra,   only: MOM_diag_manager_init, MOM_diag_manager_end
+
+  use MOM_coms_infra,           only: MOM_infra_init
   use fms_io_mod,               only: fms_io_exit
 
   use mpp_domains_mod,          only: domain2d, mpp_update_domains, &
@@ -295,7 +296,7 @@ contains
 
     call ESMF_VMGet(VM, mpiCommunicator=Comm, _RC)
 
-    call fms_init(Comm)
+    call MOM_infra_init(Comm)
 
 ! Init MOM stuff
 !---------------
