@@ -40,7 +40,7 @@ module MOM6_GEOSPlugMod
                                       mpp_get_compute_domain,       &
                                       mpp_get_data_domain
 
-  use mpp_parameter_mod,        only: AGRID, BGRID_NE, CGRID_NE, SCALAR_PAIR
+  use MOM_domain_infra,         only: AGRID, BGRID_NE, CGRID_NE, SCALAR_PAIR
 
   use MOM_time_manager,         only: set_calendar_type, time_type
   use MOM_time_manager,         only: set_time, set_date
