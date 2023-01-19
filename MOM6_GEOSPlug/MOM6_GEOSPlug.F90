@@ -35,31 +35,27 @@ module MOM6_GEOSPlugMod
   use MOM_coms_infra,           only: MOM_infra_init
   use MOM_io_infra,             only: io_infra_end
 
-  use mpp_domains_mod,          only: mpp_get_compute_domain, &
-                                      mpp_get_data_domain
+  use MOM_domain_infra,         only: get_domain_extent, &
+                                      AGRID, BGRID_NE, CGRID_NE, SCALAR_PAIR
 
-  use MOM_domain_infra,         only: AGRID, BGRID_NE, CGRID_NE, SCALAR_PAIR
+  use MOM_time_manager,         only: set_calendar_type, time_type, &
+                                      set_time, set_date, &
+                                      JULIAN
 
-  use MOM_time_manager,         only: set_calendar_type, time_type
-  use MOM_time_manager,         only: set_time, set_date
-  use MOM_time_manager,         only: JULIAN
+  use MOM_grid,                 only: ocean_grid_type
 
-  use ocean_model_mod,          only: ocean_model_init,     &
+  use ocean_model_mod,          only: get_ocean_grid,       &
+                                      ocean_model_init,     &
                                       ocean_model_init_sfc, &
                                       update_ocean_model,   &
                                       ocean_model_end,      &
-                                      ocean_model_restart
-
-  use ocean_model_mod,          only: ocean_model_data_get, &
+                                      ocean_model_restart,  &
+                                      ocean_model_data_get, &
                                       ocean_public_type,    &
                                       ocean_state_type,     &
                                       ocean_model_get_UV_surf
 
   use MOM_surface_forcing_gfdl, only: ice_ocean_boundary_type
-
-  use ocean_model_mod,          only: get_ocean_grid
-  use MOM_grid,                 only: ocean_grid_type
-  use MOM_domains,              only: pass_vector
 
 ! Nothing on the MOM side is visible through this module.
 
@@ -341,16 +337,11 @@ contains
     jsc  = Ocean_grid%jsc; jec  = Ocean_grid%jec
     jsd  = Ocean_grid%jsd; jed  = Ocean_grid%jed
 
-! -------
-! instead of:
-!   call mpp_get_compute_domain(Ocean%Domain, g_isc, g_iec, g_jsc, g_jec)
-!   g_isd  = Ocean_grid%isd_global;      g_jsd  = Ocean_grid%jsd_global
-!!  g_ied = ied +g_isd -1;               g_jed = jed +g_jsd -1               ! local + global -1
-!   g_ied = ied+(Ocean_grid%idg_offset); g_jed = jed+(Ocean_grid%jdg_offset)
-! do this:
-    call mpp_get_compute_domain(Ocean_grid%Domain%mpp_domain, g_isc, g_iec, g_jsc, g_jec)
-    call mpp_get_data_domain   (Ocean_grid%Domain%mpp_domain, g_isd, g_ied, g_jsd, g_jed)
-! -------
+!   Notes:
+!   ------
+!   - We need indices for boundary fluxes: Boundary%...
+!   - These arrays have "halos on this processor, centered at h points," see MOM_domain_infra.F90
+    call get_domain_extent(Ocean_grid%Domain%mpp_domain, g_isc, g_iec, g_jsc, g_jec, g_isd, g_ied, g_jsd, g_jed)
 
 ! Check local sizes of horizontal dimensions
 !--------------------------------------------
@@ -628,15 +619,7 @@ contains
 
 ! Get domain size
 !----------------
-
-! -------
-! do this:
-    call mpp_get_compute_domain(Ocean%Domain, isc, iec, jsc, jec)
-! instead of:
-!   call get_ocean_grid (Ocean_state, Ocean_grid)
-!   isc  = Ocean_grid%isc; iec  = Ocean_grid%iec
-!   jsc  = Ocean_grid%jsc; jec  = Ocean_grid%jec
-! -------
+    call get_domain_extent(Ocean%Domain, isc, iec, jsc, jec)
 
     IM=iec-isc+1
     JM=jec-jsc+1
