@@ -14,7 +14,7 @@ module MOM6_GEOSPlugMod
 ! It uses ESMF AND MAPL. It has heavy dependencies on FMS and MOM.
 !
 ! This should be built like MOM, so that its default reals
-! are the same as for MOM. It may also be an adequate plug for it.
+! are the same as for MOM.
 !
 ! It does not use the configuration.
 ! Its time step is the clocks time step.
@@ -26,42 +26,36 @@ module MOM6_GEOSPlugMod
   use MAPL
   use MAPL_ConstantsMod,        only: MAPL_TICE
 
-! These MOM dependencies are all we are currently using.
-
-  use constants_mod,            only: constants_init
-  use diag_manager_mod,         only: diag_manager_init, diag_manager_end
+! FMS dependencies
   use field_manager_mod,        only: field_manager_init, field_manager_end
-
   use mpp_mod,                  only: mpp_exit
-  use fms_mod,                  only: fms_init, fms_end
-  use fms_io_mod,               only: fms_io_exit
 
-  use mpp_domains_mod,          only: domain2d, mpp_update_domains, &
-                                      mpp_get_compute_domain,       &
-                                      mpp_get_data_domain
+! MOM dependencies
+  use MOM_diag_manager_infra,   only: MOM_diag_manager_init, MOM_diag_manager_end
+  use MOM_coms_infra,           only: MOM_infra_init
+  use MOM_io_infra,             only: io_infra_end
 
-  use mpp_parameter_mod,        only: AGRID, BGRID_NE, CGRID_NE, SCALAR_PAIR
+  use MOM_domain_infra,         only: get_domain_extent, &
+                                      AGRID, BGRID_NE, CGRID_NE, SCALAR_PAIR
 
-  use time_manager_mod,         only: set_calendar_type, time_type
-  use time_manager_mod,         only: set_time, set_date
-  use time_manager_mod,         only: JULIAN
+  use MOM_time_manager,         only: set_calendar_type, time_type, &
+                                      set_time, set_date, &
+                                      JULIAN
 
-  use ocean_model_mod,          only: ocean_model_init,     &
+  use MOM_grid,                 only: ocean_grid_type
+
+  use ocean_model_mod,          only: get_ocean_grid,       &
+                                      ocean_model_init,     &
                                       ocean_model_init_sfc, &
                                       update_ocean_model,   &
                                       ocean_model_end,      &
-                                      ocean_model_restart
-
-  use ocean_model_mod,          only: ocean_model_data_get, &
+                                      ocean_model_restart,  &
+                                      ocean_model_data_get, &
                                       ocean_public_type,    &
                                       ocean_state_type,     &
                                       ocean_model_get_UV_surf
 
   use MOM_surface_forcing_gfdl, only: ice_ocean_boundary_type
-
-  use ocean_model_mod,          only: get_ocean_grid
-  use MOM_grid,                 only: ocean_grid_type
-  use MOM_domains,              only: pass_vector
 
 ! Nothing on the MOM side is visible through this module.
 
@@ -104,8 +98,7 @@ contains
 ! !DESCRIPTION:  The SetServices for the PhysicsGCM GC needs to register its
 !   Initialize and Run.  It uses the MAPL_Generic construct for defining
 !   state specs and couplings among its children.  In addition, it creates the
-!   children GCs (AGCM and OGCM) and runs their
-!   respective SetServices.
+!   children GCs (AGCM and OGCM) and runs their respective SetServices.
 
 !EOP
 !=============================================================================
@@ -192,7 +185,6 @@ contains
     integer                                :: IM, JM
     integer                                :: g_isc,g_iec,g_jsc,g_jec
     integer                                :: g_isd,g_ied,g_jsd,g_jed
-
     integer                                :: YEAR,MONTH,DAY,HR,MN,SC
 
 ! Locals with MOM types
@@ -228,7 +220,7 @@ contains
 
     integer                                :: DT_OCEAN
     character(len=7)                       :: wind_stagger     ! 'AGRID' or 'BGRID' or 'CGRID'
-    integer                                ::iwind_stagger     !  AGRID  or  BGRID  or  CGRID : integer values
+    integer                                ::iwind_stagger     !  AGRID  or  BGRID  or  CGRID
 
     __Iam__('Initialize')
 
@@ -296,22 +288,21 @@ contains
 
     call ESMF_VMGet(VM, mpiCommunicator=Comm, _RC)
 
-    call fms_init(Comm)
+    call MOM_infra_init(Comm)
 
 ! Init MOM stuff
 !---------------
 
-    call constants_init
     call field_manager_init
     call set_calendar_type ( JULIAN)
-    call diag_manager_init !SA: could pass time_init, not available before (MOM5)
+    call MOM_diag_manager_init
 
     DT   = set_time (DT_OCEAN, 0)
     Time = set_date (YEAR,MONTH,DAY,HR,MN,SC)
 
-! Check run time wind stagger option set in AGCM.rc
+! Check run time wind stagger option set in AGCM.rc (GEOS config)
 ! to make sure it matches what is expected here
-!----------------------------------------------------
+!----------------------------------------------------------------
 
     call MAPL_GetResource( MAPL, wind_stagger, Label="ocean_wind_stagger:", DEFAULT="AGRID", _RC)
 
@@ -346,16 +337,11 @@ contains
     jsc  = Ocean_grid%jsc; jec  = Ocean_grid%jec
     jsd  = Ocean_grid%jsd; jed  = Ocean_grid%jed
 
-! -------
-! instead of:
-!   call mpp_get_compute_domain(Ocean%Domain, g_isc, g_iec, g_jsc, g_jec)
-!   g_isd  = Ocean_grid%isd_global;      g_jsd  = Ocean_grid%jsd_global
-!!  g_ied = ied +g_isd -1;               g_jed = jed +g_jsd -1               ! local + global -1
-!   g_ied = ied+(Ocean_grid%idg_offset); g_jed = jed+(Ocean_grid%jdg_offset)
-! do this:
-    call mpp_get_compute_domain(Ocean_grid%Domain%mpp_domain, g_isc, g_iec, g_jsc, g_jec)
-    call mpp_get_data_domain   (Ocean_grid%Domain%mpp_domain, g_isd, g_ied, g_jsd, g_jed)
-! -------
+!   Notes:
+!   ------
+!   - We need indices for boundary fluxes: Boundary%...
+!   - These arrays have "halos on this processor, centered at h points," see MOM_domain_infra.F90
+    call get_domain_extent(Ocean_grid%Domain%mpp_domain, g_isc, g_iec, g_jsc, g_jec, g_isd, g_ied, g_jsd, g_jed)
 
 ! Check local sizes of horizontal dimensions
 !--------------------------------------------
@@ -384,7 +370,7 @@ contains
     endif
 
 ! Allocate MOM flux bulletin board.
-!------------------------------------
+!----------------------------------
 
     allocate ( Boundary% u_flux          (g_isd:g_ied,g_jsd:g_jed), &
                Boundary% v_flux          (g_isd:g_ied,g_jsd:g_jed), &
@@ -411,8 +397,8 @@ contains
                Boundary% ice_rigidity    (g_isd:g_ied,g_jsd:g_jed), &
                __STAT__)
 
-! Clear the fluxes we will not be using
-!--------------------------------------
+! Initialize fluxes
+!------------------
 
     Boundary%u_flux          = 0.0
     Boundary%v_flux          = 0.0
@@ -486,9 +472,6 @@ contains
 
     deallocate(Tmp2, __STAT__)
 
-! All Done
-!---------
-
     RETURN_(ESMF_SUCCESS)
   end subroutine Initialize
 
@@ -496,7 +479,7 @@ contains
 
 !BOP
 
-! !IROUTINE: Run  -- Run method for External Model Plug
+! !IROUTINE: Run  -- Run method for External Ocean Model
 
 ! !INTERFACE:
 
@@ -530,8 +513,6 @@ contains
     type(ocean_state_type),        pointer :: Ocean_State              => null()
     type(MOM_MAPL_Type),           pointer :: MOM_MAPL_internal_state  => null()
     type(MOM_MAPLWrap_Type)                :: wrap
-
-!   type(ocean_grid_type),         pointer :: Ocean_grid               => null()
 
 !#include "MOM6_GEOSPlug_DeclarePointer___.h" ! Because these are "real(kind=GeosKind)" not using ACG.
 ! Exports
@@ -572,7 +553,6 @@ contains
     REAL_, pointer                     :: TAUYBOT(:,:)       => null()
 
 ! Temporaries
-
     real, allocatable                  :: U (:,:),  V(:,:)
     real, allocatable                  :: cos_rot(:,:)
     real, allocatable                  :: sin_rot(:,:)
@@ -624,12 +604,10 @@ contains
     call MAPL_TimerOn (MAPL,"TOTAL")
     call MAPL_TimerOn (MAPL,"RUN"  )
 
-! Get the Plug private internal state
-!--------------------------------------
+! Get the private internal state
+!-------------------------------
 
-    CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS)
-    VERIFY_(STATUS)
-
+    CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS); VERIFY_(STATUS)
     MOM_MAPL_internal_state => WRAP%PTR
 
 ! Aliases to MOM types
@@ -641,15 +619,7 @@ contains
 
 ! Get domain size
 !----------------
-
-! -------
-! do this:
-    call mpp_get_compute_domain(Ocean%Domain, isc, iec, jsc, jec)
-! instead of:
-!   call get_ocean_grid (Ocean_state, Ocean_grid)
-!   isc  = Ocean_grid%isc; iec  = Ocean_grid%iec
-!   jsc  = Ocean_grid%jsc; jec  = Ocean_grid%jec
-! -------
+    call get_domain_extent(Ocean%Domain, isc, iec, jsc, jec)
 
     IM=iec-isc+1
     JM=jec-jsc+1
@@ -666,45 +636,45 @@ contains
 !------------------------------------
 !#include "MOM6_GEOSPlug_GetPointer___.h" ! Because connectivities across MOM5 and MOM6 are messy, do these manually :(
 
-    call MAPL_GetPointer(IMPORT, TAUX,     'TAUX'  ,    RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, TAUY,     'TAUY'  ,    RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, PS,       'PS'    ,    RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, PICE,     'PICE'  ,    RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, LWFLX,    'LWFLX'  ,   RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, SHFLX,    'SHFLX'  ,   RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, QFLUX,    'QFLUX'  ,   RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, RAIN,     'RAIN'  ,    RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, SNOW,     'SNOW'  ,    RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, SFLX,     'SFLX'  ,    RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, PENUVR,   'PENUVR'  ,  RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, PENPAR,   'PENPAR'  ,  RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, PENUVF,   'PENUVF'  ,  RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, PENPAF,   'PENPAF'  ,  RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, DRNIR,    'DRNIR'  ,   RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, DFNIR,    'DFNIR'  ,   RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, DISCHARGE,'DISCHARGE', RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, AICE,     'AICE',      RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, TAUXBOT,  'TAUXBOT',   RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT, TAUYBOT,  'TAUYBOT',   RC=STATUS); VERIFY_(STATUS)
+    call MAPL_GetPointer(IMPORT, TAUX,     'TAUX'  ,    _RC)
+    call MAPL_GetPointer(IMPORT, TAUY,     'TAUY'  ,    _RC)
+    call MAPL_GetPointer(IMPORT, PS,       'PS'    ,    _RC)
+    call MAPL_GetPointer(IMPORT, PICE,     'PICE'  ,    _RC)
+    call MAPL_GetPointer(IMPORT, LWFLX,    'LWFLX'  ,   _RC)
+    call MAPL_GetPointer(IMPORT, SHFLX,    'SHFLX'  ,   _RC)
+    call MAPL_GetPointer(IMPORT, QFLUX,    'QFLUX'  ,   _RC)
+    call MAPL_GetPointer(IMPORT, RAIN,     'RAIN'  ,    _RC)
+    call MAPL_GetPointer(IMPORT, SNOW,     'SNOW'  ,    _RC)
+    call MAPL_GetPointer(IMPORT, SFLX,     'SFLX'  ,    _RC)
+    call MAPL_GetPointer(IMPORT, PENUVR,   'PENUVR'  ,  _RC)
+    call MAPL_GetPointer(IMPORT, PENPAR,   'PENPAR'  ,  _RC)
+    call MAPL_GetPointer(IMPORT, PENUVF,   'PENUVF'  ,  _RC)
+    call MAPL_GetPointer(IMPORT, PENPAF,   'PENPAF'  ,  _RC)
+    call MAPL_GetPointer(IMPORT, DRNIR,    'DRNIR'  ,   _RC)
+    call MAPL_GetPointer(IMPORT, DFNIR,    'DFNIR'  ,   _RC)
+    call MAPL_GetPointer(IMPORT, DISCHARGE,'DISCHARGE', _RC)
+    call MAPL_GetPointer(IMPORT, AICE,     'AICE',      _RC)
+    call MAPL_GetPointer(IMPORT, TAUXBOT,  'TAUXBOT',   _RC)
+    call MAPL_GetPointer(IMPORT, TAUYBOT,  'TAUYBOT',   _RC)
 
 ! Get EXPORT pointers
 !--------------------
 
-    call MAPL_GetPointer(EXPORT, UW,    'UW'  ,   RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, VW,    'VW'  ,   RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, UWB,   'UWB' ,   RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, VWB,   'VWB' ,   RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, TW,    'TW'  ,   RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, SW,    'SW'  ,   RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, SLV,   'SLV',    RC=STATUS); VERIFY_(STATUS)
+    call MAPL_GetPointer(EXPORT, UW,    'UW'  ,   _RC)
+    call MAPL_GetPointer(EXPORT, VW,    'VW'  ,   _RC)
+    call MAPL_GetPointer(EXPORT, UWB,   'UWB' ,   _RC)
+    call MAPL_GetPointer(EXPORT, VWB,   'VWB' ,   _RC)
+    call MAPL_GetPointer(EXPORT, TW,    'TW'  ,   _RC)
+    call MAPL_GetPointer(EXPORT, SW,    'SW'  ,   _RC)
+    call MAPL_GetPointer(EXPORT, SLV,   'SLV',    _RC)
 
-    call MAPL_GetPointer(EXPORT, FRAZIL,  'FRAZIL',   alloc=.true., RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, MELT_POT,'MELT_POT', alloc=.true., RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, FRZMLT,  'FRZMLT',                 RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, T_Freeze,'T_Freeze',               RC=STATUS); VERIFY_(STATUS)
+    call MAPL_GetPointer(EXPORT, FRAZIL,  'FRAZIL',   alloc=.true., _RC)
+    call MAPL_GetPointer(EXPORT, MELT_POT,'MELT_POT', alloc=.true., _RC)
+    call MAPL_GetPointer(EXPORT, FRZMLT,  'FRZMLT',                 _RC)
+    call MAPL_GetPointer(EXPORT, T_Freeze,'T_Freeze',               _RC)
 
-    call MAPL_GetPointer(EXPORT, MOM_2D_MASK, 'MOM_2D_MASK', RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, AREA, 'AREA',               RC=STATUS); VERIFY_(STATUS)
+    call MAPL_GetPointer(EXPORT, MOM_2D_MASK, 'MOM_2D_MASK', _RC)
+    call MAPL_GetPointer(EXPORT, AREA, 'AREA',               _RC)
 
 ! Fill in ocean boundary fluxes/forces
 !-------------------------------------
@@ -800,7 +770,7 @@ contains
     U = 0.0
     call ocean_model_data_get(Ocean_State, Ocean, 't_surf', U, isc, jsc) ! this comes to us in deg C
     where(MOM_2D_MASK(:,:) > 0.0)
-       TW = real(U, kind=GeosKind) + MAPL_TICE                             ! because C to K was subtracted in MOM
+       TW = real(U, kind=GeosKind) + MAPL_TICE                           ! because C to K was subtracted in MOM
     elsewhere
        TW = MAPL_UNDEF
     end where
@@ -927,8 +897,6 @@ contains
     call MAPL_TimerOff(MAPL,"RUN"   )
     call MAPL_TimerOff(MAPL,"TOTAL" )
 
-! All Done
-!---------
     RETURN_(ESMF_SUCCESS)
   end subroutine Run
 
@@ -988,11 +956,10 @@ contains
     call MAPL_TimerOn(MAPL,"TOTAL"   )
     call MAPL_TimerOn(MAPL,"FINALIZE")
 
-! Get the Plug private internal state
-!--------------------------------------
+! Get the private internal state
+!-------------------------------
 
-    CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS)
-    VERIFY_(STATUS)
+    CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS); VERIFY_(STATUS)
 
     MOM_MAPL_internal_state => WRAP%PTR
 
@@ -1014,9 +981,9 @@ contains
 
     call ocean_model_end (Ocean, Ocean_State, Time) ! SA: this also calls ocean_model_save_restart(...)
 
-    call diag_manager_end(Time )
+    call MOM_diag_manager_end(Time )
     call field_manager_end
-    call fms_io_exit
+    call io_infra_end
 
     deallocate ( Boundary% u_flux          , &
                  Boundary% v_flux          , &
@@ -1117,11 +1084,10 @@ contains
 
     if (doRecord) then
 
-! Get the Plug private internal state
-!--------------------------------------
+! Get the private internal state
+!--------------------------------
 
-       CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS)
-       VERIFY_(STATUS)
+       CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS); VERIFY_(STATUS)
 
        MOM_MAPL_internal_state => WRAP%PTR
        Ocean_State             => MOM_MAPL_internal_state%Ocean_State
@@ -1131,8 +1097,7 @@ contains
 ! Write a restart
 !-----------------
 
-       call ocean_model_restart (Ocean_State, timeStamp)
-       VERIFY_(STATUS)
+       call ocean_model_restart (Ocean_State, timeStamp); VERIFY_(STATUS)
 
     end if
 
