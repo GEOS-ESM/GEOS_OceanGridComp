@@ -1,8 +1,8 @@
 ! Blank file in which we can put "overrides" for parameters
 #override NK = 50
 #override LAYOUT = 3, 2
-#override DT = 900.0
-#override DT_THERM = 900.
+#override DT = 1800.0
+#override DT_THERM = 1800.
 
 #override USE_REGRIDDING = True
 #override BULKMIXEDLAYER = False
