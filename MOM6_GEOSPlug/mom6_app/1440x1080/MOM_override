@@ -1,8 +1,8 @@
 ! Blank file in which we can put "overrides" for parameters
 
 LAYOUT = 40, 30
-#override DT = 450.0
-#override DT_THERM = 450.
+#override DT = 600.0
+#override DT_THERM = 600.
 !BAD_VAL_SST_MIN = -3.0
 !BAD_VAL_SSS_MAX = 55.0
 HFREEZE = 2.0
