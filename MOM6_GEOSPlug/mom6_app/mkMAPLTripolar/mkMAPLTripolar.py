@@ -35,11 +35,17 @@ with nc.Dataset(vgrid_file) as ff:
     dz=ff['dz'][:]
 
 with nc.Dataset(topo_file) as ff:
-    mask=ff['wet'][:]
+    for name in ['wet', 'mask']:
+        try:
+            mask=ff[name][:]
+        except IndexError:
+            pass
 
-with nc.Dataset(basin_file) as ff:
-    basin=ff['basin'][:]
-    atl_mask=np.where(basin==2.0, 1.0, 0.0)
+# Check if basin_file is not empty
+if basin_file:
+    with nc.Dataset(basin_file) as ff:
+        basin=ff['basin'][:]
+        atl_mask=np.where(basin==2.0, 1.0, 0.0)
 
 with nc.Dataset(mapl_file, mode='r+') as ff:
     ff['lon_centers'][:]=xx[1::2,1::2]
@@ -73,5 +79,6 @@ with nc.Dataset(mapl_file, mode='r+') as ff:
     ff['angleu'][:]=angle_dx[2::2,2::2]
     ff['anglet'][:]=angle_dx[1::2,1::2]
 
-    ff['basin'][:]=basin[:]
-    ff['atl_mask'][:]=atl_mask[:]
+    if basin_file:
+        ff['basin'][:]=basin[:]
+        ff['atl_mask'][:]=atl_mask[:]
