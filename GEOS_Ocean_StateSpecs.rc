@@ -43,22 +43,23 @@ category: EXPORT
 #---------------------------------------------------------------------------------------------
 #  VARIABLE                  |   DIMENSIONS        |   Additional Metadata
 #---------------------------------------------------------------------------------------------
-NAME        |   UNITS        |   DIMS   |   VLOC   |   LONG_NAME
+NAME        |   UNITS        |   DIMS   |   VLOC   |   COND  |   LONG_NAME
 #---------------------------------------------------------------------------------------------
-#MASKO       |   1            |   xy     |   N      |   ocean_mask  
-SS_FOUND    |   PSU          |   xy     |   N      |   foundation_salinity_for_interface_layer  
-FRZMLT      |   W m-2        |   xy     |   N      |   freeze_melt_potential  
-TAUX        |   N m-2        |   xy     |   N      |   Agrid_eastward_stress_on_ocean  
-TAUY        |   N m-2        |   xy     |   N      |   Agrid_northward_stress_on_ocean  
-SWHEAT      |   W m-2        |   xyz    |   C      |   solar_heating_rate  
-RFLUX       |   W m-2        |   xy     |   N      |   downward_radiative_heat_flux_at_ocean_bottom  
-DISCHARGE   |   kg m-2 s-1   |   xy     |   N      |   river_discharge_at_ocean_points  
-FROCEAN     |   1            |   xy     |   N      |   fraction_of_gridbox_covered_by_ocean  
-LWFLX       |   W m-2        |   xy     |   N      |   surface_net_downward_longwave_flux  
-SWFLX       |   W m-2        |   xy     |   N      |   surface_net_downward_shortwave_flux  
-SHFLX       |   W m-2        |   xy     |   N      |   upward_sensible_heat_flux  
-QFLUX       |   kg m-2 s-1   |   xy     |   N      |   evaporation  
-SFLX        |   kg m-2 s-1   |   xy     |   N      |   salt_flux_due_to_ice_dynamics  
-RAIN        |   kg m-2 s-1   |   xy     |   N      |   ocean_rainfall  
-SNOW        |   kg m-2 s-1   |   xy     |   N      |   ocean_snowfall  
-PEN_OCN     |   W m-2        |   xy     |   N      |   penetrated_shortwave_flux_at_the_bottom_of_first_ocean_model_layer  
+#MASKO       |   1            |   xy     |   N     |                                   |   ocean_mask  
+SS_FOUND    |   PSU          |   xy     |   N      |                                   |   foundation_salinity_for_interface_layer  
+FRZMLT      |   W m-2        |   xy     |   N      |                                   |   freeze_melt_potential  
+TAUX        |   N m-2        |   xy     |   N      |                                   |   Agrid_eastward_stress_on_ocean  
+TAUY        |   N m-2        |   xy     |   N      |                                   |   Agrid_northward_stress_on_ocean  
+SWHEAT      |   W m-2        |   xyz    |   C      |                                   |   solar_heating_rate  
+RFLUX       |   W m-2        |   xy     |   N      |                                   |   downward_radiative_heat_flux_at_ocean_bottom  
+DISCHARGE   |   kg m-2 s-1   |   xy     |   N      |                                   |   river_discharge_at_ocean_points  
+FROCEAN     |   1            |   xy     |   N      |                                   |   fraction_of_gridbox_covered_by_ocean  
+LWFLX       |   W m-2        |   xy     |   N      |                                   |   surface_net_downward_longwave_flux  
+SWFLX       |   W m-2        |   xy     |   N      |                                   |   surface_net_downward_shortwave_flux  
+SHFLX       |   W m-2        |   xy     |   N      |                                   |   upward_sensible_heat_flux  
+QFLUX       |   kg m-2 s-1   |   xy     |   N      |                                   |   evaporation  
+SFLX        |   kg m-2 s-1   |   xy     |   N      |                                   |   salt_flux_due_to_ice_dynamics  
+RAIN        |   kg m-2 s-1   |   xy     |   N      |                                   |   ocean_rainfall  
+SNOW        |   kg m-2 s-1   |   xy     |   N      |                                   |   ocean_snowfall  
+PEN_OCN     |   W m-2        |   xy     |   N      |                                   |   penetrated_shortwave_flux_at_the_bottom_of_first_ocean_model_layer  
+T_Freeze    |   C            | xy       |   N      |  trim(OCEAN_NAME) == 'MOM6'       |   freezing_temperature_calculated_using_salinity_in_degC
