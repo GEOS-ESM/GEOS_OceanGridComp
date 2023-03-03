@@ -1,11 +1,11 @@
 netcdf MAPL_Tripolar {
 dimensions:
 	string = 255 ;
-        n_center_x = 1440 ;
-        n_center_y = 1080 ;
-        n_corner_x = 1441 ;
-        n_corner_y = 1081 ;
-	n_levels = 75 ;
+        n_center_x = 72 ;
+        n_center_y = 36 ;
+        n_corner_x = 73 ;
+        n_corner_y = 37 ;
+	n_levels = 50 ;
 
 variables:
         float lon_centers(n_center_y,n_center_x) ;
@@ -68,8 +68,8 @@ variables:
 		:organization = "NASA/GSFC, Global Modeling and Assimilation Office, Code 610.1, GMAO" ;
 
 data:
-	mom_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/ocean_hgrid.nc" ;
-	vgrid_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/vgrid.nc" ;
-	topo_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/ocean_topog.nc" ;
-	basin_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/basin_codes.nc" ;
+	mom_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/72x36/INPUT/ocean_hgrid.nc" ;
+	vgrid_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/72x36/INPUT/vgrid.nc" ;
+	topo_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/72x36/INPUT/ocean_topog.nc" ;
+	basin_file = "" ;
 }
