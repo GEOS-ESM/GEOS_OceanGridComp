@@ -9,6 +9,9 @@ module GEOS_OceanGridCompMod
 
   use ESMF
   use MAPL
+#ifdef BUILD_MIT_OCEAN
+  use MIT_GEOS5PlugMod, only: MITSetServices => SetServices  ! this sets IRF
+#endif
   use GEOS_DataSeaGridCompMod, only: DataSeaSetServices  => SetServices
 
   implicit none
@@ -110,6 +113,10 @@ contains
           case ("MOM6")
              call MAPL_GetResource ( MAPL, sharedObj,  Label="MOM6_GEOSPLUG:",    DEFAULT="libMOM6_GEOSPlug.so",    _RC)
              OCN = MAPL_AddChild(OCEAN_NAME,'setservices_', parentGC=GC, sharedObj=sharedObj,  _RC)
+#ifdef BUILD_MIT_OCEAN
+          case ("MIT")
+             OCN = MAPL_AddChild(GC, NAME=OCEAN_NAME, SS=MITSetServices, __RC__)
+#endif
           case default
              charbuf_ = "OCEAN_NAME: " // trim(OCEAN_NAME) // " is not implemented, ABORT!"
              call WRITE_PARALLEL(charbuf_)
@@ -351,6 +358,9 @@ contains
              MASK => MASK3D(:,:,1)
           case ("MOM6")
              call MAPL_GetPointer(GEX(OCN), MASK, 'MOM_2D_MASK', _RC)
+          case ("MIT")
+             call MAPL_GetPointer(GEX(OCN), MASK3D, 'MOM_3D_MASK', _RC)
+             MASK => MASK3D(:,:,1)
        end select
        if(associated(MASKO)) MASKO = MASK
     end if
@@ -425,6 +435,7 @@ contains
     real, pointer :: TS_FOUND (:,:)
     real, pointer :: SS_FOUND (:,:)
     real, pointer :: FRZMLTe(:,:)
+    real, pointer :: T_Freeze_e(:,:)
 
 ! Diagnostics exports
 
@@ -471,6 +482,7 @@ contains
     real, pointer ::   MASK(:,:)
     real, pointer :: MASK3D(:,:,:)
     real, pointer :: FRZMLT(:,:)
+    real, pointer :: T_Freeze(:,:) ! in deg C
 
     real, pointer :: TWd  (:,:)
     real, pointer :: DEL_TEMP (:,:)
@@ -565,7 +577,7 @@ contains
 ! ---------------------------------------------------------------
        if(DO_DATASEA==0) then
           select case(trim(OCEAN_NAME))
-             case ("MOM")
+             case ("MOM", "MIT")
                 call MAPL_GetPointer(GEX(OCN), MASK3D, 'MOM_3D_MASK', _RC)
                 MASK => MASK3D(:,:,1)
              case ("MOM6")
@@ -638,7 +650,8 @@ contains
        endif
        
        if(DO_DATASEA==0) then
-          call MAPL_GetPointer(GEX(OCN), FRZMLT, 'FRZMLT', alloc=.true., _RC)
+          call MAPL_GetPointer(GEX(OCN), FRZMLT,   'FRZMLT', alloc=.true., _RC)
+          call MAPL_GetPointer(GEX(OCN), T_Freeze, 'T_Freeze',alloc=.true.,_RC)
        end if
 
 ! Get pointers to exports
@@ -647,6 +660,7 @@ contains
        call MAPL_GetPointer(EXPORT, TS_FOUND,'TS_FOUND', _RC)
        call MAPL_GetPointer(EXPORT, SS_FOUND,'SS_FOUND', _RC)
        call MAPL_GetPointer(EXPORT, FRZMLTe, 'FRZMLT',   _RC)
+       call MAPL_GetPointer(EXPORT, T_Freeze_e, 'T_Freeze', _RC)
 
 ! Diagnostics exports
 !---------------------------------------------------------
@@ -675,7 +689,7 @@ contains
 ! Weight for ocean grid
 !----------------------
        wght=0.0
-       where(MASK>0)
+       where(MASK>0 .and. FROCEAN /= MAPL_UNDEF)
           WGHT = FROCEAN/MASK
        elsewhere
           WGHT = 0.0
@@ -708,7 +722,7 @@ contains
 
           if(associated(RFLUX )) RFLUX  = 0.0
           select case (trim(OCEAN_NAME))
-             case ("MOM", "DATASEA")
+             case ("MOM", "MIT", "DATASEA")
                 do L=1,LM
                    HEAT(:,:,L) = HEATi(:,:,L)*WGHT
                    if(associated(RFLUX)) then
@@ -819,11 +833,22 @@ contains
 
        if(associated(FRZMLTe)) then
           if(DO_DATASEA == 0) then
+! assume frzmlt filled inside and get from ocean export
              where(WGHT > 0.0 )
                 FRZMLTe = FRZMLT
              end where
           else
              FRZMLTe = 0.0
+          end if          
+       end if
+
+       if(associated(T_Freeze_e)) then
+          if(DO_DATASEA == 0) then
+             where(WGHT > 0.0 )
+                T_Freeze_e = T_Freeze
+             end where
+          else
+             T_Freeze_e = -1.8
           end if          
        end if
 
@@ -845,14 +870,12 @@ contains
 
 ! Update orphan points
        if(DO_DATASEA == 0) then
-          WGHT=FROCEAN*(1-MASK)
-          Tfreeze=MAPL_TICE-0.054*OrphanSalinity
+          WGHT=FROCEAN*(1.0-MASK)
+          Tfreeze=MAPL_TICE-0.054*OrphanSalinity ! in K
 
           where(wght>0.0)
              TS_FOUND=TS_FOUND+ &
-                      DT*(LWFLXi+(PENUVR+PENPAR+PENUVF+PENPAF+DRNIR+DFNIR -&
-                          PEN_OCN)-SHFLXi-QFLUXi*MAPL_ALHL-MAPL_ALHF*SNOWi+&
-                          FHOCN)/(OrphanDepth*MAPL_RHO_SEAWATER*MAPL_CAPWTR) ! explicit update in time
+                      DT*(LWFLXi+(PENUVRi+PENPARi+PENUVFi+PENPAFi+DRNIRi+DFNIRi - PEN_OCN)-SHFLXi-QFLUXi*MAPL_ALHL-MAPL_ALHF*SNOWi+FHOCN)/(OrphanDepth*MAPL_RHO_SEAWATER*MAPL_CAPWTR) ! explicit update in time
              FRZMLTe = (Tfreeze - TS_FOUND) * (MAPL_RHO_SEAWATER*MAPL_CAPWTR*OrphanDepth)/DT
              TS_FOUND=max(TS_FOUND, Tfreeze)
           end where
