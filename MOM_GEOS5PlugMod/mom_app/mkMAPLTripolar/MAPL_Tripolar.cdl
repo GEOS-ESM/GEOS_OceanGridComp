@@ -1,11 +1,11 @@
 netcdf MAPL_Tripolar {
 dimensions:
 	string = 255 ;
-        n_center_x = 1440 ;
-        n_center_y = 1080 ;
-        n_corner_x = 1441 ;
-        n_corner_y = 1081 ;
-	n_levels = 75 ;
+        n_center_x = 360 ;
+        n_center_y = 200 ;
+        n_corner_x = 361 ;
+        n_corner_y = 201 ;
+	n_levels = 50 ;
 
 variables:
         float lon_centers(n_center_y,n_center_x) ;
@@ -54,21 +54,15 @@ variables:
 	        basin:long_name = "basin_masks" ;
 	float atl_mask(n_center_y,n_center_x) ;
 	        atl_mask:long_name = "Atlantic_mask" ;
-	char mom_file(string) ;
-	        mom_file:standard_name = "path_to_ocean_hgrid_file" ;
-	char vgrid_file(string) ;
-	        vgrid_file:standard_name = "path_to_vgrid_file" ;
-	char topo_file(string) ;
-	        topo_file:standard_name = "path_to_ocean_topog_file" ;
+	char grid_spec_file(string) ;
+	        grid_spec_file:standard_name = "path_to_ocean_grid_spec_file" ;
 	char basin_file(string) ;
-	        vgrid_file:standard_name = "path_to_basin_codes_file" ;
+	        basin_file:standard_name = "path_to_basin_codes_file" ;
 
 // global attributes:
 		:author = "Yury Vikhliaev" ;
 
 data:
-	mom_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/ocean_hgrid.nc" ;
-	vgrid_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/vgrid.nc" ;
-	topo_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/ocean_topog.nc" ;
-	basin_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/basin_codes.nc" ;
+	grid_spec_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM5/360x200/INPUT/grid_spec.nc" ;
+	basin_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM5/360x200/INPUT/basin_mask.nc" ;
 }
