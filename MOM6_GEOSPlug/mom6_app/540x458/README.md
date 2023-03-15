@@ -1,1 +1,1 @@
-This is 540x458x50 configuration (0.66 degree) from NCEP(?)
+This is 540x458x50 configuration (0.66 degree). Much of this configuration was obtained from [NCAR](wget --no-check-certificate -A nc -r -l 1 -nd https://svn-ccsm-inputdata.cgd.ucar.edu/trunk/inputdata/ocn/mom/tx0.66v1/). Thanks to the [NCAR team](@gustavo-marques, @alperaltuntas, etc).
