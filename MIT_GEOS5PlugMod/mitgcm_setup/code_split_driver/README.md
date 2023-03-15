@@ -1,4 +1,4 @@
-MITgcm ocean interface code between GEOS-5 ocean plug and internal MITgcm data structuctures.
+MITgcm ocean interface code between GEOS ocean plug and internal MITgcm data structuctures.
 
 The file `main.F` is only needed for stand alone debugging.
 
