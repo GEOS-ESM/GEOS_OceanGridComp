@@ -2,7 +2,7 @@
 
 #include "MAPL_Generic.h"
 
-! GEOS-5 default real kind
+! GEOS default real kind
 
 #define G5KIND      4
 #define REAL_       real(kind=G5KIND)
