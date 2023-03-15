@@ -850,7 +850,7 @@ contains
 
           where(wght>0.0)
              TS_FOUND=TS_FOUND+ &
-                      DT*(LWFLXi+(PENUVR+PENPAR+PENUVF+PENPAF+DRNIR+DFNIR -&
+                      DT*(LWFLXi+(PENUVRi+PENPARi+PENUVFi+PENPAFi+DRNIRi+DFNIRi -&
                           PEN_OCN)-SHFLXi-QFLUXi*MAPL_ALHL-MAPL_ALHF*SNOWi+&
                           FHOCN)/(OrphanDepth*MAPL_RHO_SEAWATER*MAPL_CAPWTR) ! explicit update in time
              FRZMLTe = (Tfreeze - TS_FOUND) * (MAPL_RHO_SEAWATER*MAPL_CAPWTR*OrphanDepth)/DT
