@@ -661,7 +661,7 @@ contains
        call MAPL_GetPointer(EXPORT, SS_FOUND,'SS_FOUND', _RC)
        call MAPL_GetPointer(EXPORT, FRZMLTe, 'FRZMLT',   _RC)
        ! T_Freeze is only MOM6 in the StateSpecs
-       if (OCEAN_NAME == "MOM6") then
+       if (trim(OCEAN_NAME) == "MOM6") then
           call MAPL_GetPointer(EXPORT, T_Freeze_e, 'T_Freeze', _RC)
        else
           nullify(T_Freeze_e)
