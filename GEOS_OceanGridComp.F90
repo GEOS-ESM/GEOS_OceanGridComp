@@ -353,14 +353,11 @@ contains
        call MAPL_GetPointer(EXPORT, MASKO, 'MASKO'  , alloc=.true., _RC)
 
        select case (trim(OCEAN_NAME))
-          case ("MOM")
-             call MAPL_GetPointer(GEX(OCN), MASK3D, 'MOM_3D_MASK', _RC)
+          case ("MOM", "MIT")
+             call MAPL_GetPointer(GEX(OCN), MASK3D, trim(OCEAN_NAME)//'_3D_MASK', _RC)
              MASK => MASK3D(:,:,1)
           case ("MOM6")
              call MAPL_GetPointer(GEX(OCN), MASK, 'MOM_2D_MASK', _RC)
-          case ("MIT")
-             call MAPL_GetPointer(GEX(OCN), MASK3D, 'MOM_3D_MASK', _RC)
-             MASK => MASK3D(:,:,1)
        end select
        if(associated(MASKO)) MASKO = MASK
     end if
@@ -578,7 +575,7 @@ contains
        if(DO_DATASEA==0) then
           select case(trim(OCEAN_NAME))
              case ("MOM", "MIT")
-                call MAPL_GetPointer(GEX(OCN), MASK3D, 'MOM_3D_MASK', _RC)
+                call MAPL_GetPointer(GEX(OCN), MASK3D, trim(OCEAN_NAME)//'_3D_MASK', _RC)
                 MASK => MASK3D(:,:,1)
              case ("MOM6")
                 call MAPL_GetPointer(GEX(OCN), MASK, 'MOM_2D_MASK', _RC)
@@ -651,7 +648,11 @@ contains
 
        if(DO_DATASEA==0) then
           call MAPL_GetPointer(GEX(OCN), FRZMLT,   'FRZMLT', alloc=.true., _RC)
-          call MAPL_GetPointer(GEX(OCN), T_Freeze, 'T_Freeze',alloc=.true.,_RC)
+          if (trim(OCEAN_NAME) == "MOM6") then
+           call MAPL_GetPointer(GEX(OCN), T_Freeze, 'T_Freeze',alloc=.true.,_RC)
+          else
+           nullify(T_Freeze)
+          end if
        end if
 
 ! Get pointers to exports
