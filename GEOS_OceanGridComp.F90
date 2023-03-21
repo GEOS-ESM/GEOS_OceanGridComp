@@ -40,8 +40,8 @@ module GEOS_OceanGridCompMod
      type(T_PrivateState), pointer :: ptr
   end type T_PrivateState_Wrap
 
-  integer ::          OCN 
-  integer ::          OCNd 
+  integer ::          OCN
+  integer ::          OCNd
   logical ::      DUAL_OCEAN
 
 contains
@@ -364,7 +364,7 @@ contains
        end select
        if(associated(MASKO)) MASKO = MASK
     end if
- 
+
     call MAPL_TimerOff(STATE,"TOTAL"     )
     call MAPL_TimerOff(STATE,"INITIALIZE")
 
@@ -517,7 +517,7 @@ contains
     call ESMF_GridCompGet( gc, NAME=COMP_NAME, currentPhase=PHASE, _RC)
     Iam = trim(COMP_NAME)//'::'//'Run'
 
-    if (PHASE >= 10) PHASE = PHASE - 10 ! to be replaced by MAPL get_phase 
+    if (PHASE >= 10) PHASE = PHASE - 10 ! to be replaced by MAPL get_phase
     Iam = trim(COMP_NAME) // Iam
 
 ! Get my internal MAPL_Generic state
@@ -648,7 +648,7 @@ contains
           call MAPL_GetPointer(GEX(OCNd), TWd, 'TW'  ,    alloc=.true., _RC)
           call MAPL_GetPointer(IMPORT,    FId, 'FRACICEd' ,             _RC)
        endif
-       
+
        if(DO_DATASEA==0) then
           call MAPL_GetPointer(GEX(OCN), FRZMLT,   'FRZMLT', alloc=.true., _RC)
           call MAPL_GetPointer(GEX(OCN), T_Freeze, 'T_Freeze',alloc=.true.,_RC)
@@ -660,7 +660,12 @@ contains
        call MAPL_GetPointer(EXPORT, TS_FOUND,'TS_FOUND', _RC)
        call MAPL_GetPointer(EXPORT, SS_FOUND,'SS_FOUND', _RC)
        call MAPL_GetPointer(EXPORT, FRZMLTe, 'FRZMLT',   _RC)
-       call MAPL_GetPointer(EXPORT, T_Freeze_e, 'T_Freeze', _RC)
+       ! T_Freeze is only MOM6 in the StateSpecs
+       if (OCEAN_NAME == "MOM6") then
+          call MAPL_GetPointer(EXPORT, T_Freeze_e, 'T_Freeze', _RC)
+       else
+          nullify(T_Freeze_e)
+       end if
 
 ! Diagnostics exports
 !---------------------------------------------------------
@@ -786,12 +791,12 @@ contains
              ! calculate temperature correction to send back to MOM
              call MAPL_GetPointer(GIM(OCN), DEL_TEMP, 'DEL_TEMP', _RC)
              call MAPL_GetPointer(GIM(OCNd), FI ,     'FRACICE' , _RC)
-             
+
              call MAPL_GetResource(STATE,TAU_SST,           Label="TAU_SST:",           default=432000.0, _RC)
              call MAPL_GetResource(STATE,TAU_SST_UNDER_ICE, Label="TAU_SST_UNDER_ICE:", default=86400.0 , _RC)
 
              ! we should have valid pointers to TW and TWd by now
-             
+
              DEL_TEMP = 0.0 ! we do not want uninitiazed variables
              where(MASK > 0.0 .and. FI < 0.05)
                 ! what about relaxation
@@ -800,7 +805,7 @@ contains
 
              where(MASK > 0.0 .and. FI >= 0.05 .and. FId > FI)
                 ! 0.054 (C/psu) is the ratio between the freezing temperature and salinity of brine.
-                ! -0.054*SW gives salinity dependent freezing temperature 
+                ! -0.054*SW gives salinity dependent freezing temperature
                 ! ideally this const should be from the ocean model, but doing so is difficult here
                 DEL_TEMP = ((-0.054*SW+MAPL_TICE) - TW)*DT/(DT+TAU_SST_UNDER_ICE)
 
@@ -811,7 +816,7 @@ contains
                exportState=GEX(OCN), clock=CLOCK, phase=2, userRC=STATUS )
              VERIFY_(STATUS)
           end if
-          
+
           call MAPL_TimerOff(STATE,"--ModRun")
           call MAPL_TimerOn (STATE,"TOTAL")
 
@@ -839,7 +844,7 @@ contains
              end where
           else
              FRZMLTe = 0.0
-          end if          
+          end if
        end if
 
        if(associated(T_Freeze_e)) then
@@ -849,7 +854,7 @@ contains
              end where
           else
              T_Freeze_e = -1.8
-          end if          
+          end if
        end if
 
        if (DUAL_OCEAN) then
