@@ -1,0 +1,36 @@
+! Blank file in which we can put "overrides" for parameters
+
+#override DT = 900.0
+#override DT_THERM = 900.0
+
+#override NK = 50
+#override USE_REGRIDDING = True
+#override BULKMIXEDLAYER = False
+#override COORD_FILE = "Layer_coord50.nc"
+#override USE_STORED_SLOPES = True
+#override USE_NEUTRAL_DIFFUSION = True
+#override SIMPLE_TKE_TO_KD = True
+#override REGRIDDING_COORDINATE_MODE = "Z*"
+#override ALE_COORDINATE_CONFIG = "FILE:vgrid.nc,dz"
+#override REMAPPING_SCHEME = "PPM_H4"
+#override HMIX_FIXED = 0.5
+#override CFL_TRUNCATE_RAMP_TIME = 7200.
+#override Z_INIT_ALE_REMAPPING = True
+#override ENERGETICS_SFC_PBL = True
+#override USE_MLD_ITERATION = False
+#override MASS_WEIGHT_IN_PRESSURE_GRADIENT = True
+KVML = 0.0                      !   [m2 s-1] default = 1.0E-04
+                                ! The kinematic viscosity in the mixed layer.  A typical value is ~1e-2 m2 s-1.
+                                ! KVML is not used if BULKMIXEDLAYER is true.  The default is set by KV.
+
+TOPO_FILE = "ocean_topog.nc"
+#override RESTART_CHECKSUMS_REQUIRED = False
+
+
+#override VERBOSITY = 3
+!DEBUG = True
+!FATAL_UNUSED_PARAMS = True
+
+!#override NIPROC = 4
+!#override NJPROC = 4
+#override LAYOUT = 45,2

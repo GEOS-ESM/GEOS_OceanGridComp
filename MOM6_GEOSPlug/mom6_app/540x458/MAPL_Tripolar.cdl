@@ -1,11 +1,11 @@
 netcdf MAPL_Tripolar {
 dimensions:
 	string = 255 ;
-        n_center_x = 1440 ;
-        n_center_y = 1080 ;
-        n_corner_x = 1441 ;
-        n_corner_y = 1081 ;
-	n_levels = 75 ;
+        n_center_x = 540 ;
+        n_center_y = 458 ;
+        n_corner_x = 541 ;
+        n_corner_y = 459 ;
+	n_levels = 50 ;
 
 variables:
         float lon_centers(n_center_y,n_center_x) ;
@@ -61,14 +61,15 @@ variables:
 	char topo_file(string) ;
 	        topo_file:standard_name = "path_to_ocean_topog_file" ;
 	char basin_file(string) ;
-	        vgrid_file:standard_name = "path_to_basin_codes_file" ;
+	        basin_file:standard_name = "path_to_basin_codes_file" ;
 
 // global attributes:
 		:author = "Yury Vikhliaev" ;
+		:organization = "NASA/GSFC, Global Modeling and Assimilation Office, Code 610.1, GMAO" ;
 
 data:
-	mom_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/ocean_hgrid.nc" ;
-	vgrid_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/vgrid.nc" ;
-	topo_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/ocean_topog.nc" ;
-	basin_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/basin_codes.nc" ;
+	mom_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/540x458/INPUT/ocean_hgrid.nc" ;
+	vgrid_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/540x458/INPUT/vgrid.nc" ;
+	topo_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/540x458/INPUT/ocean_topog.nc" ;
+	basin_file = "" ;
 }
