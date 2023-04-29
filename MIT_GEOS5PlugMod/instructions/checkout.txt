@@ -7,7 +7,35 @@
 # Load GEOSenv module
   module load GEOSenv
 
-# Checkout the model
+# Checkout the model, method 1 (preferred)
   mepo clone -b feature/atrayano/MITgcm-DYAMOND git@github.com:GEOS-ESM/GEOSgcm.git
-  cd GEOSgcm
-  mepo checkout-if-exists feature/atrayano/MITgcm-DYAMOND
+
+# Checkout the model, method 2 (note that this method checks out older code, skip this method for now)
+# git clone -b feature/udistr/MITgcm-DYAMOND git@github.com:GEOS-ESM/GEOSgcm.git
+# cd GEOSgcm
+# mepo init
+# mepo clone
+
+# The above methods end up "HEAD detached sparse" and "HEAD detached",
+# respectively.  To get back on a modifiable branch:
+  cd GEOSgcm/src/Components/@GEOSgcm_GridComp
+  git checkout feature/atrayano/MITgcm-DYAMOND
+
+# Method 2 of getting back to modifiable branch, suggested by Atanas but not yet succesfully tested
+# cd GEOSgcm
+# mepo checkout-if-exists feature/atrayano/MITgcm-DYAMOND
+
+
+###########################
+# checking out MITgcm checkpoint68o
+cd GEOSgcm/src/Components/@GEOSgcm_GridComp/GEOSogcm_GridComp/GEOS_OceanGridComp/MIT_GEOS5PlugMod
+rm -rf \@mit
+git clone git@github.com:MITgcm/MITgcm.git
+mv MITgcm @mit
+cd @mit
+git checkout checkpoint68o
+
+###########################
+# to rebuild MITgcm only
+  cd GEOSgcm/build
+  rm -rf src/Components/@GEOSgcm_GridComp/GEOSogcm_GridComp/GEOS_OceanGridComp/MIT_GEOS5PlugMod

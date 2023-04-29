@@ -15,7 +15,7 @@
   source @env/g5_modules
   mkdir build
   cd build
-  cmake .. -DBASEDIR=$BASEDIR/Linux -DCMAKE_INSTALL_PREFIX=../install -DBUILD_MIT_OCEAN=ON -DCMAKE_Fortran_COMPILER=ifort -DMIT_CONFIG_ID=c90_llc90_05
+  cmake .. -DBASEDIR=$BASEDIR/Linux -DCMAKE_INSTALL_PREFIX=../install -DBUILD_MIT_OCEAN=ON -DCMAKE_Fortran_COMPILER=ifort -DMIT_CONFIG_ID=c90_llc90_02
 # For debug, add: -DCMAKE_BUILD_TYPE=Debug
 
 # Compile code
@@ -29,8 +29,8 @@
   ./gcm_setup
 
 # Sample answers:
-  TESTMIT5-NL
-  New version of GEOSMIT with better tuned atmosphere
+  run_checkpoint68o
+  GEOS-ECCO configuration with ECCO-v4r4 set-up and MITgcm checkpoint68o
   NO (default)
   c90
   72 (default)
@@ -50,9 +50,18 @@
   s1353 (my default, if not enter valid gid)
 
 # Prepare experiment in EXPERIMENT directory
-# Need to copy some things from here- /nobackup/afahad/GEOSMITgcmFiles/
-# Copy mit_input directory and contents - this run starts from Niter0 = 0.
-  cp -r /nobackup/afahad/GEOSMITgcmFiles/mit_input/ .
+# Copy mit_input directory and contents
+# (be sure to replace GEOSDIR below with your own GEOSDIR)
+# (eventually this should be included in the gcm_run.j script)
+  setenv GEOSDIR /nobackupp17/dmenemen/Jason/checkpoint68o/GEOSgcm/install 
+  setenv GEOSgcm $GEOSDIR/../src/Components/@GEOSgcm_GridComp
+  setenv MITplug $GEOSgcm/GEOSogcm_GridComp/GEOS_OceanGridComp/MIT_GEOS5PlugMod/
+  setenv MITinput $MITplug/configs/c90_llc90_02/input/
+  mkdir mit_input
+  cd mit_input
+  ln -s /nobackup/hzhang1/pub/Release4/input_bin/* .
+  cp $MITinput/* .
+  cd ..
 
 # Copy restarts-orig  contents for GEOS restarts into main exp directory
   cp -r /nobackup/afahad/GEOSMITgcmFiles/restarts-orig/* .	

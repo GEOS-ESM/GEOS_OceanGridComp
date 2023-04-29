@@ -1263,9 +1263,6 @@ contains
 ! Profilers
 !----------
 
-    call MAPL_TimerOn(MAPL,"TOTAL"   )
-    call MAPL_TimerOn(MAPL,"FINALIZE")
-
 ! Generic Finalize
 ! ------------------
     
