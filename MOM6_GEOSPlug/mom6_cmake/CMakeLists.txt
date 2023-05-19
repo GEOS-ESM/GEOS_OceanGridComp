@@ -22,7 +22,6 @@ list( APPEND MOM6_SRCS
    src/ALE/coord_hycom.F90
    src/ALE/coord_rho.F90
    src/ALE/coord_sigma.F90
-   src/ALE/coord_slight.F90
    src/ALE/coord_zlike.F90
    src/ALE/MOM_ALE.F90
    src/ALE/MOM_hybgen_regrid.F90
@@ -40,6 +39,7 @@ list( APPEND MOM6_SRCS
    src/ALE/regrid_consts.F90
    src/ALE/regrid_edge_values.F90
    src/ALE/regrid_interp.F90
+   src/ALE/remapping_attic.F90
    src/ALE/regrid_solvers.F90
    src/core/MOM_barotropic.F90
    src/core/MOM_boundary_update.F90
@@ -123,7 +123,6 @@ list( APPEND MOM6_SRCS
    src/framework/MOM_data_override.F90
    src/framework/MOM_diag_mediator.F90
    src/framework/MOM_diag_remap.F90
-   src/framework/MOM_diag_vkernels.F90
    src/framework/MOM_document.F90
    src/framework/MOM_domains.F90
    src/framework/MOM_dyn_horgrid.F90
@@ -136,6 +135,8 @@ list( APPEND MOM6_SRCS
    src/framework/MOM_interpolate.F90
    src/framework/MOM_intrinsic_functions.F90
    src/framework/MOM_io.F90
+   src/framework/MOM_io_file.F90
+   src/framework/MOM_netcdf.F90
    src/framework/MOM_random.F90
    src/framework/MOM_restart.F90
    src/framework/MOM_safe_alloc.F90
