@@ -1272,6 +1272,9 @@ contains
     call MAPL_GenericFinalize( GC, IMPORT, EXPORT, CLOCK, RC=status )
     VERIFY_(STATUS)
 
+    call MAPL_TimerOff(MAPL,"FINALIZE")
+    call MAPL_TimerOff(MAPL,"TOTAL"   )
+ 
 ! All Done
 !---------
 
