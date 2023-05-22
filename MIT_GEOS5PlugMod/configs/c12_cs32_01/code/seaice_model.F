@@ -43,6 +43,9 @@ C !USES: ===============================================================
 #ifdef ALLOW_AUTODIFF_TAMC
 # include "tamc.h"
 #endif
+#ifdef HACK_FOR_GMAO_CPL
+# include "SEAICE_LAYERS.h"
+#endif /* HACK_FOR_GMAO_CPL */
 
 C !INPUT PARAMETERS: ===================================================
 C     myTime :: Current time in simulation
@@ -56,6 +59,9 @@ C !LOCAL VARIABLES: ====================================================
 C     i,j,bi,bj :: Loop counters
       INTEGER i, j
       INTEGER bi, bj
+#ifdef ALLOW_EXF
+      INTEGER grpDiag
+#endif
 #ifdef ALLOW_SITRACER
       INTEGER iTr
 #endif
@@ -69,17 +75,26 @@ CEOP
       IF (debugMode) CALL DEBUG_ENTER( 'SEAICE_MODEL', myThid )
 #endif
 
-#ifdef ALLOW_EXF
-C--   Winds are from pkg/exf, which does not update edges.
-      CALL EXCH_UV_AGRID_3D_RL( uwind, vwind, .TRUE., 1, myThid )
-#endif
-
 #ifdef ALLOW_THSICE
       IF ( useThSice ) THEN
 C--   Map thSice-variables to HEFF and AREA
        CALL SEAICE_MAP_THSICE( myTime, myIter, myThid )
       ENDIF
 #endif /* ALLOW_THSICE */
+
+#ifdef ALLOW_EXF
+      IF ( useEXF ) THEN
+C--   Winds are from pkg/exf, which does not update edges.
+       CALL EXCH_UV_AGRID_3D_RL( uwind, vwind, .TRUE., 1, myThid )
+       IF ( useDiagnostics ) THEN
+C-    Fill-in EXF wind-stess diags, weighted by open-ocean fraction
+        grpDiag = -1
+        IF ( SEAICEuseDYNAMICS ) grpDiag = 1
+        CALL EXF_WEIGHT_SFX_DIAGS(
+     I                  AREA, grpDiag, myTime, myIter, myThid )
+       ENDIF
+      ENDIF
+#endif /* ALLOW_EXF */
 
 #ifdef HACK_FOR_GMAO_CPL
         CALL SEAICE_SAVE4GMAO( myTime, 1, myIter, myThid )
@@ -195,6 +210,16 @@ C     the ice to limit the concentration to 1.
       CALL SEAICE_REG_RIDGE( myTime, myIter, myThid )
 #endif /* ndef HACK_FOR_GMAO_CPL */
 
+#ifdef ALLOW_EXF
+      IF ( useEXF .AND. useDiagnostics ) THEN
+C-    Fill-in EXF surface flux diags, weighted by open-ocean fraction
+        grpDiag = -2
+        IF ( usePW79thermodynamics ) grpDiag = 2
+        CALL EXF_WEIGHT_SFX_DIAGS(
+     I                  AREA, grpDiag, myTime, myIter, myThid )
+      ENDIF
+#endif /* ALLOW_EXF */
+
 #ifdef DISABLE_SEAICE_GROWTH
        IF ( .TRUE. ) THEN
 #else /* DISABLE_SEAICE_GROWTH */
@@ -202,10 +227,17 @@ C     thermodynamics growth
 C     must call growth after calling advection
 C     because of ugly time level business
        IF ( usePW79thermodynamics ) THEN
+#ifdef ALLOW_SEAICE_GROWTH_ADX
+#ifdef ALLOW_DEBUG
+        IF (debugMode) CALL DEBUG_CALL( 'SEAICE_GROWTH_ADX', myThid )
+#endif
+        CALL SEAICE_GROWTH_ADX( myTime, myIter, myThid )
+#else
 #ifdef ALLOW_DEBUG
         IF (debugMode) CALL DEBUG_CALL( 'SEAICE_GROWTH', myThid )
 #endif
         CALL SEAICE_GROWTH( myTime, myIter, myThid )
+#endif
        ELSE
 #endif /* DISABLE_SEAICE_GROWTH */
         DO bj=myByLo(myThid),myByHi(myThid)
@@ -317,9 +349,29 @@ CML   CALL EXCH_UV_XY_RS(fu,fv,.TRUE.,myThid)
 
 #ifdef HACK_FOR_GMAO_CPL
 C-    Save advective increments:
-        CALL SEAICE_SAVE4GMAO( myTime, 2, myIter, myThid )
+      CALL SEAICE_SAVE4GMAO( myTime, 2, myIter, myThid )
 C-    for now, reset increments to zero
-c       CALL SEAICE_SAVE4GMAO( myTime, 0, myIter, myThid )
+c     CALL SEAICE_SAVE4GMAO( myTime, 0, myIter, myThid )
+
+C-    Compute SI_FRZMLT, the  available heat (W/m^2) to freeze (>0) or melt (<0)
+C     sea ice so that surface level ocean reaches freezing temperature.
+C     FRZMLT = (-0.054*SW - TW) * (MAPL_RHO_SEAWATER*MAPL_CAPWTR*10.)/DT
+C     where -0.054*SW is the CICE freezing point of sea water in deg C.
+C     The freezing potential (>0) is subtracted from QNET.
+      DO bj=myByLo(myThid),myByHi(myThid)
+       DO bi=myBxLo(myThid),myBxHi(myThid)
+        DO j=1-OLy,sNy+OLy
+         DO i=1-OLx,sNx+OLx
+          SI_FRZMLT(i,j,bi,bj) = maskC(i,j,1,bi,bj) *
+     &           (-0.054*salt(i,j,1,bi,bj) - theta(i,j,1,bi,bj)) *
+     &           rhoNil * HeatCapacity_Cp * drF(1) / deltaT
+          Qnet(i,j,bi,bj) = Qnet(i,j,bi,bj) -
+     &           MAX( SI_FRZMLT(i,j,bi,bj) , zeroRL )
+         ENDDO
+        ENDDO
+       ENDDO
+      ENDDO
+
 #endif /* HACK_FOR_GMAO_CPL */
 
 #ifdef ALLOW_EXF
