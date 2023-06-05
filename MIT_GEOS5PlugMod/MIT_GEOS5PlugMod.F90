@@ -1264,7 +1264,7 @@ contains
 !----------
 
     call MAPL_TimerOn(MAPL,"TOTAL"   )
-    call MAPL_TimerOn(MAPL,"FINALIZE")
+ !   call MAPL_TimerOn(MAPL,"FINALIZE")
 
 ! Generic Finalize
 ! ------------------
@@ -1272,7 +1272,7 @@ contains
     call MAPL_GenericFinalize( GC, IMPORT, EXPORT, CLOCK, RC=status )
     VERIFY_(STATUS)
 
-    call MAPL_TimerOff(MAPL,"FINALIZE")
+!    call MAPL_TimerOff(MAPL,"FINALIZE")
     call MAPL_TimerOff(MAPL,"TOTAL"   )
  
 ! All Done
