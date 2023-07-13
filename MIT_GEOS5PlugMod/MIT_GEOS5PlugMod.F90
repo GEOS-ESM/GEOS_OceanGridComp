@@ -381,6 +381,8 @@ contains
     VERIFY_(STATUS)
     call MAPL_TimerAdd(GC,   name="RUN"        ,RC=STATUS)
     VERIFY_(STATUS)
+    call MAPL_TimerAdd(GC,   name="RUN2"        ,RC=STATUS)
+    VERIFY_(STATUS)
     call MAPL_TimerAdd(GC,   name="FINALIZE"   ,RC=STATUS)
     VERIFY_(STATUS)
 
@@ -1209,8 +1211,10 @@ contains
 
     end where
     CALL DRIVER_SET_IMPORT_STATE( istate,   'TS', T )
-    deallocate(T)
+
     call mitgcm_import_fill_ts(istate%import)
+
+    call MAPL_TimerOff (MAPL,"RUN2"  )
 
 ! All Done
 !---------
