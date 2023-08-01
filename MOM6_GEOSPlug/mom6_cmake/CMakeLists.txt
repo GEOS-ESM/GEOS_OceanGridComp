@@ -75,14 +75,18 @@ list( APPEND MOM6_SRCS
    src/diagnostics/MOM_spatial_means.F90
    src/diagnostics/MOM_sum_output.F90
    src/diagnostics/MOM_wave_speed.F90
-   src/diagnostics/MOM_wave_structure.F90
    src/equation_of_state/MOM_EOS.F90
+   src/equation_of_state/MOM_EOS_Jackett06.F90
+   src/equation_of_state/MOM_EOS_Roquet_SpV.F90
+   src/equation_of_state/MOM_EOS_Roquet_rho.F90
    src/equation_of_state/MOM_EOS_linear.F90
-   src/equation_of_state/MOM_EOS_NEMO.F90
    src/equation_of_state/MOM_EOS_TEOS10.F90
    src/equation_of_state/MOM_EOS_UNESCO.F90
    src/equation_of_state/MOM_EOS_Wright.F90
+   src/equation_of_state/MOM_EOS_Wright_full.F90
+   src/equation_of_state/MOM_EOS_Wright_red.F90
    src/equation_of_state/MOM_TFreeze.F90
+   src/equation_of_state/MOM_temperature_convert.F90
 #  src/equation_of_state/TEOS10/gsw_chem_potential_water_t_exact.f90
 #  src/equation_of_state/TEOS10/gsw_ct_freezing_exact.f90
 #  src/equation_of_state/TEOS10/gsw_ct_freezing_poly.f90
@@ -172,6 +176,7 @@ list( APPEND MOM6_SRCS
    src/parameterizations/lateral/MOM_thickness_diffuse.F90
    src/parameterizations/lateral/MOM_spherical_harmonics.F90
    src/parameterizations/lateral/MOM_tidal_forcing.F90
+   src/parameterizations/lateral/MOM_Zanna_Bolton.F90
    src/parameterizations/vertical/MOM_ALE_sponge.F90
    src/parameterizations/vertical/MOM_bkgnd_mixing.F90
    src/parameterizations/vertical/MOM_bulk_mixed_layer.F90
