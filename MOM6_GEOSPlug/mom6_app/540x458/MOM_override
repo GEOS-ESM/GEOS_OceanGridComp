@@ -34,3 +34,5 @@ TOPO_FILE = "ocean_topog.nc"
 !#override NIPROC = 4
 !#override NJPROC = 4
 #override LAYOUT = 45,2
+
+HFREEZE = 10.0
