@@ -21,9 +21,6 @@ NJGLOBAL = 458                  !
                                 ! The processor layout that was actually used.
 
 ! === module MOM ===
-DIABATIC_FIRST = True           !   [Boolean] default = False
-                                ! If true, apply diabatic and thermodynamic processes, including buoyancy
-                                ! forcing and mass gain or loss, before stepping the dynamics forward.
 THICKNESSDIFFUSE = True         !   [Boolean] default = False
                                 ! If true, interface heights are diffused with a coefficient of KHTH.
 THICKNESSDIFFUSE_FIRST = True   !   [Boolean] default = False
@@ -60,7 +57,7 @@ C_P = 3925.0                    !   [J kg-1 K-1] default = 3991.86795711963
                                 ! definition of conservative temperature.
 CHECK_BAD_SURFACE_VALS = True   !   [Boolean] default = False
                                 ! If true, check the surface state for ridiculous values.
-SAVE_INITIAL_CONDS = True       !   [Boolean] default = False
+SAVE_INITIAL_CONDS = False      !   [Boolean] default = False
                                 ! If true, write the initial conditions to a file given by IC_OUTPUT_FILE.
 
 ! === module MOM_fixed_initialization ===
@@ -107,12 +104,13 @@ TOPO_CONFIG = "file"            !
                                 !     USER - call a user modified routine.
 MAXIMUM_DEPTH = 6000.0          !   [m]
                                 ! The maximum depth of the ocean.
-MINIMUM_DEPTH = 0.5             !   [m] default = 0.0
+MINIMUM_DEPTH = 9.5             !   [m] default = 0.0
                                 ! If MASKING_DEPTH is unspecified, then anything shallower than MINIMUM_DEPTH is
                                 ! assumed to be land and all fluxes are masked out. If MASKING_DEPTH is
                                 ! specified, then all depths shallower than MINIMUM_DEPTH but deeper than
                                 ! MASKING_DEPTH are rounded to MINIMUM_DEPTH.
-CHANNEL_CONFIG = "none"         ! default = "none"
+MASKING_DEPTH = 0.0
+CHANNEL_CONFIG = "list"         ! default = "none"
                                 ! A parameter that determines which set of channels are
                                 ! restricted to specific  widths.  Options are:
                                 !     none - All channels have the grid width.
@@ -123,6 +121,8 @@ CHANNEL_CONFIG = "none"         ! default = "none"
                                 !       test case.
                                 !     file - Read open face widths everywhere from a
                                 !       NetCDF file on the model grid.
+CHANNEL_LIST_FILE = "MOM_channels_global_tx06v1" 
+
 PARALLEL_RESTARTFILES = True    !   [Boolean] default = False
                                 ! If true, each processor writes its own restart file, otherwise a single
                                 ! restart file is generated
@@ -232,14 +232,14 @@ KV = 1.0E-04                    !   [m2 s-1]
                                 ! m2 s-1, may be used.
 
 ! === module MOM_thickness_diffuse ===
-KHTH = 600.0                    !   [m2 s-1] default = 0.0
+KHTH = 0.0                      !   [m2 s-1] default = 0.0
                                 ! The background horizontal thickness diffusivity.
-KHTH_MAX = 900.0                !   [m2 s-1] default = 0.0
+KHTH_MAX = 0.0                  !   [m2 s-1] default = 0.0
                                 ! The maximum horizontal thickness diffusivity.
-KHTH_USE_FGNV_STREAMFUNCTION = True !   [Boolean] default = False
+KHTH_USE_FGNV_STREAMFUNCTION = False !   [Boolean] default = False
                                 ! If true, use the streamfunction formulation of Ferrari et al., 2010, which
                                 ! effectively emphasizes graver vertical modes by smoothing in the vertical.
-FGNV_C_MIN = 0.01               !   [m s-1] default = 0.0
+FGNV_C_MIN = 0.0                !   [m s-1] default = 0.0
                                 ! A minium wave speed used in the Ferrari et al., 2010, streamfunction
                                 ! formulation.
 
@@ -256,11 +256,9 @@ ETA_TOLERANCE = 1.0E-06         !   [m] default = 3.15E-09
                                 ! total tolerance for SSH is 4 times this value.  The default is
                                 ! 0.5*NK*ANGSTROM, and this should not be set less than about
                                 ! 10^-15*MAXIMUM_DEPTH.
-VELOCITY_TOLERANCE = 1.0E-04    !   [m s-1] default = 3.0E+08
-                                ! The tolerance for barotropic velocity discrepancies between the barotropic
-                                ! solution and  the sum of the layer thicknesses.
 
 ! === module MOM_CoriolisAdv ===
+CORIOLIS_SCHEME = "SADOURNY75_ENSTRO"
 BOUND_CORIOLIS = True           !   [Boolean] default = False
                                 ! If true, the Coriolis terms at u-points are bounded by the four estimates of
                                 ! (f+rv)v from the four neighboring v-points, and similarly at v-points.  This
@@ -283,7 +281,7 @@ TIDE_SAL_SCALAR_VALUE = 0.094   !   [m m-1]
 ! === module MOM_hor_visc ===
 LAPLACIAN = True                !   [Boolean] default = False
                                 ! If true, use a Laplacian horizontal viscosity.
-KH_VEL_SCALE = 0.01             !   [m s-1] default = 0.0
+KH_VEL_SCALE = 0.0              !   [m s-1] default = 0.0
                                 ! The velocity scale which is multiplied by the grid spacing to calculate the
                                 ! Laplacian viscosity. The final viscosity is the largest of this scaled
                                 ! viscosity, the Smagorinsky and Leith viscosities, and KH.
@@ -320,7 +318,7 @@ BEBT = 0.2                      !   [nondim] default = 0.1
                                 ! from 0 (for a forward-backward treatment of nonrotating gravity waves) to 1
                                 ! (for a backward Euler treatment). In practice, BEBT must be greater than about
                                 ! 0.05.
-DTBT = -0.95                    !   [s or nondim] default = -0.98
+DTBT = -0.98                    !   [s or nondim] default = -0.98
                                 ! The barotropic time step, in s. DTBT is only used with the split explicit time
                                 ! stepping. To set the time step automatically based the maximum stable value
                                 ! use 0, or a negative value gives the fraction of the stable value. Setting
@@ -332,7 +330,7 @@ MIXEDLAYER_RESTRAT = True       !   [Boolean] default = False
                                 ! If true, a density-gradient dependent re-stratifying flow is imposed in the
                                 ! mixed layer. Can be used in ALE mode without restriction but in layer mode can
                                 ! only be used if BULKMIXEDLAYER is true.
-FOX_KEMPER_ML_RESTRAT_COEF = 20.0 !   [nondim] default = 0.0
+FOX_KEMPER_ML_RESTRAT_COEF = 60.0 !   [nondim] default = 0.0
                                 ! A nondimensional coefficient that is proportional to the ratio of the
                                 ! deformation radius to the dominant lengthscale of the submesoscale mixed layer
                                 ! instabilities, times the minimum of the ratio of the mesoscale eddy kinetic
@@ -431,11 +429,11 @@ TRACER_ADVECTION_SCHEME = "PPM:H3" ! default = "PLM"
                                 !   PPM    - Piecewise Parabolic Method (Colella-Woodward)
 
 ! === module MOM_tracer_hor_diff ===
-KHTR = 600.0                    !   [m2 s-1] default = 0.0
+KHTR = 0.0                    !   [m2 s-1] default = 0.0
                                 ! The background along-isopycnal tracer diffusivity.
-KHTR_MIN = 50.0                 !   [m2 s-1] default = 0.0
+KHTR_MIN = 0.0                 !   [m2 s-1] default = 0.0
                                 ! The minimum along-isopycnal tracer diffusivity.
-KHTR_MAX = 900.0                !   [m2 s-1] default = 0.0
+KHTR_MAX = 0.0                !   [m2 s-1] default = 0.0
                                 ! The maximum along-isopycnal tracer diffusivity.
 
 ! === module MOM_sum_output ===
