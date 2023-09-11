@@ -39,6 +39,8 @@ UW            | m s-1         | xy   | N    | surface_Agrid_eastward_velocity
 VW            | m s-1         | xy   | N    | surface_Agrid_northward_velocity
 UWB           | m s-1         | xy   | N    | surface_Bgrid_X_velocity
 VWB           | m s-1         | xy   | N    | surface_Bgrid_Y_velocity
+UWC           | m s-1         | xy   | N    | surface_Cgrid_X_velocity
+VWC           | m s-1         | xy   | N    | surface_Cgrid_Y_velocity
 TW            | K             | xy   | N    | surface_temperature
 SW            | psu           | xy   | N    | surface_salinity
 MOM_2D_MASK   | 1             | xy   | N    | ocean_mask_at_tracer_points

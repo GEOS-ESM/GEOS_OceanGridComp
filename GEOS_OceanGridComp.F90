@@ -178,6 +178,10 @@ contains
           call MAPL_AddExportSpec (GC, SHORT_NAME = 'SSH', CHILD_ID   = OCN, _RC)
           call MAPL_AddExportSpec (GC, SHORT_NAME = 'PBO', CHILD_ID   = OCN, _RC)
        endif
+       if (trim(OCEAN_NAME) == "MOM6") then
+          call MAPL_AddExportSpec (GC, SHORT_NAME = 'UWC', CHILD_ID   = OCN, _RC)
+          call MAPL_AddExportSpec (GC, SHORT_NAME = 'VWC', CHILD_ID   = OCN, _RC)
+       endif
     end if
 
 !EOS

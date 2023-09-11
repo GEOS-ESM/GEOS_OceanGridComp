@@ -522,6 +522,8 @@ contains
     REAL_, pointer                     :: VW    (:,:)        => null()
     REAL_, pointer                     :: UWB   (:,:)        => null()
     REAL_, pointer                     :: VWB   (:,:)        => null()
+    REAL_, pointer                     :: UWC   (:,:)        => null()
+    REAL_, pointer                     :: VWC   (:,:)        => null()
     REAL_, pointer                     :: SLV   (:,:)        => null()
     REAL_, pointer                     :: FRAZIL(:,:)        => null()
     REAL_, pointer                     :: MELT_POT(:,:)      => null()
@@ -664,6 +666,8 @@ contains
     call MAPL_GetPointer(EXPORT, VW,    'VW'  ,   _RC)
     call MAPL_GetPointer(EXPORT, UWB,   'UWB' ,   _RC)
     call MAPL_GetPointer(EXPORT, VWB,   'VWB' ,   _RC)
+    call MAPL_GetPointer(EXPORT, UWC,   'UWC' ,   _RC)
+    call MAPL_GetPointer(EXPORT, VWC,   'VWC' ,   _RC)
     call MAPL_GetPointer(EXPORT, TW,    'TW'  ,   _RC)
     call MAPL_GetPointer(EXPORT, SW,    'SW'  ,   _RC)
     call MAPL_GetPointer(EXPORT, SLV,   'SLV',    _RC)
@@ -883,6 +887,19 @@ contains
       elsewhere
         VWB =0.0
       end where
+    end if
+
+!   C-grid currents (for CICE dynamics)
+    U = 0.0; V = 0.0
+    call ocean_model_get_UV_surf(Ocean_State, Ocean, 'uc', U, isc, jsc) ! this comes to us in m/s
+    call ocean_model_get_UV_surf(Ocean_State, Ocean, 'vc', V, isc, jsc) ! this comes to us in m/s
+
+    if(associated(UWC )) then
+       UWC = real(U, kind=GeosKind)
+    endif
+
+    if(associated(VWC )) then
+       VWC = real(V, kind=GeosKind)
     end if
 
 ! Optional Exports at GEOS precision
