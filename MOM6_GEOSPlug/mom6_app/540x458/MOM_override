@@ -1,11 +1,11 @@
 ! Blank file in which we can put "overrides" for parameters
 
-#override DT = 900.0
-#override DT_THERM = 900.0
+#override DT = 450.0
+#override DT_THERM = 450.0
+#override HFREEZE = 10.0
 
 #override NK = 50
 #override USE_REGRIDDING = True
-#override BULKMIXEDLAYER = False
 #override COORD_FILE = "Layer_coord50.nc"
 #override USE_STORED_SLOPES = True
 #override USE_NEUTRAL_DIFFUSION = True
@@ -14,25 +14,53 @@
 #override ALE_COORDINATE_CONFIG = "FILE:vgrid.nc,dz"
 #override REMAPPING_SCHEME = "PPM_H4"
 #override HMIX_FIXED = 0.5
-#override CFL_TRUNCATE_RAMP_TIME = 7200.
 #override Z_INIT_ALE_REMAPPING = True
 #override ENERGETICS_SFC_PBL = True
-#override USE_MLD_ITERATION = False
 #override MASS_WEIGHT_IN_PRESSURE_GRADIENT = True
-KVML = 0.0                      !   [m2 s-1] default = 1.0E-04
-                                ! The kinematic viscosity in the mixed layer.  A typical value is ~1e-2 m2 s-1.
-                                ! KVML is not used if BULKMIXEDLAYER is true.  The default is set by KV.
 
 TOPO_FILE = "ocean_topog.nc"
 #override RESTART_CHECKSUMS_REQUIRED = False
 
+#override LAYOUT =  90,2
 
-#override VERBOSITY = 3
-!DEBUG = True
-!FATAL_UNUSED_PARAMS = True
+! WOA'18 T, S initial condition
+#override TEMP_SALT_Z_INIT_FILE = "woa18_04_initial_conditions.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "theta0"
+#override Z_INIT_FILE_SALT_VAR  = "s_an"
+!
+! Diffusion in MEKE and horizontal (KH) diffusivity
+! 
+#override MEKE_GMCOEFF = 0.0
+#override MEKE_GEOMETRIC = True
+#override MEKE_GEOMETRIC_ALPHA = 0.1
+#override MEKE_EQUILIBRIUM_ALT = True
+#override MEKE_EQUILIBRIUM_RESTORE = True
+#override MEKE_RESTORING_TIMESCALE = 1.0E+07
 
-!#override NIPROC = 4
-!#override NJPROC = 4
-#override LAYOUT = 45,2
+#override MEKE_KHTH_FAC = 1.0
+#override MEKE_KHTR_FAC = 1.0
+#override MEKE_VISCOSITY_COEFF_KU = 0.2
+#override MEKE_ALPHA_DEFORM = 1.0
+#override MEKE_ALPHA_RHINES = 1.0
+#override MEKE_ALPHA_EADY = 1.0
+#override MEKE_ALPHA_FRICT = 1.0
+#override MEKE_ALPHA_GRID = 1.0
+#override MEKE_ADVECTION_FACTOR = 1.0
+#override KHTR_MIN = 50.0
+#override NDIFF_INTERIOR_ONLY = True
 
-HFREEZE = 10.0
+!#override MEKE_KHTH_FAC = 0.8
+!#override MEKE_KHTR_FAC = 0.8
+#override MEKE_KHMEKE_FAC = 0.5
+!#override MEKE_ALPHA_RHINES = 0.05
+!#override MEKE_ALPHA_EADY = 0.05
+!
+#override KHTR_SLOPE_CFF = 0.25
+#override KH_RES_FN_POWER = 100
+#override SMAGORINSKY_KH = True
+#override SMAG_LAP_CONST = 0.15
+!
+! Lateral Boundary diffusion scheme of Marques 2023
+!
+#override USE_LATERAL_BOUNDARY_DIFFUSION = True
+#override LBD_LINEAR_TRANSITION = True
