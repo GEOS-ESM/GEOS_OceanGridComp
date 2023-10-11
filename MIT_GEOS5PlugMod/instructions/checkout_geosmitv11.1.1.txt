@@ -110,7 +110,7 @@ cp -r /nobackupp11/afahad/GEOSMITgcmFiles/mit_input_llc90_02/ mit_input
 # copy env script
 cp /nobackupp11/afahad/GEOSMITgcmFiles/geosmitenv_v11.1.1.sh .
 
-./geosmitenv_v11.1.sh
+./geosmitenv_v11.1.1.sh
 
 #submit job
 
