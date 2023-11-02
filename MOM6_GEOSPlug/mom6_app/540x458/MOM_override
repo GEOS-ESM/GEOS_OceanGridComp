@@ -23,10 +23,6 @@ TOPO_FILE = "ocean_topog.nc"
 
 #override LAYOUT =  90,2
 
-! WOA'18 T, S initial condition
-#override TEMP_SALT_Z_INIT_FILE = "woa18_04_initial_conditions.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "theta0"
-#override Z_INIT_FILE_SALT_VAR  = "s_an"
 !
 ! Diffusion in MEKE and horizontal (KH) diffusivity
 ! 
