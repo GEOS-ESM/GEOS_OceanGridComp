@@ -58,5 +58,5 @@ TOPO_FILE = "ocean_topog.nc"
 !
 ! Lateral Boundary diffusion scheme of Marques 2023
 !
-#override USE_LATERAL_BOUNDARY_DIFFUSION = True
+#override USE_HORIZONTAL_BOUNDARY_DIFFUSION = True
 #override LBD_LINEAR_TRANSITION = True
