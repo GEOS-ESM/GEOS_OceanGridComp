@@ -23,10 +23,6 @@ TOPO_FILE = "ocean_topog.nc"
 
 #override LAYOUT =  90,2
 
-! WOA'18 T, S initial condition
-#override TEMP_SALT_Z_INIT_FILE = "woa18_04_initial_conditions.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "theta0"
-#override Z_INIT_FILE_SALT_VAR  = "s_an"
 !
 ! Diffusion in MEKE and horizontal (KH) diffusivity
 ! 
@@ -62,5 +58,5 @@ TOPO_FILE = "ocean_topog.nc"
 !
 ! Lateral Boundary diffusion scheme of Marques 2023
 !
-#override USE_LATERAL_BOUNDARY_DIFFUSION = True
+#override USE_HORIZONTAL_BOUNDARY_DIFFUSION = True
 #override LBD_LINEAR_TRANSITION = True
