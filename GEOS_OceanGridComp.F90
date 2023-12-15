@@ -165,6 +165,7 @@ contains
     call MAPL_AddExportSpec (GC, SHORT_NAME = 'SW', CHILD_ID = OCN,  _RC)
     call MAPL_AddExportSpec (GC, SHORT_NAME = 'UW', CHILD_ID = OCN,  _RC)
     call MAPL_AddExportSpec (GC, SHORT_NAME = 'VW', CHILD_ID = OCN,  _RC)
+    call MAPL_AddExportSpec (GC, SHORT_NAME = 'DW', CHILD_ID = OCN,  _RC)
 
     if(DO_DATASEA==0) then
        call MAPL_AddExportSpec (GC, SHORT_NAME = 'DH',  CHILD_ID = OCN, _RC)

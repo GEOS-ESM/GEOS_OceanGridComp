@@ -10,6 +10,9 @@ category: IMPORT
  FRACICE        | 1       | xy          | N    |                     | fractional_cover_of_seaice
  DATA_SST       | K       | xy          | N    | ocean_extData       | sea_surface_temperature
  DATA_SSS       | PSU     | xy          | N    | ocean_sssData       | sea_surface_salinity
+ DATA_UW        | m s-1   | xy          | N    |                     | zonal_velocity_of_surface_water
+ DATA_VW        | m s-1   | xy          | N    |                     | meridional_velocity_of_surface_water
+ DATA_DW        | m       | xy          | N    |                     | sea_floor_depth
 
 category: EXPORT
 #----------------------------------------------------------------------------------------
@@ -19,6 +22,7 @@ category: EXPORT
 #----------------------------------------------------------------------------------------
  UW             | m s-1   | xy          | N           | zonal_velocity_of_surface_water
  VW             | m s-1   | xy          | N           | meridional_velocity_of_surface_water
+ DW             | m       | xy          | N           | sea_floor_depth
  TW             | K       | xy          | N           | foundation_temperature_for_interface_layer
  SW             | PSU     | xy          | N           | foundation_salinity_for_interface_layer
 
