@@ -168,6 +168,9 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
   real, pointer, dimension(:,:)       :: TNEW   => null()
   real, pointer, dimension(:,:)       :: F1     => null()
 
+  real, parameter :: MAX_SPEED   = 1e1   ! maximum surface current speed, m s-1
+  real, parameter :: MAX_TERRAIN = 12e3  ! maximum elevation/depth, m
+
 ! Pointers to imports and exports
 #include "GEOS_DataSea_DeclarePointer___.h"
 
@@ -255,8 +258,29 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
 !  Update the exports
 !--------------------
 
-   if(associated(UW)) UW = 0.0
-   if(associated(VW)) VW = 0.0
+   if (associated(UW)) then
+       where (abs(DATA_UW) < MAX_SPEED)
+           UW = DATA_UW
+       elsewhere
+           UW = 0.0
+       end where
+   end if
+
+   if (associated(VW)) then
+       where (abs(DATA_VW) < MAX_SPEED)
+           VW = DATA_VW
+       elsewhere
+           VW = 0.0
+       end where
+   end if
+
+   if (associated(DW)) then
+       where (abs(DATA_DW) < MAX_TERRAIN)
+           DW = DATA_DW
+       elsewhere
+           DW = 0.0
+       end where
+   end if
 
    TICE   = MAPL_TICE-1.8
 
