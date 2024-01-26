@@ -1,0 +1,5 @@
+Exports:
+    DATA_UW:
+        collection: /dev/null
+    DATA_VW:
+        collection: /dev/null
