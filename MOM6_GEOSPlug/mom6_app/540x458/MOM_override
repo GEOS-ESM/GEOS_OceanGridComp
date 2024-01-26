@@ -60,3 +60,11 @@ TOPO_FILE = "ocean_topog.nc"
 !
 #override USE_HORIZONTAL_BOUNDARY_DIFFUSION = True
 #override LBD_LINEAR_TRANSITION = True
+!
+! Extra slack for bad values
+!
+#override BAD_VAL_SSH_MAX = 50.0 
+#override BAD_VAL_SSS_MAX = 75.0
+#override BAD_VAL_SST_MAX = 55.0
+#override BAD_VAL_SST_MIN = -3.0
+
