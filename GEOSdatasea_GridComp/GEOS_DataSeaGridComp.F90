@@ -81,6 +81,7 @@ module GEOS_DataSeaGridCompMod
 ! Get my name and set-up traceback handle
 ! ---------------------------------------
 
+    call ESMF_GridCompGet( GC, NAME=COMP_NAME, _RC)
     Iam = trim(comp_name)//'::'//'SetServices'
 
 ! Set the Initialize, Run, Finalize entry points
