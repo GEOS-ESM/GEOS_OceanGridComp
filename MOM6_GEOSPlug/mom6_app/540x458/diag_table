@@ -3,7 +3,7 @@
 #"scalar",   1,"days",1,"days","Time",
 #"layer",    1,"days",1,"days","Time",
 #"prog",     0,"days",1,"days","Time",
-#"prog_z",    1,"days",1,"days","Time",
+"prog_z",    1,"months",1,"days","Time",
 #"ave_prog", 1,"days",1,"days","Time",
 #"tracer",   1,"days",1,"days","Time",
 #"cont",     1,"days",1,"days","Time",
