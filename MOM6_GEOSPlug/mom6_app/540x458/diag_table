@@ -74,10 +74,10 @@
 ##==================
 #"ocean_model_z","u","u","prog_z","all",.true.,"none",2
 #"ocean_model_z","v","v","prog_z","all",.true.,"none",2
-#"ocean_model_z","temp","temp","prog_z","all",.true.,"none",2
+"ocean_model_z","temp","temp","prog_z","all",.true.,"none",2
 #"ocean_model_z","temp_xyave","temp_xyave","prog_z","all",.true.,"none",2
-#"ocean_model_z","salt","salt","prog_z","all",.true.,"none",2
-#"ocean_model_z","thkcello","thkcello","prog_z","all",.true.,"none",2
+"ocean_model_z","salt","salt","prog_z","all",.true.,"none",2
+"ocean_model_z","thkcello","thkcello","prog_z","all",.true.,"none",2
 #
 ## Auxilary Tracers:
 ##==================
