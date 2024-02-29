@@ -173,6 +173,7 @@ list( APPEND MOM6_SRCS
    src/parameterizations/lateral/MOM_MEKE.F90
    src/parameterizations/lateral/MOM_MEKE_types.F90
    src/parameterizations/lateral/MOM_mixed_layer_restrat.F90
+   src/parameterizations/lateral/MOM_self_attr_load.F90
    src/parameterizations/lateral/MOM_thickness_diffuse.F90
    src/parameterizations/lateral/MOM_spherical_harmonics.F90
    src/parameterizations/lateral/MOM_tidal_forcing.F90
