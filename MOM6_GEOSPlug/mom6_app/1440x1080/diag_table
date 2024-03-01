@@ -3,7 +3,7 @@
 #"scalar",   1,"days",1,"days","Time",
 #"layer",    1,"days",1,"days","Time",
 #"prog",     0,"days",1,"days","Time",
-"prog_z",    1,"days",1,"days","Time",
+"prog_z",    1,"months",1,"days","Time",
 #"ave_prog", 1,"days",1,"days","Time",
 #"tracer",   1,"days",1,"days","Time",
 #"cont",     1,"days",1,"days","Time",
@@ -11,7 +11,7 @@
 ##"bt_mom",  5,"days",1,"days","Time",
 #"visc",     1,"days",1,"days","Time",
 ##"energy",  5,"days",1,"days","Time",
-"forcing",   1,"days",1,"days","Time",
+#"forcing",   1,"days",1,"days","Time",
 #"surface",  1,"months",1,"days","Time",
 "sfc_ave",   1,"days",1,"days","Time",
 #"ocean_static",       -1,"days",1,"days","time",
@@ -72,10 +72,10 @@
 #
 ## Z-space fields:
 ##==================
-"ocean_model_z","u","u","prog_z","all",.true.,"none",2
-"ocean_model_z","v","v","prog_z","all",.true.,"none",2
+#"ocean_model_z","u","u","prog_z","all",.true.,"none",2
+#"ocean_model_z","v","v","prog_z","all",.true.,"none",2
 "ocean_model_z","temp","temp","prog_z","all",.true.,"none",2
-"ocean_model_z","temp_xyave","temp_xyave","prog_z","all",.true.,"none",2
+#"ocean_model_z","temp_xyave","temp_xyave","prog_z","all",.true.,"none",2
 "ocean_model_z","salt","salt","prog_z","all",.true.,"none",2
 "ocean_model_z","thkcello","thkcello","prog_z","all",.true.,"none",2
 #
@@ -282,7 +282,7 @@
 #"ocean_model","LwLatSens","LwLatSens",                          "forcing","all",.true.,"none",1
 #"ocean_model","salt_flux","salt_flux",                          "forcing","all",.true.,"none",1
 #"ocean_model","Heat_PmE","Heat_PmE",                            "forcing","all",.true.,"none",1
-"ocean_model","frazil","frazil",                                "forcing","all",.true.,"none",1
+#"ocean_model","frazil","frazil",                                "forcing","all",.true.,"none",1
 #"ocean_model","internal_heat","internal_heat",                  "forcing","all",.true.,"none",1
 #"ocean_model","heat_added","heat_added",                       "forcing","all",.true.,"none",1
 ##

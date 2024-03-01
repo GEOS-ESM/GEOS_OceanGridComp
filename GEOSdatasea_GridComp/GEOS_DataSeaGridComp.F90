@@ -214,7 +214,7 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
 ! In atmospheric forecast mode we do not have future SST and SSS
 !--------------------------------------------------------------
 
-   call MAPL_GetResource(MAPL,IFCST, LABEL="IS_FCST:",        default=0,    _RC)
+   call MAPL_GetResource(MAPL,IFCST, LABEL="OGCM_IS_FCST:",   default=0,    _RC)
    call MAPL_GetResource(MAPL,adjSST,LABEL="SST_ADJ_UND_ICE:",default=0,    _RC)
 
    FCST = IFCST==1
