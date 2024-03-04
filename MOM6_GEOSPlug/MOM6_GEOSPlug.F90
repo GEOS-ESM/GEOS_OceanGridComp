@@ -828,7 +828,7 @@ contains
       call update_ocean_model(Boundary, Ocean_State, Ocean, Time, DT, .false., .false.)
     endif
 
-! Copy tracers from MOM internal state to IMPORT bundle
+! Copy tracers from MOM6 internal state to IMPORT bundle
 !------------------------------------------------------
 
     if (OBIO) then
