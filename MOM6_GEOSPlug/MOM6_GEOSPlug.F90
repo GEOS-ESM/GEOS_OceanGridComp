@@ -13,7 +13,7 @@ module MOM6_GEOSPlugMod
 ! A  MAPL/ESMF Gridded Component that acts as a coupler for MOM.
 ! It uses ESMF AND MAPL. It has heavy dependencies on FMS and MOM.
 !
-! This should be built like MOM, so that its default reals
+! This should be built like MOM, so that its default reals/
 ! are the same as for MOM.
 !
 ! It does not use the configuration.
@@ -999,6 +999,7 @@ contains
 !   3d exports with MOM6, such as depths, T, S, U, V, etc
 !   will not be exported. If needed, write them directly from MOM6
 
+!For test purposes the obio exports are given dummy values
     DH=10.0
     if (OBIO) then    
       TL=292.0
