@@ -4,10 +4,18 @@ esma_set_this ()
 
 option (BUILD_MIT_OCEAN "BUILD_MIT_OCEAN is turned off by default" OFF) #OFF by default
 if ( NOT BUILD_MIT_OCEAN )
-  esma_add_library (${this}
-    SRCS GEOS_OceanGridComp.F90
-    SUBCOMPONENTS MOM6_GEOSPlug MOM_GEOS5PlugMod GEOSdatasea_GridComp
-    DEPENDENCIES GEOSdatasea_GridComp MAPL esmf)
+  if (TARGET fms_r8)
+    esma_add_library (${this}
+      SRCS GEOS_OceanGridComp.F90
+      SUBCOMPONENTS MOM6_GEOSPlug MOM_GEOS5PlugMod GEOSdatasea_GridComp
+      DEPENDENCIES GEOSdatasea_GridComp MAPL esmf)
+    target_compile_definitions (${this} PRIVATE HAVE_FMS)
+  else ()
+    esma_add_library (${this}
+      SRCS GEOS_OceanGridComp.F90
+      SUBCOMPONENTS GEOSdatasea_GridComp
+      DEPENDENCIES GEOSdatasea_GridComp MAPL esmf)
+  endif()
 
 else()
   add_compile_definitions(BUILD_MIT_OCEAN)
