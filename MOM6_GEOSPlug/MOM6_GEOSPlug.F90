@@ -229,9 +229,6 @@ contains
     REAL_, pointer                         :: AREA(:,:)        => null()
     REAL_, pointer                         :: MOM_2D_MASK(:,:) => null()
     REAL_, pointer                         :: SLV(:,:)         => null()
-!    REAL_, pointer                         :: DH  (:,:,:)
-!    REAL_, pointer                         :: TL  (:,:,:)
-!    REAL_, pointer                         :: SL  (:,:,:)
 
     real, allocatable                      :: Tmp2(:,:)
 
@@ -460,9 +457,6 @@ contains
     call MAPL_GetPointer(EXPORT, SW,          'SW'  ,        alloc=.true., _RC)
     call MAPL_GetPointer(EXPORT, AREA,        'AREA',        alloc=.true., _RC)
     call MAPL_GetPointer(EXPORT, SLV,         'SLV' ,        alloc=.true., _RC)
-!    call MAPL_GetPointer(EXPORT, DH,          'DH'  ,        alloc=.true., _RC)
-!    call MAPL_GetPointer(EXPORT, TL,          'T'   ,        alloc=.true., _RC)
-!    call MAPL_GetPointer(EXPORT, SL,          'S'   ,        alloc=.true., _RC)
 
 ! Get the 2-D MOM data
 !---------------------
