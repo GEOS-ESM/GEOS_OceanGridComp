@@ -24,6 +24,7 @@ module GEOS_OceanGridCompMod
   character(len=ESMF_MAXSTR)  :: OCEAN_NAME
   integer                     :: DO_DATASEA
   integer                     :: DO_OBIO
+  logical                     :: OBIO
   real                        :: OrphanDepth
 
 ! !DESCRIPTION:
@@ -101,7 +102,8 @@ contains
 
     call MAPL_GetResource (MAPL, DO_DATASEA,  Label="USE_DATASEA:" ,    DEFAULT=1,    _RC)
     call MAPL_GetResource (MAPL, OrphanDepth, Label="OGCM_TOP_LAYER:" , DEFAULT=10.0, _RC)
-    call MAPL_GetResource ( MAPL, DO_OBIO,    Label="USE_OCEANOBIOGEOCHEM:",DEFAULT=0,_RC)
+    call MAPL_GetResource ( MAPL, DO_OBIO,    Label="USE_OCEANOBIOGEOCHEM:", DEFAULT=0,_RC)
+    OBIO = DO_OBIO /= 0
 
     if(DO_DATASEA/=0) then
        OCEAN_NAME="DATASEA"
@@ -173,7 +175,7 @@ contains
        call MAPL_AddExportSpec (GC, SHORT_NAME = 'UWB', CHILD_ID = OCN, _RC)
        call MAPL_AddExportSpec (GC, SHORT_NAME = 'VWB', CHILD_ID = OCN, _RC)
        call MAPL_AddExportSpec (GC, SHORT_NAME = 'SLV', CHILD_ID = OCN, _RC)
-       if(DO_OBIO/=0) then
+       if(OBIO) then
          call MAPL_AddExportSpec (GC, SHORT_NAME = 'T',   CHILD_ID = OCN, _RC)
          call MAPL_AddExportSpec (GC, SHORT_NAME = 'S',   CHILD_ID = OCN, _RC)
        endif
