@@ -61,5 +61,7 @@ QFLUX       |   kg m-2 s-1   |   xy     |   N      |                            
 SFLX        |   kg m-2 s-1   |   xy     |   N      |                                   |   salt_flux_due_to_ice_dynamics  
 RAIN        |   kg m-2 s-1   |   xy     |   N      |                                   |   ocean_rainfall  
 SNOW        |   kg m-2 s-1   |   xy     |   N      |                                   |   ocean_snowfall  
+FRESH       |   kg m-2 s-1   |   xy     |   N      |                               |                     |   fresh_water_flux_due_to_ice_dynamics 
+WATERFLUX   |   kg m-2 s-1   |   xy     |   N      |                               |                     |   total_fresh_water_flux_into_ocean
 PEN_OCN     |   W m-2        |   xy     |   N      |                                   |   penetrated_shortwave_flux_at_the_bottom_of_first_ocean_model_layer  
 T_Freeze    |   C            | xy       |   N      |  trim(OCEAN_NAME) == 'MOM6'       |   freezing_temperature_calculated_using_salinity_in_degC

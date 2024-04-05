@@ -452,6 +452,8 @@ contains
     real, pointer :: QFLUXe(:,:)
     real, pointer :: RAINe(:,:)
     real, pointer :: SNOWe(:,:)
+    real, pointer :: FRESHe(:,:)
+    real, pointer :: WATERFLUXe(:,:)
     real, pointer :: SFLXe(:,:)
     real, pointer :: PEN_OCNe(:,:)
 
@@ -687,6 +689,8 @@ contains
        call MAPL_GetPointer(EXPORT, QFLUXe,     'QFLUX'  ,   _RC)
        call MAPL_GetPointer(EXPORT, RAINe,      'RAIN'  ,    _RC)
        call MAPL_GetPointer(EXPORT, SNOWe,      'SNOW'  ,    _RC)
+       call MAPL_GetPointer(EXPORT, FRESHe,     'FRESH'  ,    _RC)
+       call MAPL_GetPointer(EXPORT, WATERFLUXe, 'WATERFLUX',  _RC)
        call MAPL_GetPointer(EXPORT, SFLXe,      'SFLX'  ,    _RC)
        call MAPL_GetPointer(EXPORT, PEN_OCNe,   'PEN_OCN',   _RC)
 
@@ -905,6 +909,9 @@ contains
        end if
 
     end if ! Time to run
+
+    if (associated(FRESHe)) FRESHe = FRESH
+    if (associated(WATERFLUXe)) WATERFLUXe = RAIN + SNOW - QFLUX + DISCHARGE + FRESH
 
 ! Profilers
 !----------
