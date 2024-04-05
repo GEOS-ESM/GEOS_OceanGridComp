@@ -765,6 +765,9 @@ contains
           if (associated(SNOWe)) SNOWe = SNOW
           if (associated(SFLXe)) SFLXe = SFLX
           if (associated(PEN_OCNe)) PEN_OCNe = PEN_OCN
+          if (associated(FRESHe)) FRESHe = FRESH
+          if (associated(WATERFLUXe)) WATERFLUXe = RAIN + SNOW - QFLUX + DISCHARGE
+
        end if !DO_DATASEA
 
 ! Loop the ocean model
@@ -909,9 +912,6 @@ contains
        end if
 
     end if ! Time to run
-
-    if (associated(FRESHe)) FRESHe = FRESH
-    if (associated(WATERFLUXe)) WATERFLUXe = RAIN + SNOW - QFLUX + DISCHARGE + FRESH
 
 ! Profilers
 !----------
