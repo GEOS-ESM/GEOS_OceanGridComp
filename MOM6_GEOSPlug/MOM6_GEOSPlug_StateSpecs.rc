@@ -52,6 +52,7 @@ MELT_POT      | W m-2         | xy   | N    |              | heat_that_can_be_us
 FRZMLT        | W m-2         | xy   | N    |              | freeze_melt_potential
 T_Freeze      | degC          | xy   | N    |              | freezing_temperature_calculated_using_salinity
 DH            | m             | xyz  | C    |              | layer_thickness
+MASK          | 1             | xyz  | C    |              | ocean_3d_mask_at_tracer_points
 T             | K             | xyz  | C    |     OBIO     | potential_temperature
 S             | PSU           | xyz  | C    |     OBIO     | salinity
 
