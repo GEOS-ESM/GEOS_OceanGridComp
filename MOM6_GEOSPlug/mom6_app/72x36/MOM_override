@@ -21,7 +21,7 @@
 #override MASS_WEIGHT_IN_PRESSURE_GRADIENT = True
 
 #override VERBOSITY = 2
-#override DEBUG = True
+#override DEBUG = False
 #override FATAL_UNUSED_PARAMS = True
 
 #override TOPO_FILE = "ocean_topog_Edited.nc"

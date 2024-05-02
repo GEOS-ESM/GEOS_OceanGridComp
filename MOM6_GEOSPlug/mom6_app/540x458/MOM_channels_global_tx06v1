@@ -1,0 +1,6 @@
+! Created by Gustavo Marques (gmarques@ucar.edu) and Frank Bryan (bryan@ucar.edu )
+! Date: 06/25/2020
+! This file specifies restricted channel widths in MOM.  The order is:
+!  [U|V]_width, min_longitude, max_longitude, min_latitude, max_latitude, width
+
+U_width, -6.50,  -5.0, 35.8, 36.4,  12000.0  ! Gibraltar
