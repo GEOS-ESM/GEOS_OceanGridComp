@@ -1,13 +1,11 @@
 ! Blank file in which we can put "overrides" for parameters
 
-LAYOUT = 40, 30
+LAYOUT = 36, 30
 #override DT = 450.0
 #override DT_THERM = 450.
-!BAD_VAL_SST_MIN = -3.0
-!BAD_VAL_SSS_MAX = 55.0
 HFREEZE = 2.0
 
-! disable checksums
+! Disable checksums
 RESTART_CHECKSUMS_REQUIRED = False
 
 !VERBOSITY = 9
@@ -18,3 +16,40 @@ RESTART_CHECKSUMS_REQUIRED = False
 #override DIAG_COORDS = "z Z ZSTAR"
 #override DIAG_COORD_DEF_Z = "WOA09"
 
+! Use (known) bug fixes.
+#override USE_GM_WORK_BUG                 = False
+#override BT_USE_OLD_CORIOLIS_BRACKET_BUG = False
+#override KAPPA_SHEAR_ITER_BUG            = False
+#override KAPPA_SHEAR_ALL_LAYER_TKE_BUG   = False
+#override FIX_USTAR_GUSTLESS_BUG          = True
+#override REMAP_UV_USING_OLD_ALG          = False
+
+! For SOCA
+#override VERTEX_SHEAR = True
+
+! Known improvements
+#override INTERNAL_WAVE_SPEED_BETTER_EST = True
+#override REMAP_AUXILIARY_VARS = True
+
+! Thermo_spans_coupling should be set to False
+#override THERMO_SPANS_COUPLING = False
+
+! Following improved ocean-ice simulations
+#override CORIOLIS_SCHEME = SADOURNY75_ENERGY
+#override BOUNDARY_EXTRAPOLATION = False
+#override EPBL_MSTAR_SCHEME = "REICHL_H18"
+#override EPBL_MLD_BISECTION = False
+#override APPLY_INTERFACE_FILTER = True
+#override THICKNESSDIFFUSE = False
+#override KH_VEL_SCALE = 0.00286
+#override HTBL_SHELF_MIN = 10.
+#override KH_ETA_CONST = 20.
+#override AH_VEL_SCALE = 0.02
+#override SMAGORINSKY_AH = False
+#override BBL_THICK_MIN = 10.
+#override BBL_EFFIC = 0.01
+#override PRESSURE_DEPENDENT_FRAZIL = False
+!
+! update answers
+#override DEFAULT_2018_ANSWERS = False
+!
