@@ -28,7 +28,7 @@ module MOM6_GEOSPlugMod
 
 ! FMS dependencies
   use field_manager_mod,        only: field_manager_init, field_manager_end
-  use mpp_mod,                  only: mpp_exit
+  use mpp_mod,                  only: mpp_exit, mpp_pe
 
 ! MOM dependencies
   use MOM_diag_manager_infra,   only: MOM_diag_manager_init, MOM_diag_manager_end
@@ -201,7 +201,7 @@ contains
     integer                                :: Comm
     integer                                :: isc,iec,jsc,jec
     integer                                :: isd,ied,jsd,jed
-    integer                                :: IM, JM
+    integer                                :: IM, JM, LM
     integer                                :: g_isc,g_iec,g_jsc,g_jec
     integer                                :: g_isd,g_ied,g_jsd,g_jed
     integer                                :: YEAR,MONTH,DAY,HR,MN,SC
@@ -235,7 +235,10 @@ contains
     REAL_, pointer                         :: MOM_2D_MASK(:,:) => null()
     REAL_, pointer                         :: SLV(:,:)         => null()
 
-    real, allocatable                      :: Tmp2(:,:)
+    real, allocatable                      :: Tmp2(:,:), Tmp3(:,:,:)
+    integer                                :: i
+
+    REAL_, pointer, dimension(:, :, :)     :: DH, TL, SL, MASK
 
     integer                                :: DT_OCEAN
     character(len=7)                       :: wind_stagger     ! 'AGRID' or 'BGRID' or 'CGRID'
@@ -372,6 +375,9 @@ contains
     ASSERT_(counts(1)==IM)
     ASSERT_(counts(2)==JM)
 
+    call get_ocean_grid(Ocean_state, Ocean_grid)                      
+    LM=Ocean_grid%ke
+
 ! Check run time surface current stagger option set in MOM_input 
 ! to make sure it matches what is expected here
 !---------------------------------------------------------------
@@ -454,7 +460,7 @@ contains
 
     call MAPL_GenericInitialize( GC, IMPORT, EXPORT, CLOCK, _RC )
 
-! Make sure exports neede by the parent prior to our run call are initialized
+! Make sure exports needed by the parent prior to our run call are initialized
 !----------------------------------------------------------------------------
 
     call MAPL_GetPointer(EXPORT, MOM_2D_MASK, 'MOM_2D_MASK', alloc=.true., _RC)
@@ -462,6 +468,44 @@ contains
     call MAPL_GetPointer(EXPORT, SW,          'SW'  ,        alloc=.true., _RC)
     call MAPL_GetPointer(EXPORT, AREA,        'AREA',        alloc=.true., _RC)
     call MAPL_GetPointer(EXPORT, SLV,         'SLV' ,        alloc=.true., _RC)
+    call MAPL_GetPointer(EXPORT, DH,          'DH'  ,        alloc=.true., _RC)
+    call MAPL_GetPointer(EXPORT, MASK,        'MASK',        alloc=.true., _RC)
+    if (OBIO) then
+      call MAPL_GetPointer(EXPORT, TL,          'T',           alloc=.true., _RC)
+      call MAPL_GetPointer(EXPORT, SL,          'S',           alloc=.true., _RC)
+    endif
+
+! Get the 3-D MOM data
+!---------------------
+    allocate(Tmp3(IM,JM,LM), __STAT__)
+
+    call ocean_model_get_3D_tmask(Ocean_State, tmp3, isc, jsc)
+    MASK = real(tmp3, kind=GeosKind)
+
+    call ocean_model_get_thickness(Ocean_State, tmp3, isc, jsc)
+    where(MASK > 0.0)
+      DH = real(tmp3, kind=GeosKind)
+    elsewhere
+      DH = MAPL_UNDEF
+    end where
+
+    if (OBIO) then
+      call ocean_model_get_prog_tracer_index(Ocean_State,i,'temp')
+      call ocean_model_get_prog_tracer(Ocean_State,i, tmp3, isc, jsc)
+      where(MASK > 0.0)
+        TL = real(tmp3,kind=GeosKind) + MAPL_TICE
+      elsewhere
+        TL = MAPL_UNDEF
+      end where
+
+      call ocean_model_get_prog_tracer_index(Ocean_State,i,'salt')
+      call ocean_model_get_prog_tracer(Ocean_State, i, tmp3, isc, jsc)
+      where(MASK > 0.0)
+        SL = real(tmp3,kind=GeosKind)
+      elsewhere
+        SL = MAPL_UNDEF
+      end where
+    endif
 
 ! Get the 2-D MOM data
 !---------------------
@@ -614,7 +658,8 @@ contains
     REAL_, pointer, dimension(:,:)     :: LATS  => null()
     REAL_, pointer, dimension(:,:)     :: LONS  => null()
 
-    character(len=ESMF_MAXSTR)         :: units, longname
+    character(len=ESMF_MAXSTR)         :: units, longname, cfname, dfname
+    
 
     __Iam__('Run')
 
@@ -722,10 +767,10 @@ contains
     call MAPL_GetPointer(EXPORT, AREA, 'AREA',               _RC)
 
     call MAPL_GetPointer(EXPORT, DH,    'DH'  ,   _RC)
+    call MAPL_GetPointer(EXPORT, MASK,  'MASK',   _RC)  
     if (OBIO) then
       call MAPL_GetPointer(EXPORT, TL,    'T'   ,   _RC)
       call MAPL_GetPointer(EXPORT, SL,    'S'   ,   _RC)
-      call MAPL_GetPointer(EXPORT, MASK,  'MASK',   _RC)  
     endif
 
 ! Fill in ocean boundary fluxes/forces
@@ -816,11 +861,9 @@ contains
 
          H = real(TRACER, kind=GeosKind)
 
-         H=5.0
-
          write(TRNAME(11:13),'(I3.3)') I
          call ocean_model_get_prog_tracer_index(Ocean_State,tracer_index,TRNAME)
-!         if(tracer_index > 0) call ocean_model_put_prog_tracer(Ocean_State,tracer_index,H)
+         if(tracer_index > 0) call ocean_model_put_prog_tracer(Ocean_State,tracer_index,H, isc, jsc)
       end do
     endif
 
@@ -842,11 +885,11 @@ contains
 ! Copy tracers from MOM6 internal state to IMPORT bundle
 !------------------------------------------------------
 
-    if (OBIO) then
 !Get 3D mask first
-      call ocean_model_get_3D_tmask(Ocean_State, H)
-      MASK = real(H, kind=GeosKind)
+    call ocean_model_get_3D_tmask(Ocean_State, H, isc, jsc)
+    MASK = real(H, kind=GeosKind)
 
+    if (OBIO) then
       do I=1,NA
          call ESMF_FieldBundleGet(TR,   I,   FIELD,  RC=STATUS)
          VERIFY_(STATUS)
@@ -857,14 +900,13 @@ contains
 
          write(TRNAME(11:13),'(I3.3)') I
          call ocean_model_get_prog_tracer_index(Ocean_State,tracer_index,TRNAME)
-         if(tracer_index > 0) call ocean_model_get_prog_tracer(Ocean_State, tracer_index, H, &
-                                   isc, jsc, units, longname)
+         if(tracer_index > 0) call ocean_model_get_prog_tracer(Ocean_State, tracer_index, H, isc, jsc)
 
-         where(MASK > 0.0)
+!         where(MASK > 0.0)
             TRACER = real(H, kind=GeosKind)
-         elsewhere
-            TRACER = MAPL_UNDEF
-         end where
+!         elsewhere
+!            TRACER = MAPL_UNDEF
+!         end where
 
       end do
     endif
@@ -872,36 +914,33 @@ contains
 ! Get required Exports at GEOS precision
 !---------------------------------------
 
-    if (OBIO) then
 !MOM 3D fields
+!Thickness
+    call ocean_model_get_thickness(Ocean_State, H, isc, jsc)
+    where(MASK > 0.0)
+      DH = real(H, kind=GeosKind)
+    elsewhere
+      DH = MAPL_UNDEF
+    end where
+
+    if (OBIO) then
 !Temp
       call ocean_model_get_prog_tracer_index(Ocean_State,tracer_index,'temp')
-      call ocean_model_get_prog_tracer(Ocean_State,tracer_index,H,isc, jsc, units, longname)
-
+      call ocean_model_get_prog_tracer(Ocean_State,tracer_index, H, isc, jsc)
       where(MASK > 0.0)
-        TL = real(H+MAPL_TICE,kind=GeosKind) 
+        TL = real(H,kind=GeosKind) + MAPL_TICE
       elsewhere
         TL = MAPL_UNDEF
       end where
 
 !Salt
       call ocean_model_get_prog_tracer_index(Ocean_State,tracer_index,'salt')
-      call ocean_model_get_prog_tracer(Ocean_State,tracer_index,H,isc, jsc, units, longname)
-
+      call ocean_model_get_prog_tracer(Ocean_State, tracer_index, H, isc, jsc)
       where(MASK > 0.0)
         SL = real(H,kind=GeosKind)
       elsewhere
         SL = MAPL_UNDEF
       end where
-
-!Thickness
-      call ocean_model_get_thickness(Ocean_State, H, isc, jsc)
-      where(MASK > 0.0)
-        DH = real(H, kind=GeosKind)
-      elsewhere
-        DH = MAPL_UNDEF
-      end where
-
     endif
 
 !   2D mask
