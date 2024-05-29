@@ -1,8 +1,8 @@
 esma_set_this (OVERRIDE mom6)
 
 # This is for selecting the MOM6 infrastructure interface
-## We default to FMS1 and look if something is passed in...
-set (DEFAULT_MOM6_INFRA "FMS1")
+## We default to FMS2 and look if something is passed in...
+set (DEFAULT_MOM6_INFRA "FMS2")
 if (NOT MOM6_INFRA)
   set (MOM6_INFRA ${DEFAULT_MOM6_INFRA})
 endif ()
@@ -201,7 +201,7 @@ list( APPEND MOM6_SRCS
    src/parameterizations/vertical/MOM_sponge.F90
    src/parameterizations/vertical/MOM_tidal_mixing.F90
    src/parameterizations/vertical/MOM_vert_friction.F90
-   src/parameterizations/stochastic/MOM_stochastics.F90 
+   src/parameterizations/stochastic/MOM_stochastics.F90
    src/tracer/advection_test_tracer.F90
    src/tracer/boundary_impulse_tracer.F90
    src/tracer/DOME_tracer.F90
@@ -524,7 +524,7 @@ esma_add_library (${this}
   SRCS ${SRCS}
   DEPENDENCIES fms_r8
   INCLUDES
-  $<BUILD_INTERFACE:${MOM6_path}/config_src/memory/dynamic_nonsymmetric> 
+  $<BUILD_INTERFACE:${MOM6_path}/config_src/memory/dynamic_nonsymmetric>
 #  choose above set MOM6_infra interface
   $<BUILD_INTERFACE:${MOM6_path}/config_src/infra/${MOM6_INFRA}>
   $<BUILD_INTERFACE:${MOM6_path}/src/framework>
