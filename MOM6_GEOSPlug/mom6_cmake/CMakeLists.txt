@@ -522,7 +522,7 @@ endforeach ()
 
 esma_add_library (${this}
   SRCS ${SRCS}
-  DEPENDENCIES fms_r8
+  DEPENDENCIES FMS::fms_r8
   INCLUDES
   $<BUILD_INTERFACE:${MOM6_path}/config_src/memory/dynamic_nonsymmetric>
 #  choose above set MOM6_infra interface
