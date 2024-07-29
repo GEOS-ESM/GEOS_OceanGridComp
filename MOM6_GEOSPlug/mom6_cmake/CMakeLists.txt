@@ -50,6 +50,7 @@ list( APPEND MOM6_SRCS
    src/core/MOM_CoriolisAdv.F90
    src/core/MOM_density_integrals.F90
    src/core/MOM_dynamics_split_RK2.F90
+   src/core/MOM_dynamics_split_RK2b.F90
    src/core/MOM_dynamics_unsplit.F90
    src/core/MOM_dynamics_unsplit_RK2.F90
    src/core/MOM.F90
@@ -76,6 +77,7 @@ list( APPEND MOM6_SRCS
    src/diagnostics/MOM_sum_output.F90
    src/diagnostics/MOM_wave_speed.F90
    src/equation_of_state/MOM_EOS.F90
+   src/equation_of_state/MOM_EOS_base_type.F90
    src/equation_of_state/MOM_EOS_Jackett06.F90
    src/equation_of_state/MOM_EOS_Roquet_SpV.F90
    src/equation_of_state/MOM_EOS_Roquet_rho.F90
