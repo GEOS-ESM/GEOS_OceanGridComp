@@ -127,8 +127,6 @@ BAD_VAL_SST_MIN = -3.0          !   [deg C] default = -2.1
 BAD_VAL_COLUMN_THICKNESS = 0.0  !   [m] default = 0.0
                                 ! The value of column thickness below which a bad value message is triggered, if
                                 ! CHECK_BAD_SURFACE_VALS is true.
-DEFAULT_2018_ANSWERS = False    !   [Boolean] default = False
-                                ! This sets the default value for the various _2018_ANSWERS parameters.
 SURFACE_2018_ANSWERS = False    !   [Boolean] default = False
                                 ! If true, use expressions for the surface properties that recover the answers
                                 ! from the end of 2018. Otherwise, use more appropriate expressions that differ
