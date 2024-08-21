@@ -51,5 +51,3 @@ RESTART_CHECKSUMS_REQUIRED = False
 #override PRESSURE_DEPENDENT_FRAZIL = False
 !
 ! update answers
-#override DEFAULT_2018_ANSWERS = False
-!

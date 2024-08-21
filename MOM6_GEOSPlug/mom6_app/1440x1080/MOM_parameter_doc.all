@@ -150,8 +150,6 @@ BAD_VAL_COLUMN_THICKNESS = 0.0  !   [m] default = 0.0
                                 ! CHECK_BAD_SURFACE_VALS is true.
 DEFAULT_ANSWER_DATE = 99991231  ! default = 99991231
                                 ! This sets the default value for the various _ANSWER_DATE parameters.
-DEFAULT_2018_ANSWERS = False    !   [Boolean] default = False
-                                ! This sets the default value for the various _2018_ANSWERS parameters.
 SURFACE_2018_ANSWERS = False    !   [Boolean] default = False
                                 ! If true, use expressions for the surface properties that recover the answers
                                 ! from the end of 2018. Otherwise, use more appropriate expressions that differ
