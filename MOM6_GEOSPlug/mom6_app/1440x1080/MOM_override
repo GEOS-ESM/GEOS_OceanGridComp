@@ -51,5 +51,10 @@ RESTART_CHECKSUMS_REQUIRED = False
 #override PRESSURE_DEPENDENT_FRAZIL = False
 !
 ! update answers
-#override DEFAULT_2018_ANSWERS = False
-!
+
+! Overrides to match results from previous MOM6 version
+! See https://github.com/GEOS-ESM/MOM6/releases/tag/geos%2Fv3.2
+! and https://github.com/mom-ocean/MOM6/pull/1631#issuecomment-2252914251
+
+#override USE_HUYNH_STENCIL_BUG = True
+#override EPBL_ANSWER_DATE = 20231231
