@@ -69,7 +69,9 @@ list( APPEND MOM6_SRCS
    src/core/MOM_verticalGrid.F90
    src/core/MOM_porous_barriers.F90
    src/diagnostics/MOM_debugging.F90
+   src/diagnostics/MOM_diagnose_MLD.F90
    src/diagnostics/MOM_diagnostics.F90
+   src/diagnostics/MOM_harmonic_analysis.F90
    src/diagnostics/MOM_obsolete_diagnostics.F90
    src/diagnostics/MOM_obsolete_params.F90
    src/diagnostics/MOM_PointAccel.F90
@@ -176,6 +178,7 @@ list( APPEND MOM6_SRCS
    src/parameterizations/lateral/MOM_MEKE_types.F90
    src/parameterizations/lateral/MOM_mixed_layer_restrat.F90
    src/parameterizations/lateral/MOM_self_attr_load.F90
+   src/parameterizations/lateral/MOM_streaming_filter.F90
    src/parameterizations/lateral/MOM_thickness_diffuse.F90
    src/parameterizations/lateral/MOM_spherical_harmonics.F90
    src/parameterizations/lateral/MOM_tidal_forcing.F90
@@ -203,7 +206,7 @@ list( APPEND MOM6_SRCS
    src/parameterizations/vertical/MOM_sponge.F90
    src/parameterizations/vertical/MOM_tidal_mixing.F90
    src/parameterizations/vertical/MOM_vert_friction.F90
-   src/parameterizations/stochastic/MOM_stochastics.F90 
+   src/parameterizations/stochastic/MOM_stochastics.F90
    src/tracer/advection_test_tracer.F90
    src/tracer/boundary_impulse_tracer.F90
    src/tracer/DOME_tracer.F90
@@ -526,7 +529,7 @@ esma_add_library (${this}
   SRCS ${SRCS}
   DEPENDENCIES fms_r8
   INCLUDES
-  $<BUILD_INTERFACE:${MOM6_path}/config_src/memory/dynamic_nonsymmetric> 
+  $<BUILD_INTERFACE:${MOM6_path}/config_src/memory/dynamic_nonsymmetric>
 #  choose above set MOM6_infra interface
   $<BUILD_INTERFACE:${MOM6_path}/config_src/infra/${MOM6_INFRA}>
   $<BUILD_INTERFACE:${MOM6_path}/src/framework>
