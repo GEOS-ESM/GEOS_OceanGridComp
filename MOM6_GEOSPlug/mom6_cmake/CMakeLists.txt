@@ -69,7 +69,9 @@ list( APPEND MOM6_SRCS
    src/core/MOM_verticalGrid.F90
    src/core/MOM_porous_barriers.F90
    src/diagnostics/MOM_debugging.F90
+   src/diagnostics/MOM_diagnose_MLD.F90
    src/diagnostics/MOM_diagnostics.F90
+   src/diagnostics/MOM_harmonic_analysis.F90
    src/diagnostics/MOM_obsolete_diagnostics.F90
    src/diagnostics/MOM_obsolete_params.F90
    src/diagnostics/MOM_PointAccel.F90
@@ -176,6 +178,7 @@ list( APPEND MOM6_SRCS
    src/parameterizations/lateral/MOM_MEKE_types.F90
    src/parameterizations/lateral/MOM_mixed_layer_restrat.F90
    src/parameterizations/lateral/MOM_self_attr_load.F90
+   src/parameterizations/lateral/MOM_streaming_filter.F90
    src/parameterizations/lateral/MOM_thickness_diffuse.F90
    src/parameterizations/lateral/MOM_spherical_harmonics.F90
    src/parameterizations/lateral/MOM_tidal_forcing.F90
