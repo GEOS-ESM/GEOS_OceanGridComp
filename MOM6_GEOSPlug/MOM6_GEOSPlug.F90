@@ -830,10 +830,15 @@ contains
        endif
 
        where(MOM_2D_MASK(:,:)>0.0)
-          FRZMLT = FRAZIL + MELT_POT
+          FRZMLT = MELT_POT
        elsewhere
           FRZMLT = 0.0
        end where
+
+       where(MOM_2D_MASK(:,:)>0.0 .and. FRAZIL(:,:) > 0.0)
+          FRZMLT = FRAZIL
+       endwhere
+
     end if
 
 !   freezing temperature (deg C)
