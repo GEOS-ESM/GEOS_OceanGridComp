@@ -539,8 +539,8 @@ contains
     type(ice_ocean_boundary_type), pointer :: Boundary                 => null()
     type(ocean_public_type),       pointer :: Ocean                    => null()
     type(ocean_state_type),        pointer :: Ocean_State              => null()
-    type(MOM_MAPL_Type),           pointer :: MOM_MAPL_internal_state  => null()
     type(ocean_grid_type),         pointer :: Ocean_grid               => null()
+    type(MOM_MAPL_Type),           pointer :: MOM_MAPL_internal_state  => null()
     type(MOM_MAPLWrap_Type)                :: wrap
 
 !#include "MOM6_GEOSPlug_DeclarePointer___.h" ! Because these are "real(kind=GeosKind)" not using ACG.
