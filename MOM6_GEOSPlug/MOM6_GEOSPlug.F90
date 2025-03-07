@@ -44,16 +44,19 @@ module MOM6_GEOSPlugMod
 
   use MOM_grid,                 only: ocean_grid_type
 
-  use ocean_model_mod,          only: get_ocean_grid,       &
-                                      ocean_model_init,     &
-                                      ocean_model_init_sfc, &
-                                      update_ocean_model,   &
-                                      ocean_model_end,      &
-                                      ocean_model_restart,  &
-                                      ocean_model_data_get, &
-                                      ocean_public_type,    &
-                                      ocean_state_type,     &
-                                      ocean_model_get_UV_surf
+  use ocean_model_mod,          only: get_ocean_grid,                   &
+                                      ocean_model_init,                 &
+                                      ocean_model_init_sfc,             &
+                                      update_ocean_model,               &
+                                      ocean_model_end,                  &
+                                      ocean_model_restart,              &
+                                      ocean_model_data_get,             &
+                                      ocean_public_type,                &
+                                      ocean_state_type,                 &
+                                      ocean_model_get_UV_surf,          &
+                                      ocean_model_get_thickness,        &
+                                      ocean_model_get_prog_tracer,      &
+                                      ocean_model_get_prog_tracer_index
 
   use MOM_surface_forcing_gfdl, only: ice_ocean_boundary_type
 
@@ -182,7 +185,7 @@ contains
     integer                                :: Comm
     integer                                :: isc,iec,jsc,jec
     integer                                :: isd,ied,jsd,jed
-    integer                                :: IM, JM
+    integer                                :: IM, JM, LM
     integer                                :: g_isc,g_iec,g_jsc,g_jec
     integer                                :: g_isd,g_ied,g_jsd,g_jed
     integer                                :: YEAR,MONTH,DAY,HR,MN,SC
@@ -216,11 +219,14 @@ contains
     REAL_, pointer                         :: MOM_2D_MASK(:,:) => null()
     REAL_, pointer                         :: SLV(:,:)         => null()
 
-    real, allocatable                      :: Tmp2(:,:)
+    real, allocatable                      :: Tmp2(:,:), Tmp3(:,:,:)
+
+    REAL_, pointer, dimension(:, :, :)     :: DH, TL, SL
 
     integer                                :: DT_OCEAN
     character(len=7)                       :: wind_stagger     ! 'AGRID' or 'BGRID' or 'CGRID'
     integer                                ::iwind_stagger     !  AGRID  or  BGRID  or  CGRID
+    integer                                :: i
 
     __Iam__('Initialize')
 
@@ -353,6 +359,9 @@ contains
     ASSERT_(counts(1)==IM)
     ASSERT_(counts(2)==JM)
 
+    call get_ocean_grid(Ocean_state, Ocean_grid)
+    LM=Ocean_grid%ke
+
 ! Check run time surface current stagger option set in MOM_input 
 ! to make sure it matches what is expected here
 !---------------------------------------------------------------
@@ -443,6 +452,24 @@ contains
     call MAPL_GetPointer(EXPORT, SW,          'SW'  ,        alloc=.true., _RC)
     call MAPL_GetPointer(EXPORT, AREA,        'AREA',        alloc=.true., _RC)
     call MAPL_GetPointer(EXPORT, SLV,         'SLV',         alloc=.true., _RC)
+    call MAPL_GetPointer(EXPORT, DH,          'DH'  ,        alloc=.true., _RC)
+    call MAPL_GetPointer(EXPORT, TL,          'T',           alloc=.true., _RC)
+    call MAPL_GetPointer(EXPORT, SL,          'S',           alloc=.true., _RC)
+
+! Get the 3-D MOM data
+!---------------------
+    allocate(Tmp3(IM,JM,LM), __STAT__)
+
+    call ocean_model_get_thickness(Ocean_State, tmp3, isc, jsc)
+    DH = real(tmp3, kind=GeosKind)
+
+    call ocean_model_get_prog_tracer_index(Ocean_State,i,'temp')
+    call ocean_model_get_prog_tracer(Ocean_State,i, tmp3, isc, jsc)
+    TL = real(tmp3,kind=GeosKind) + MAPL_TICE
+
+    call ocean_model_get_prog_tracer_index(Ocean_State,i,'salt')
+    call ocean_model_get_prog_tracer(Ocean_State, i, tmp3, isc, jsc)
+    SL = real(tmp3,kind=GeosKind)
 
 ! Get the 2-D MOM data
 !---------------------
@@ -471,6 +498,7 @@ contains
     end if
 
     deallocate(Tmp2, __STAT__)
+    deallocate(Tmp3, __STAT__)
 
     RETURN_(ESMF_SUCCESS)
   end subroutine Initialize
@@ -511,6 +539,7 @@ contains
     type(ice_ocean_boundary_type), pointer :: Boundary                 => null()
     type(ocean_public_type),       pointer :: Ocean                    => null()
     type(ocean_state_type),        pointer :: Ocean_State              => null()
+    type(ocean_grid_type),         pointer :: Ocean_grid               => null()
     type(MOM_MAPL_Type),           pointer :: MOM_MAPL_internal_state  => null()
     type(MOM_MAPLWrap_Type)                :: wrap
 
@@ -531,6 +560,9 @@ contains
     REAL_, pointer                     :: MOM_2D_MASK  (:,:) => null()
     REAL_, pointer                     :: AREA  (:,:)        => null()
     REAL_, pointer                     :: T_Freeze (:,:)     => null()
+    REAL_, pointer                     :: DH  (:,:,:)        => null()
+    REAL_, pointer                     :: TL  (:,:,:)        => null()
+    REAL_, pointer                     :: SL  (:,:,:)        => null()
 
 ! Imports
     REAL_, pointer                     :: TAUX(:,:)          => null()
@@ -555,11 +587,11 @@ contains
     REAL_, pointer                     :: TAUYBOT(:,:)       => null()
 
 ! Temporaries
-    real, allocatable                  :: U (:,:),  V(:,:)
+    real, allocatable                  :: U(:,:),  V(:,:), H(:,:,:)
     real, allocatable                  :: cos_rot(:,:)
     real, allocatable                  :: sin_rot(:,:)
 
-    integer                            :: IM, JM
+    integer                            :: IM, JM, LM
 
     integer                            :: steady_state_ocean = 0       ! SA: Per Atanas T, "name" of this var is misleading
                                                                        ! We run ocean model only when it = 0
@@ -575,6 +607,7 @@ contains
     real                               :: pice_scaling = 1.0
     real                               :: dTf_dS
     integer                            :: DT_OCEAN
+    integer                            :: tracer_index
 
     REAL_, pointer, dimension(:,:)     :: LATS  => null()
     REAL_, pointer, dimension(:,:)     :: LONS  => null()
@@ -626,11 +659,15 @@ contains
     IM=iec-isc+1
     JM=jec-jsc+1
 
+    call get_ocean_grid (Ocean_state, Ocean_grid)
+    LM=Ocean_grid%ke
+
 ! Temporaries with MOM default reals
 !-----------------------------------
 
     allocate(U(IM,JM   ),    __STAT__)
     allocate(V(IM,JM   ),    __STAT__)
+    allocate(H(IM,JM,LM),    __STAT__)
     allocate(cos_rot(IM,JM), __STAT__)
     allocate(sin_rot(IM,JM), __STAT__)
 
@@ -661,6 +698,10 @@ contains
 
 ! Get EXPORT pointers
 !--------------------
+
+    call MAPL_GetPointer(EXPORT, DH,    'DH'  ,   _RC)
+    call MAPL_GetPointer(EXPORT, TL,    'T'   ,   _RC)
+    call MAPL_GetPointer(EXPORT, SL,    'S'   ,   _RC)
 
     call MAPL_GetPointer(EXPORT, UW,    'UW'  ,   _RC)
     call MAPL_GetPointer(EXPORT, VW,    'VW'  ,   _RC)
@@ -765,7 +806,23 @@ contains
 ! Get required Exports at GEOS precision
 !---------------------------------------
 
-!   mask
+!MOM 3D fields
+!   Thickness
+    call ocean_model_get_thickness(Ocean_State, H, isc, jsc)
+    DH = real(H, kind=GeosKind)
+
+!   Temp
+    call ocean_model_get_prog_tracer_index(Ocean_State,tracer_index,'temp')
+    call ocean_model_get_prog_tracer(Ocean_State,tracer_index, H, isc, jsc)
+    TL = real(H,kind=GeosKind) + MAPL_TICE
+
+!   Salt
+    call ocean_model_get_prog_tracer_index(Ocean_State,tracer_index,'salt')
+    call ocean_model_get_prog_tracer(Ocean_State, tracer_index, H, isc, jsc)
+    SL = real(H,kind=GeosKind)
+
+!MOM 2D fields
+!   2D mask
     U = 0.0
     call ocean_model_data_get(Ocean_State, Ocean, 'mask', U, isc, jsc)
     MOM_2D_MASK = real(U, kind=GeosKind)
@@ -908,11 +965,12 @@ contains
 ! Optional Exports at GEOS precision
 !-----------------------------------
 ! none
-!   3d exports with MOM6, such as depths, T, S, U, V, etc
+!   3d exports with MOM6, other than depth, T, S (needed by NOBM), such as U, V, etc
 !   will not be exported. If needed, write them directly from MOM6
 
     deallocate(U, V,            __STAT__)
     deallocate(cos_rot,sin_rot, __STAT__)
+    deallocate(H,               __STAT__)
 
     call MAPL_TimerOff(MAPL,"RUN"   )
     call MAPL_TimerOff(MAPL,"TOTAL" )
