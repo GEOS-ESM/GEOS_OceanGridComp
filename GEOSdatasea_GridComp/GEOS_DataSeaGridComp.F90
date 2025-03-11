@@ -167,6 +167,7 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
 
   real, pointer, dimension(:,:)       :: TNEW   => null()
   real, pointer, dimension(:,:)       :: F1     => null()
+  real, pointer, dimension(:,:)       :: LATS   => null()
 
   real, parameter :: MAX_SPEED   = 10.0  ! maximum surface current speed, m s-1
 
@@ -249,7 +250,15 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
      endif
 
    else ! binary
+#ifdef AQUA_PLANET
+     call MAPL_Get(MAPL, LATS = LATS, _RC)
+     SST = MAPL_TICE ! 0 Celsius
+     where (abs(LATS) < MAPL_PI/3.0)
+        SST = MAPL_TICE + 27.0*(1.0-(SIN(1.5*LATS))**2)
+     end where
+#else
      call MAPL_ReadForcing(MAPL,'SST',DATASeaFILE, CURRENTTIME, sst, INIT_ONLY=FCST, _RC)
+#endif
    endif
 
    call MAPL_TimerOff(MAPL,"-UPDATE" )
