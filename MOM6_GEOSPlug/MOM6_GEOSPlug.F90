@@ -892,9 +892,9 @@ contains
           FRZMLT = 0.0
        end where
 
-       where(MOM_2D_MASK(:,:)>0.0 .and. FRAZIL(:,:) > 0.0)
+       where(MOM_2D_MASK(:,:)>0.0 .and. FRAZIL>0.0)
           FRZMLT = FRAZIL
-       endwhere
+       end where
 
     end if
 

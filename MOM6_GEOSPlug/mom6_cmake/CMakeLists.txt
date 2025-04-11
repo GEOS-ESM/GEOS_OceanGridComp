@@ -1,8 +1,8 @@
 esma_set_this (OVERRIDE mom6)
 
 # This is for selecting the MOM6 infrastructure interface
-## We default to FMS1 and look if something is passed in...
-set (DEFAULT_MOM6_INFRA "FMS1")
+## We default to FMS2 and look if something is passed in...
+set (DEFAULT_MOM6_INFRA "FMS2")
 if (NOT MOM6_INFRA)
   set (MOM6_INFRA ${DEFAULT_MOM6_INFRA})
 endif ()
@@ -527,7 +527,7 @@ endforeach ()
 
 esma_add_library (${this}
   SRCS ${SRCS}
-  DEPENDENCIES fms_r8
+  DEPENDENCIES FMS::fms_r8
   INCLUDES
   $<BUILD_INTERFACE:${MOM6_path}/config_src/memory/dynamic_nonsymmetric>
 #  choose above set MOM6_infra interface

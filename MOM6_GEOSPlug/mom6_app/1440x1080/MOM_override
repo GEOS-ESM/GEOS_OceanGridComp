@@ -51,7 +51,6 @@ RESTART_CHECKSUMS_REQUIRED = False
 #override PRESSURE_DEPENDENT_FRAZIL = False
 !
 ! update answers
-!
 
 ! Overrides to match results from previous MOM6 version
 ! See https://github.com/GEOS-ESM/MOM6/releases/tag/geos%2Fv3.2
