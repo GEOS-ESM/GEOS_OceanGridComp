@@ -214,6 +214,8 @@ list( APPEND MOM6_SRCS
    src/tracer/dye_example.F90
    src/tracer/ideal_age_example.F90
    src/tracer/ISOMIP_tracer.F90
+   src/tracer/MARBL_forcing_mod.F90
+   src/tracer/MARBL_tracers.F90
    src/tracer/MOM_CFC_cap.F90
    src/tracer/MOM_generic_tracer.F90
    src/tracer/MOM_hor_bnd_diffusion.F90
@@ -514,6 +516,11 @@ list( APPEND MOM6_SRCS
    # database comms
    config_src/external/database_comms/database_client_interface.F90
    config_src/external/database_comms/MOM_database_comms.F90
+   # MARBL
+   config_src/external/MARBL/marbl_constants_mod.F90
+   config_src/external/MARBL/marbl_interface.F90
+   config_src/external/MARBL/marbl_interface_public_types.F90
+   config_src/external/MARBL/marbl_logging.F90
 )
 
 
