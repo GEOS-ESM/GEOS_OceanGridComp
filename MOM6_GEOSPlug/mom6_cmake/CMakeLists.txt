@@ -36,26 +36,10 @@ list( APPEND MOM6_SRCS
    src/ALE/polynomial_functions.F90
    src/ALE/PPM_functions.F90
    src/ALE/PQM_functions.F90
-   src/ALE/Recon1d_EMPLM_CWK.F90
-   src/ALE/Recon1d_EMPLM_WA.F90
-   src/ALE/Recon1d_EMPLM_WA_poly.F90
-   src/ALE/Recon1d_EPPM_CWK.F90
-   src/ALE/Recon1d_MPLM_CWK.F90
-   src/ALE/Recon1d_MPLM_WA.F90
-   src/ALE/Recon1d_MPLM_WA_poly.F90
-   src/ALE/Recon1d_PCM.F90
-   src/ALE/Recon1d_PLM_CW.F90
-   src/ALE/Recon1d_PLM_CWK.F90
-   src/ALE/Recon1d_PLM_hybgen.F90
-   src/ALE/Recon1d_PPM_CW.F90
-   src/ALE/Recon1d_PPM_CWK.F90
-   src/ALE/Recon1d_PPM_H4_2018.F90
-   src/ALE/Recon1d_PPM_H4_2019.F90
-   src/ALE/Recon1d_PPM_hybgen.F90
-   src/ALE/Recon1d_type.F90
    src/ALE/regrid_consts.F90
    src/ALE/regrid_edge_values.F90
    src/ALE/regrid_interp.F90
+   src/ALE/remapping_attic.F90
    src/ALE/regrid_solvers.F90
    src/core/MOM_barotropic.F90
    src/core/MOM_boundary_update.F90
@@ -85,7 +69,6 @@ list( APPEND MOM6_SRCS
    src/core/MOM_verticalGrid.F90
    src/core/MOM_porous_barriers.F90
    src/diagnostics/MOM_debugging.F90
-   src/diagnostics/MOM_diagnose_KdWork.F90
    src/diagnostics/MOM_diagnose_MLD.F90
    src/diagnostics/MOM_diagnostics.F90
    src/diagnostics/MOM_harmonic_analysis.F90
@@ -161,7 +144,6 @@ list( APPEND MOM6_SRCS
    src/framework/MOM_intrinsic_functions.F90
    src/framework/MOM_io.F90
    src/framework/MOM_io_file.F90
-   src/framework/MOM_murmur_hash.F90
    src/framework/MOM_netcdf.F90
    src/framework/MOM_random.F90
    src/framework/MOM_restart.F90
@@ -170,7 +152,6 @@ list( APPEND MOM6_SRCS
    src/framework/MOM_unique_scales.F90
    src/framework/MOM_unit_scaling.F90
    src/framework/MOM_write_cputime.F90
-   src/framework/numerical_testing_type.F90
    src/framework/posix.F90
    src/framework/posix.h
    src/ice_shelf/MOM_ice_shelf_diag_mediator.F90
@@ -201,7 +182,6 @@ list( APPEND MOM6_SRCS
    src/parameterizations/lateral/MOM_thickness_diffuse.F90
    src/parameterizations/lateral/MOM_spherical_harmonics.F90
    src/parameterizations/lateral/MOM_tidal_forcing.F90
-   src/parameterizations/lateral/MOM_wave_drag.F90
    src/parameterizations/lateral/MOM_Zanna_Bolton.F90
    src/parameterizations/vertical/MOM_ALE_sponge.F90
    src/parameterizations/vertical/MOM_bkgnd_mixing.F90
@@ -237,13 +217,13 @@ list( APPEND MOM6_SRCS
    src/tracer/MARBL_forcing_mod.F90
    src/tracer/MARBL_tracers.F90
    src/tracer/MOM_CFC_cap.F90
+   src/tracer/MOM_generic_tracer.F90
    src/tracer/MOM_hor_bnd_diffusion.F90
    src/tracer/MOM_neutral_diffusion.F90
    src/tracer/MOM_OCMIP2_CFC.F90
    src/tracer/MOM_offline_aux.F90
    src/tracer/MOM_offline_main.F90
    src/tracer/MOM_tracer_advect.F90
-   src/tracer/MOM_tracer_advect_schemes.F90
    src/tracer/MOM_tracer_diabatic.F90
    src/tracer/MOM_tracer_flow_control.F90
    src/tracer/MOM_tracer_hor_diff.F90
@@ -527,7 +507,6 @@ list( APPEND MOM6_SRCS
    config_src/external/GFDL_ocean_BGC/FMS_coupler_util.F90
    config_src/external/GFDL_ocean_BGC/generic_tracer.F90
    config_src/external/GFDL_ocean_BGC/generic_tracer_utils.F90
-   config_src/external/GFDL_ocean_BGC/MOM_generic_tracer.F90
    # drifters-particles
    config_src/external/drifters/MOM_particles.F90
    config_src/external/drifters/MOM_particles_types.F90
