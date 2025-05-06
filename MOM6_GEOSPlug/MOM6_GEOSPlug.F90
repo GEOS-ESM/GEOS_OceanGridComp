@@ -4,6 +4,9 @@
 #define GeosKind      4
 #define REAL_       real(kind=GeosKind)
 
+#define COUPLE_MOM6_AND_WAVES
+
+
 module MOM6_GEOSPlugMod
 
 !BOP
@@ -136,6 +139,30 @@ contains
 ! !Export state:
 #include "MOM6_GEOSPlug_Export___.h"
 
+#if defined COUPLE_MOM6_AND_WAVES
+   call MAPL_AddImportSpec(GC,                &
+        SHORT_NAME     = 'UUSSP',             &
+        LONG_NAME      = 'u-component of surface stokes drift (partitioned)', &
+        UNITS          = 'm s-1',             &
+        UNGRIDDED_DIMS = [3],                 &
+        DIMS           = MAPL_DimsHorzOnly,   &
+        VLOCATION      = MAPL_VLocationNone,  &
+        RESTART        = MAPL_RestartSkip,    &
+!       DEFAULT        = 0.0,                 &
+        _RC  )
+
+   call MAPL_AddImportSpec(GC,                &
+        SHORT_NAME     = 'VUSSP',             &
+        LONG_NAME      = 'v-component of surface stokes drift (partitioned)', &
+        UNITS          = 'm s-1',             &
+        UNGRIDDED_DIMS = [3],                 &
+        DIMS           = MAPL_DimsHorzOnly,   &
+        VLOCATION      = MAPL_VLocationNone,  &
+        RESTART        = MAPL_RestartSkip,    &
+!       DEFAULT        = 0.0,                 &
+        _RC  )
+#endif
+
 !EOS
 
 ! Set the Profiling timers
@@ -221,6 +248,10 @@ contains
     integer                                :: DT_OCEAN
     character(len=7)                       :: wind_stagger     ! 'AGRID' or 'BGRID' or 'CGRID'
     integer                                ::iwind_stagger     !  AGRID  or  BGRID  or  CGRID
+
+#if defined COUPLE_MOM6_AND_WAVES
+    integer                                :: wm_num_partitions
+#endif
 
     __Iam__('Initialize')
 
@@ -322,7 +353,18 @@ contains
 
     Ocean%is_ocean_pe = .true.
     call ocean_model_init  (Ocean, Ocean_state, Time, Time, iwind_stagger)
- 
+
+#if defined COUPLE_MOM6_AND_WAVES
+    wm_num_partitions = 0
+    
+    if (Ocean_state%Waves%UseWaves) then
+        wm_num_partitions = Ocean_state%Waves%NumBands
+    end if
+
+    print *, 'DBG: MOM6_Plug  Ocean_state%Waves%NumBands = ', Ocean_state%Waves%NumBands
+    print *, 'DBG: MOM6_Plug  Ocean_state%Waves%WaveNum_Cen = ', Ocean_state%Waves%WaveNum_Cen
+#endif
+
     MOM_MAPL_internal_state%Ocean_State => Ocean_State
 
     call ocean_model_init_sfc(Ocean_state, Ocean)
@@ -386,7 +428,7 @@ contains
                Boundary% fprec           (g_isd:g_ied,g_jsd:g_jed), &
                Boundary% runoff          (g_isd:g_ied,g_jsd:g_jed), &
                Boundary% calving         (g_isd:g_ied,g_jsd:g_jed), &
-               Boundary% stress_mag      (g_isd:g_ied,g_jsd:g_jed), &
+!              Boundary% stress_mag      (g_isd:g_ied,g_jsd:g_jed), &
                Boundary% ustar_berg      (g_isd:g_ied,g_jsd:g_jed), &
                Boundary% area_berg       (g_isd:g_ied,g_jsd:g_jed), &
                Boundary% mass_berg       (g_isd:g_ied,g_jsd:g_jed), &
@@ -395,7 +437,13 @@ contains
                Boundary% p               (g_isd:g_ied,g_jsd:g_jed), &
                Boundary% mi              (g_isd:g_ied,g_jsd:g_jed), &
                Boundary% ice_rigidity    (g_isd:g_ied,g_jsd:g_jed), &
+#if defined COUPLE_MOM6_AND_WAVES
+               Boundary% stk_wavenumbers (wm_num_partitions), &
+               Boundary% ustkb           (g_isd:g_ied,g_jsd:g_jed,wm_num_partitions), &
+               Boundary% vstkb           (g_isd:g_ied,g_jsd:g_jed,wm_num_partitions), &
+#endif
                __STAT__)
+
 
 ! Initialize fluxes
 !------------------
@@ -414,7 +462,7 @@ contains
     Boundary%fprec           = 0.0
     Boundary%runoff          = 0.0
     Boundary%calving         = 0.0
-    Boundary%stress_mag      = 0.0
+!   Boundary%stress_mag      = 0.0
     Boundary%ustar_berg      = 0.0
     Boundary%area_berg       = 0.0
     Boundary%mass_berg       = 0.0
@@ -422,7 +470,12 @@ contains
     Boundary%calving_hflx    = 0.0
     Boundary%p               = 0.0
     Boundary%mi              = 0.0
-    Boundary% ice_rigidity   = 0.0
+    Boundary%ice_rigidity    = 0.0
+#if defined COUPLE_MOM6_AND_WAVES
+    Boundary%stk_wavenumbers = 0.0
+    Boundary%ustkb           = 0.0
+    Boundary%vstkb           = 0.0
+#endif
 
 ! Profilers
 ! ---------
@@ -554,6 +607,11 @@ contains
     REAL_, pointer                     :: TAUXBOT(:,:)       => null()
     REAL_, pointer                     :: TAUYBOT(:,:)       => null()
 
+#if defined COUPLE_MOM6_AND_WAVES
+    REAL_, pointer                     :: USSP(:,:,:)        => null()
+    REAL_, pointer                     :: VSSP(:,:,:)        => null()
+#endif
+
 ! Temporaries
     real, allocatable                  :: U (:,:),  V(:,:)
     real, allocatable                  :: cos_rot(:,:)
@@ -567,6 +625,9 @@ contains
     character(len=7)                   :: pres_loading                 ! yes or no
 
     integer                            :: isc,iec,jsc,jec
+#if defined COUPLE_MOM6_AND_WAVES
+    integer                            :: istk
+#endif
 
     integer                            :: YEAR,MONTH,DAY,HR,MN,SC
     type(time_type)                    :: Time
@@ -659,6 +720,18 @@ contains
     call MAPL_GetPointer(IMPORT, TAUXBOT,  'TAUXBOT',   _RC)
     call MAPL_GetPointer(IMPORT, TAUYBOT,  'TAUYBOT',   _RC)
 
+#if defined COUPLE_MOM6_AND_WAVES
+    call MAPL_GetPointer(IMPORT, USSP,     'UUSSP',     _RC)
+    call MAPL_GetPointer(IMPORT, VSSP,     'VUSSP',     _RC)
+
+    print *, 'DBG::GEOS:MOM6  USSP = ', shape(USSP), minval(USSP), maxval(USSP)
+    print *, 'DBG::GEOS:MOM6  VSSP = ', shape(VSSP), minval(VSSP), maxval(VSSP)
+
+    print *, 'DBG::GEOS:MOM6  TAUX = ', shape(TAUX), minval(TAUX), maxval(TAUX)
+    print *, 'DBG::GEOS:MOM6  TAUY = ', shape(TAUY), minval(TAUY), maxval(TAUY)
+#endif
+
+
 ! Get EXPORT pointers
 !--------------------
 
@@ -731,6 +804,27 @@ contains
 
     Boundary%U_flux  (isc:iec,jsc:jec)= real( (U*cos_rot - V*sin_rot), kind=KIND(Boundary%p))
     Boundary%V_flux  (isc:iec,jsc:jec)= real( (U*sin_rot + V*cos_rot), kind=KIND(Boundary%p))
+
+#if defined COUPLE_MOM6_AND_WAVES
+! Waves
+! -----
+    Boundary%stk_wavenumbers = Ocean_state%Waves%Wavenum_cen ! move to init()
+    Boundary%ustkb = 0.0
+    Boundary%vstkb = 0.0
+
+    do istk = 1, size(Boundary%stk_wavenumbers)
+        U = real(USSP(:,:,istk), kind=kind(U))
+        V = real(VSSP(:,:,istk), kind=kind(V))
+
+        where ( (abs(U) > 1.0) .or. (abs(V) > 1.0))
+            U = 0.0
+            V = 0.0
+        endwhere 
+
+        Boundary%ustkb(isc:iec,jsc:jec,istk) = 0.0 * real((U*cos_rot - V*sin_rot), kind=KIND(Boundary%ustkb))
+        Boundary%vstkb(isc:iec,jsc:jec,istk) = 0.0 * real((U*sin_rot + V*cos_rot), kind=KIND(Boundary%vstkb))
+    end do
+#endif
 
 ! Set the time for MOM
 !---------------------
@@ -1016,7 +1110,7 @@ contains
                  Boundary% fprec           , &
                  Boundary% runoff          , &
                  Boundary% calving         , &
-                 Boundary% stress_mag      , &
+!                Boundary% stress_mag      , &
                  Boundary% ustar_berg      , &
                  Boundary% area_berg       , &
                  Boundary% mass_berg       , &
@@ -1025,6 +1119,11 @@ contains
                  Boundary% p               , &
                  Boundary% mi              , &
                  Boundary% ice_rigidity    , &
+#if defined COUPLE_MOM6_AND_WAVES
+                 Boundary% stk_wavenumbers , &
+                 Boundary% ustkb           , &
+                 Boundary% vstkb           , &
+#endif
                  __STAT__)
 
     deallocate ( Ocean,                   __STAT__)
