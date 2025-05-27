@@ -55,6 +55,7 @@ module MOM6_GEOSPlugMod
                                       ocean_state_type,                 &
                                       ocean_model_get_UV_surf,          &
                                       ocean_model_get_thickness,        &
+                                      ocean_model_put_prog_tracer,      &
                                       ocean_model_get_prog_tracer,      &
                                       ocean_model_get_prog_tracer_index
 
@@ -1022,85 +1023,77 @@ contains
     character(len=ESMF_MAXSTR)             :: COMP_NAME
 
 !! Locals
+    type(MAPL_MetaComp),           pointer :: MAPL                     => null()
 
-    !integer                                :: IM, JM, LM
-    !integer                                :: tracer_index
+    type(ocean_public_type),       pointer :: Ocean                    => null()
+    type(ocean_state_type),        pointer :: Ocean_State              => null()
+    type(ocean_grid_type),         pointer :: Ocean_grid               => null()
+    type(MOM_MAPL_Type),           pointer :: MOM_MAPL_internal_state  => null()
+    type(MOM_MAPLWrap_Type)                :: wrap
 
+    integer                                :: isc,iec,jsc,jec
 
 !! Imports
-    !REAL_, pointer                         :: DEL_TEMP(:,:)
+    REAL_, pointer                         :: DEL_TEMP(:,:)
 
 !! Temporaries
 
-    !real, allocatable                      :: T(:,:,:)
-
-!! Pointers to export
-    !REAL_, pointer                         :: MASK(:,:,:)
-
-    !type(MAPL_MetaComp),           pointer :: MAPL
-    !type(MOM_MAPL_Type),           pointer :: MOM_MAPL_internal_state
-    !type(MOM_MAPLWrap_Type)                :: wrap
-!!    type(ice_ocean_boundary_type), pointer :: boundary
-!!    type(ocean_public_type),       pointer :: Ocean
-!!    type(mom5_ocean_state_type),   pointer :: Ocean_State
-!!    type(domain2d)                         :: OceanDomain
-    !integer                                :: isc,iec,jsc,jec
-    !integer                                :: isd,ied,jsd,jed
+    real, allocatable                      :: T(:,:,:)
+    integer                                :: IM, JM, LM
+    integer                                :: tracer_index
 
 !! Begin
 !!------
 
-
 !! Get the component's name and set-up traceback handle.
 !! -----------------------------------------------------
-    !Iam = "Run2"
-    !call ESMF_GridCompGet( gc, NAME=comp_name, RC=status )
-    !VERIFY_(status)
-    !Iam = trim(comp_name) // Iam
+    Iam = "Run2"
+    call ESMF_GridCompGet( GC, NAME=COMP_NAME, _RC)
+    Iam = trim(COMP_NAME)//'::'//Iam
 
 !! Get my internal MAPL_Generic state
 !!-----------------------------------
 
-    !call MAPL_GetObjectFromGC ( GC, MAPL, RC=status)
-    !VERIFY_(STATUS)
-
+    call MAPL_GetObjectFromGC( GC, MAPL, _RC)
 
 !! Profilers
 !!----------
 
-    !call MAPL_TimerOn (MAPL,"TOTAL")
-    !call MAPL_TimerOn (MAPL,"RUN2"  )
+    call MAPL_TimerOn (MAPL,"TOTAL")
+    call MAPL_TimerOn (MAPL,"RUN2" )
 
 !! Get the Plug's private internal state
 !!--------------------------------------
 
-    !CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS )
-    !VERIFY_(STATUS)
-
-    !MOM_MAPL_internal_state => WRAP%PTR 
+    CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS); 
+    VERIFY_(STATUS)
+    MOM_MAPL_internal_state => WRAP%PTR
 
 !! Aliases to MOM types
 !!---------------------
 
-!!    Boundary => MOM_MAPL_internal_state%Ice_ocean_boundary
-!!    Ocean    => MOM_MAPL_internal_state%Ocean
+    Ocean       => MOM_MAPL_internal_state%Ocean
+    Ocean_State => MOM_MAPL_internal_state%Ocean_State
 
+! Get domain size
+!----------------
+    call get_domain_extent(Ocean%Domain, isc, iec, jsc, jec)
 
-!!    call get_ocean_domain(OceanDomain)
-    !call mom4_get_dimensions(isc, iec, jsc, jec, isd, ied, jsd, jed, LM)
+    IM=iec-isc+1
+    JM=jec-jsc+1
 
-    !IM=iec-isc+1
-    !JM=jec-jsc+1
+    call get_ocean_grid (Ocean_state, Ocean_grid)
+    LM=Ocean_grid%ke
 
 !! Temporaries with MOM default reals
 !!-----------------------------------
 
-    !allocate(T(IM,JM,LM), stat=STATUS); VERIFY_(STATUS)
+    allocate(T(IM,JM,LM), stat=STATUS); VERIFY_(STATUS)
 
 !! Get IMPORT pointers
 !!--------------------
 
-    !call MAPL_GetPointer(IMPORT, DEL_TEMP, 'DEL_TEMP', RC=STATUS); VERIFY_(STATUS)
+    call MAPL_GetPointer(IMPORT, DEL_TEMP, 'DEL_TEMP', RC=STATUS); VERIFY_(STATUS)
 
 !! Get EXPORT pointers
 !!--------------------
@@ -1108,27 +1101,24 @@ contains
     !call MAPL_GetPointer(EXPORT, MASK, 'MOM_3D_MASK', RC=STATUS)
     !VERIFY_(STATUS)
 
+    call ocean_model_get_prog_tracer_index(Ocean_State,tracer_index,'temp')
+    ASSERT_(tracer_index > 0) ! temperature index is valid
+    call ocean_model_get_prog_tracer(Ocean_State,tracer_index, T, isc, jsc)
 
-    !call mom4_get_temperature_index(tracer_index)
-    !ASSERT_(tracer_index > 0) ! temperature index is valid
-    !call mom4_get_prog_tracer(tracer_index,fld=T)
-
-    !where(MASK(:,:,1) > 0.0) ! correct only ocean points
        !!ALT: Note that we modify only top level of T
        !!     we do not need to worry about temperature units
        !!     since we are applying difference
 
        !!     some relaxation ??? here or in guest ???
 
-       !T(:,:,1) = T(:,:,1) + DEL_TEMP
+    T(:,:,1) = T(:,:,1) + DEL_TEMP
 
-    !end where
-    !call mom4_put_prog_tracer(tracer_index,T)
+    call ocean_model_put_prog_tracer(Ocean_State, tracer_index, T)
 
-    !deallocate(T)
+    deallocate(T, __STAT__)
 
-    !call MAPL_TimerOff(MAPL,"RUN2"  )
-    !call MAPL_TimerOff(MAPL,"TOTAL")
+    call MAPL_TimerOff(MAPL,"RUN2" )
+    call MAPL_TimerOff(MAPL,"TOTAL")
 
 ! All Done
 !---------
