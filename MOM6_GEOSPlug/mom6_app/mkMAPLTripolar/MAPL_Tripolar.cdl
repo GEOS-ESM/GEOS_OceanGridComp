@@ -64,12 +64,12 @@ variables:
 	        basin_file:standard_name = "path_to_basin_codes_file" ;
 
 // global attributes:
-		:author = "Yury Vikhliaev" ;
+		:author = "Yury Vikhliaev -- modified by skhani1" ;
 		:organization = "NASA/GSFC, Global Modeling and Assimilation Office, Code 610.1, GMAO" ;
 
 data:
-	mom_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/ocean_hgrid.nc" ;
-	vgrid_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/vgrid.nc" ;
-	topo_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/ocean_topog.nc" ;
-	basin_file = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/1440x1080_newtopo/INPUT/basin_codes.nc" ;
+	mom_file = "/discover/nobackup/projects/gmao/geos_itv/skhani/Ocean_Bathymetry/OM4_p25/INPUT_NEW3/ocean_hgrid.nc" ;
+	vgrid_file = "/discover/nobackup/projects/gmao/geos_itv/skhani/Ocean_Bathymetry/OM4_p25/INPUT_NEW3/vgrid.nc" ;
+	topo_file = "/discover/nobackup/projects/gmao/geos_itv/skhani/Ocean_Bathymetry/OM4_p25/INPUT_NEW3/ocean_topog.nc" ;
+	basin_file = "/discover/nobackup/projects/gmao/geos_itv/skhani/Ocean_Bathymetry/OM4_p25/INPUT_NEW3/basin_codes.v20140629.nc" ;
 }
