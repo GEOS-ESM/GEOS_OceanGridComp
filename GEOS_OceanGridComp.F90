@@ -43,6 +43,7 @@ module GEOS_OceanGridCompMod
   integer ::          OCN
   integer ::          OCNd
   logical ::      DUAL_OCEAN
+  logical ::     DO_DATA_ATM4OCN
 
 contains
 
@@ -100,6 +101,8 @@ contains
 
     call MAPL_GetResource (MAPL, DO_DATASEA,  Label="USE_DATASEA:" ,    DEFAULT=1,    _RC)
     call MAPL_GetResource (MAPL, OrphanDepth, Label="OGCM_TOP_LAYER:" , DEFAULT=10.0, _RC)
+
+    call MAPL_GetResource (MAPL, DO_DATA_ATM4OCN,  Label="USE_DATA_ATM4OCN:", DEFAULT=.FALSE., _RC)
 
     if(DO_DATASEA/=0) then
        OCEAN_NAME="DATASEA"
@@ -188,11 +191,11 @@ contains
 
     if(DO_DATASEA==0) then
        call MAPL_TerminateImport    ( GC, SHORT_NAME=               &
-          [character(len=9) :: 'TAUX  ','TAUY  ',                   &
-            'PENUVR','PENPAR','PENUVF','PENPAF', 'DRNIR', 'DFNIR',  &
-            'DISCHARGE', 'LWFLX', 'SHFLX', 'QFLUX', 'RAIN', 'SNOW', &
-            'SFLX','SWHEAT'],                                       &  ! do not terminate import of PEN_OCN since it is not used in the `plug'
-            CHILD=OCN, _RC)
+           [character(len=9) :: 'TAUX  ','TAUY  ',                   &
+              'PENUVR','PENPAR','PENUVF','PENPAF', 'DRNIR', 'DFNIR',  &
+              'DISCHARGE','CALVING','LWFLX', 'SHFLX', 'QFLUX', 'RAIN', 'SNOW', &
+              'SFLX','SWHEAT'],                                       &  ! do not terminate import of PEN_OCN since it is not used in the `plug'
+              CHILD=OCN, _RC)
     end if
 
 ! Set the Initialize, Run, Finalize entry points
@@ -421,6 +424,8 @@ contains
     real, pointer :: DFNIRi(:,:)
     real, pointer :: HEATi(:,:,:)
     real, pointer :: DISCHARGEi(:,:)
+    real, pointer :: RUNOFFi(:,:)
+    real, pointer :: CALVINGi(:,:)
     real, pointer :: LWFLXi(:,:)
     real, pointer :: SHFLXi(:,:)
     real, pointer :: QFLUXi(:,:)
@@ -446,6 +451,7 @@ contains
     real, pointer :: HEATe (:,:,:)
     real, pointer :: FROCEANe (:,:)
     real, pointer :: DISCHARGEe(:,:)
+    real, pointer :: CALVINGe(:,:)
     real, pointer :: LWFLXe(:,:)
     real, pointer :: SWFLXe(:,:)
     real, pointer :: SHFLXe(:,:)
@@ -467,6 +473,7 @@ contains
     real, pointer :: DFNIR(:,:)
     real, pointer :: HEAT(:,:,:)
     real, pointer :: DISCHARGE(:,:)
+    real, pointer :: CALVING(:,:)
     real, pointer :: LWFLX(:,:)
     real, pointer :: SHFLX(:,:)
     real, pointer :: QFLUX(:,:)
@@ -620,6 +627,11 @@ contains
        call MAPL_GetPointer(IMPORT, FRESH,      'FRESH'  ,   _RC)
        call MAPL_GetPointer(IMPORT, FSALT,      'FSALT'  ,   _RC)
 
+       if(DO_DATA_ATM4OCN) then
+          call MAPL_GetPointer(IMPORT, RUNOFFi,    'RUNOFF', _RC)
+          call MAPL_GetPointer(IMPORT, CALVINGi,  'CALVING', _RC)
+       endif
+
 ! Get pointers from ImExState
 !----------------------------
        if(DO_DATASEA==0) then
@@ -633,6 +645,7 @@ contains
           call MAPL_GetPointer(GIM(OCN), DFNIR,     'DFNIR'  ,   _RC)
           call MAPL_GetPointer(GIM(OCN), HEAT,      'SWHEAT',    _RC)
           call MAPL_GetPointer(GIM(OCN), DISCHARGE, 'DISCHARGE', _RC)
+          call MAPL_GetPointer(GIM(OCN), CALVING,   'CALVING',   _RC)
           call MAPL_GetPointer(GIM(OCN), LWFLX,     'LWFLX'  ,   _RC)
           call MAPL_GetPointer(GIM(OCN), SHFLX,     'SHFLX'  ,   _RC)
           call MAPL_GetPointer(GIM(OCN), QFLUX,     'QFLUX'  ,   _RC)
@@ -681,6 +694,7 @@ contains
        call MAPL_GetPointer(EXPORT, TAUYe,      'TAUY'   ,   _RC)
        call MAPL_GetPointer(EXPORT, HEATe,      'SWHEAT' ,   _RC)
        call MAPL_GetPointer(EXPORT, DISCHARGEe, 'DISCHARGE', _RC)
+       call MAPL_GetPointer(EXPORT, CALVINGe,   'CALVING',   _RC)
        call MAPL_GetPointer(EXPORT, LWFLXe,     'LWFLX'  ,   _RC)
        call MAPL_GetPointer(EXPORT, SWFLXe,     'SWFLX'  ,   _RC)
        call MAPL_GetPointer(EXPORT, SHFLXe,     'SHFLX'  ,   _RC)
@@ -689,6 +703,7 @@ contains
        call MAPL_GetPointer(EXPORT, SNOWe,      'SNOW'  ,    _RC)
        call MAPL_GetPointer(EXPORT, SFLXe,      'SFLX'  ,    _RC)
        call MAPL_GetPointer(EXPORT, PEN_OCNe,   'PEN_OCN',   _RC)
+
 
        if(associated(FROCEANe)) FROCEANe = FROCEAN
 
@@ -720,7 +735,20 @@ contains
           PENPAF    = PENPAFi    * WGHT
           DRNIR     = DRNIRi     * WGHT
           DFNIR     = DFNIRi     * WGHT
-          DISCHARGE = DISCHARGEi * WGHT
+          if(DO_DATA_ATM4OCN) then
+             DISCHARGE = RUNOFFi
+             CALVING   = CALVINGi
+             ! may not be needed
+             where(DISCHARGE < 0.0)
+                DISCHARGE = 0.0
+             endwhere
+             where(CALVING < 0.0)
+                CALVING = 0.0
+             endwhere
+          else
+             DISCHARGE = DISCHARGEi * WGHT
+             CALVING   = 0.0
+          endif
           LWFLX     = LWFLXi     * WGHT
           QFLUX     = QFLUXi     * WGHT
           SHFLX     = (SHFLXi-FHOCN) * WGHT
@@ -753,6 +781,7 @@ contains
           if (associated(TAUXe)) TAUXe = TAUX
           if (associated(TAUYe)) TAUYe = TAUY
           if (associated(DISCHARGEe)) DISCHARGEe = DISCHARGE
+          if (associated(CALVINGe)) CALVINGe = CALVING
           if (associated(LWFLXe)) LWFLXe = LWFLX
           if (associated(SWFLXe)) SWFLXe = PENUVR+PENPAR+PENUVF+PENPAF+DRNIR+DFNIR
           if (associated(SHFLXe)) SHFLXe = SHFLX
