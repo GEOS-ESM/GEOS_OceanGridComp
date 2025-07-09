@@ -18,7 +18,6 @@ DRNIR       |   W m-2        |   xy     |   N      |                            
 DFNIR       |   W m-2        |   xy     |   N      |                               |                     |   net_surface_downwelling_nir_diffuse_flux 
 SWHEAT      |   W m-2        |   xyz    |   C      |                               |                     |   solar_heating_rate 
 DISCHARGE   |   kg m-2 s-1   |   xy     |   N      |                               |                     |   river_discharge_at_ocean_points 
-RUNOFF      |   kg m-2 s-1   |   xy     |   N      |   DO_DATA_ATM4OCN             |                     |   river_discharge_at_ocean_points_from_datm
 CALVING     |   kg m-2 s-1   |   xy     |   N      |   DO_DATA_ATM4OCN             |                     |   ice_calving_at_ocean_points_from_datm
 TR          |   1            |   xyz    |   C      |   trim(OCEAN_NAME) == 'MOM'   |   MAPL_BundleItem   |   tracer_mixing_ratios 
 TRFLUX      |   X            |   xy     |   N      |   trim(OCEAN_NAME) == 'MOM'   |   MAPL_BundleItem   |   surface_fluxes_of_tracers 

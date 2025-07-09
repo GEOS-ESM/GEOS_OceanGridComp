@@ -424,7 +424,6 @@ contains
     real, pointer :: DFNIRi(:,:)
     real, pointer :: HEATi(:,:,:)
     real, pointer :: DISCHARGEi(:,:)
-    real, pointer :: RUNOFFi(:,:)
     real, pointer :: CALVINGi(:,:)
     real, pointer :: LWFLXi(:,:)
     real, pointer :: SHFLXi(:,:)
@@ -628,7 +627,6 @@ contains
        call MAPL_GetPointer(IMPORT, FSALT,      'FSALT'  ,   _RC)
 
        if(DO_DATA_ATM4OCN) then
-          call MAPL_GetPointer(IMPORT, RUNOFFi,    'RUNOFF', _RC)
           call MAPL_GetPointer(IMPORT, CALVINGi,  'CALVING', _RC)
        endif
 
@@ -736,7 +734,7 @@ contains
           DRNIR     = DRNIRi     * WGHT
           DFNIR     = DFNIRi     * WGHT
           if(DO_DATA_ATM4OCN) then
-             DISCHARGE = RUNOFFi
+             DISCHARGE = DISCHARGEi
              CALVING   = CALVINGi
              ! may not be needed
              where(DISCHARGE < 0.0)
