@@ -54,7 +54,7 @@ TAUY        |   N m-2        |   xy     |   N      |                            
 SWHEAT      |   W m-2        |   xyz    |   C      |                                   |   solar_heating_rate  
 RFLUX       |   W m-2        |   xy     |   N      |                                   |   downward_radiative_heat_flux_at_ocean_bottom  
 DISCHARGE   |   kg m-2 s-1   |   xy     |   N      |                                   |   river_discharge_at_ocean_points  
-CALVING     |   kg m-2 s-1   |   xy     |   N      |   DO_DATA_ATM4OCN                 |   ice_calving_at_ocean_points
+CALVING     |   kg m-2 s-1   |   xy     |   N      |                                   |   ice_calving_at_ocean_points
 FROCEAN     |   1            |   xy     |   N      |                                   |   fraction_of_gridbox_covered_by_ocean  
 LWFLX       |   W m-2        |   xy     |   N      |                                   |   surface_net_downward_longwave_flux  
 SWFLX       |   W m-2        |   xy     |   N      |                                   |   surface_net_downward_shortwave_flux  
