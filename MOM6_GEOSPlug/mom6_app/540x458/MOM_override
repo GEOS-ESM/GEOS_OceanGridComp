@@ -67,10 +67,3 @@ TOPO_FILE = "ocean_topog.nc"
 #override BAD_VAL_SSS_MAX = 75.0
 #override BAD_VAL_SST_MAX = 55.0
 #override BAD_VAL_SST_MIN = -3.0
-
-! Overrides to match results from previous MOM6 version
-! See https://github.com/GEOS-ESM/MOM6/releases/tag/geos%2Fv3.2
-! and https://github.com/mom-ocean/MOM6/pull/1631#issuecomment-2252914251
-
-#override USE_HUYNH_STENCIL_BUG = True
-#override EPBL_ANSWER_DATE = 20231231
