@@ -914,21 +914,20 @@ contains
     call ocean_model_get_UV_surf(Ocean_State, Ocean, 'ua', U, isc, jsc) ! this comes to us in m/s
     call ocean_model_get_UV_surf(Ocean_State, Ocean, 'va', V, isc, jsc) ! this comes to us in m/s
 
-    if(associated(UW )) then
+    if(associated(UW ) .and. associated(VW )) then
       where(MOM_2D_MASK(:,:) > 0.0)
-        UW = real(U, kind=GeosKind)
+        UW = real(U, kind=GeosKind) * cos_rot + real(V, kind=GeosKind) * sin_rot
+        VW = real(V, kind=GeosKind) * cos_rot - real(U, kind=GeosKind) * sin_rot
       elsewhere
         UW=0.0
-      end where
-    endif
-
-    if(associated(VW )) then
-      where(MOM_2D_MASK(:,:) > 0.0)
-        VW = real(V, kind=GeosKind)
-      elsewhere
         VW=0.0
       end where
-    end if
+    else
+       print *, 'Both UW and VW MUST be allocated.'
+       ASSERT_(.false.)
+    endif
+
+
 
 !   B-grid currents (for CICE dynamics)
     U = 0.0; V = 0.0
