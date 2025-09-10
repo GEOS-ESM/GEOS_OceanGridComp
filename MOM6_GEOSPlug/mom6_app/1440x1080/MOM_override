@@ -51,4 +51,6 @@ RESTART_CHECKSUMS_REQUIRED = False
 #override PRESSURE_DEPENDENT_FRAZIL = False
 !
 ! update answers
-!
+
+! see https://github.com/GEOS-ESM/MOM6/issues/15
+#override MEKE_POSITIVE = True
