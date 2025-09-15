@@ -13,10 +13,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           mode: minimum
-          count: 1
-          labels: "0 diff,0 diff trivial,Non 0-diff,0 diff structural,0-diff trivial,Not 0-diff,0-diff,automatic,0-diff uncoupled,github_actions"
+          count: 3
+          labels: "0 diff coupled,0 diff dataatm,0 diff dataocean,0 diff trivial,non 0-diff coupled,non 0-diff dataatm,non 0-diff dataocean,0 diff structural"
           add_comment: true
-          message: "This PR is being prevented from merging because you have not added one of our required labels: {{ provided }}. Please add one so that the PR can be merged."
+          message: "This PR is being prevented from merging because you have not added three of our required labels to say if they are 0-diff or non-0-diff for coupled, dataatm, and dataocean runs: {{ provided }}. Please add so that the PR can be merged."
 
   blocking-label:
     runs-on: ubuntu-latest
