@@ -524,9 +524,6 @@ list( APPEND MOM6_SRCS
    config_src/external/ODA_hooks/ocean_da_types.F90
    config_src/external/ODA_hooks/write_ocean_obs.F90
    # tracer
-   config_src/external/GFDL_ocean_BGC/FMS_coupler_util.F90
-   config_src/external/GFDL_ocean_BGC/generic_tracer.F90
-   config_src/external/GFDL_ocean_BGC/generic_tracer_utils.F90
    config_src/external/GFDL_ocean_BGC/MOM_generic_tracer.F90
    # drifters-particles
    config_src/external/drifters/MOM_particles.F90
