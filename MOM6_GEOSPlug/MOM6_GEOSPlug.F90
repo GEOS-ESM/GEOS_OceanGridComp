@@ -773,6 +773,13 @@ contains
     Boundary%U_flux  (isc:iec,jsc:jec)= real( (U*cos_rot - V*sin_rot), kind=KIND(Boundary%p))
     Boundary%V_flux  (isc:iec,jsc:jec)= real( (U*sin_rot + V*cos_rot), kind=KIND(Boundary%p))
 
+!Calculate the magnitude of the stress on the ocean [Pa]
+!-------------------------------------------------------                                      
+   U = 0.0; V = 0.0
+   U = real ( TAUX*(1.-AICE) - TAUXBOT*AICE )**2
+   V = real ( TAUY*(1.-AICE) - TAUYBOT*AICE )**2
+   Boundary%stress_mag     (isc:iec,jsc:jec)= real( (U+V)**0.5, kind=KIND(Boundary%p) )      
+
 ! Set the time for MOM
 !---------------------
 
@@ -891,11 +898,9 @@ contains
        elsewhere
           FRZMLT = 0.0
        end where
-
-       where(MOM_2D_MASK(:,:)>0.0 .and. FRAZIL(:,:) > 0.0)
+       where(MOM_2D_MASK(:,:)>0.0 .and. FRAZIL>0.0)
           FRZMLT = FRAZIL
-       endwhere
-
+       end where
     end if
 
 !   freezing temperature (deg C)
@@ -926,6 +931,8 @@ contains
        print *, 'Both UW and VW MUST be allocated.'
        ASSERT_(.false.)
     endif
+
+
 
 !   B-grid currents (for CICE dynamics)
     U = 0.0; V = 0.0
