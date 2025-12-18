@@ -1,0 +1,76 @@
+! Blank file in which we can put "overrides" for parameters
+
+LAYOUT = 24, 24
+#override DT = 600
+#override DT_THERM = 600
+HFREEZE = 2.0
+
+! Disable checksums
+RESTART_CHECKSUMS_REQUIRED = False
+
+!VERBOSITY = 9
+!DEBUG = True
+!REPORT_UNUSED_PARAMS = True
+
+#override NUM_DIAG_COORDS = 1
+#override DIAG_COORDS = "z Z ZSTAR"
+#override DIAG_COORD_DEF_Z = "WOA09"
+
+! Use (known) bug fixes.
+#override USE_GM_WORK_BUG                 = False
+#override BT_USE_OLD_CORIOLIS_BRACKET_BUG = False
+#override KAPPA_SHEAR_ITER_BUG            = False
+#override KAPPA_SHEAR_ALL_LAYER_TKE_BUG   = False
+#override FIX_USTAR_GUSTLESS_BUG          = True
+#override REMAP_UV_USING_OLD_ALG          = False
+
+! For SOCA
+#override VERTEX_SHEAR = True
+
+! Known improvements
+#override INTERNAL_WAVE_SPEED_BETTER_EST = True
+#override REMAP_AUXILIARY_VARS = True
+
+! Thermo_spans_coupling should be set to False
+#override THERMO_SPANS_COUPLING = False
+
+! Following improved ocean-ice simulations
+#override CORIOLIS_SCHEME = SADOURNY75_ENERGY
+#override BOUNDARY_EXTRAPOLATION = False
+#override EPBL_MSTAR_SCHEME = "REICHL_H18"
+#override EPBL_MLD_BISECTION = False
+#override APPLY_INTERFACE_FILTER = True
+#override THICKNESSDIFFUSE = False
+#override KH_VEL_SCALE = 0.00286
+#override HTBL_SHELF_MIN = 10.
+#override KH_ETA_CONST = 20.
+#override AH_VEL_SCALE = 0.02
+#override SMAGORINSKY_AH = False
+#override BBL_THICK_MIN = 10.
+#override BBL_EFFIC = 0.01
+#override PRESSURE_DEPENDENT_FRAZIL = False
+!
+! update answers
+
+! Overrides to match results from previous MOM6 version
+! See https://github.com/GEOS-ESM/MOM6/releases/tag/geos%2Fv3.2
+! and https://github.com/mom-ocean/MOM6/pull/1631#issuecomment-2252914251
+
+#override USE_HUYNH_STENCIL_BUG = True
+#override EPBL_ANSWER_DATE = 20231231
+!!#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.v20141007.nc"
+
+!! New Ocean Bathymetry (OM4)
+
+#override TIDEAMP_FILE = "tidal_amplitude.nc"
+#override GEOTHERMAL_FILE = "geothermal_davies2013_v1.nc"
+#override CHL_FILE = "seawifs-clim-1997-2010.720x576.v20180328.nc"
+
+!! Updates for MLD  !! SK
+
+#override FOX_KEMPER_ML_RESTRAT_COEF = 1.0 
+#override MLE_FRONT_LENGTH = 500.0
+#override MLE%USE_BODNER23 = True 
+
+
+
