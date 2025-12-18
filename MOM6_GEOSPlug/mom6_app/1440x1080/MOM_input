@@ -591,7 +591,7 @@ TKE_ITIDE_MAX = 0.1             !   [W m-2] default = 1000.0
 READ_TIDEAMP = True             !   [Boolean] default = False
                                 ! If true, read a file (given by TIDEAMP_FILE) containing the tidal amplitude
                                 ! with INT_TIDE_DISSIPATION.
-TIDEAMP_FILE = "tidal_amplitude.v20140616.nc_newtopo_config.nc" ! default = "tideamp.nc"
+TIDEAMP_FILE = "tidal_amplitude.v20140616.nc" ! default = "tideamp.nc"
                                 ! The path to the file containing the spatially varying tidal amplitudes with
                                 ! INT_TIDE_DISSIPATION.
 H2_FILE = "ocean_topog.nc"      !
@@ -605,7 +605,7 @@ H2_FILE = "ocean_topog.nc"      !
 GEOTHERMAL_SCALE = 1.0          !   [W m-2 or various] default = 0.0
                                 ! The constant geothermal heat flux, a rescaling factor for the heat flux read
                                 ! from GEOTHERMAL_FILE, or 0 to disable the geothermal heating.
-GEOTHERMAL_FILE = "geothermal_davies2013_v1_newtopo_config.nc" ! default = ""
+GEOTHERMAL_FILE = "geothermal_davies2013_v1.nc" ! default = ""
                                 ! The file from which the geothermal heating is to be read, or blank to use a
                                 ! constant heating rate.
 GEOTHERMAL_VARNAME = "geothermal_hf" ! default = "geo_heat"
@@ -670,7 +670,7 @@ PRESSURE_DEPENDENT_FRAZIL = True !   [Boolean] default = False
 VAR_PEN_SW = True               !   [Boolean] default = False
                                 ! If true, use one of the CHL_A schemes specified by OPACITY_SCHEME to determine
                                 ! the e-folding depth of incoming short wave radiation.
-CHL_FILE = "seawifs-clim-1997-2010.1440x1080.v20180328_newtopo_config.nc" !
+CHL_FILE = "seawifs-clim-1997-2010.1440x1080.v20180328.nc" !
                                 ! CHL_FILE is the file containing chl_a concentrations in the variable CHL_A. It
                                 ! is used when VAR_PEN_SW and CHL_FROM_FILE are true.
 CHL_VARNAME = "chlor_a"         ! default = "CHL_A"

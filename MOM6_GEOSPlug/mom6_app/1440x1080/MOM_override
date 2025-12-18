@@ -1,8 +1,8 @@
 ! Blank file in which we can put "overrides" for parameters
 
 LAYOUT = 36, 30
-#override DT = 450.0
-#override DT_THERM = 450.
+#override DT = 600
+#override DT_THERM = 600
 HFREEZE = 2.0
 
 ! Disable checksums
@@ -51,4 +51,26 @@ RESTART_CHECKSUMS_REQUIRED = False
 #override PRESSURE_DEPENDENT_FRAZIL = False
 !
 ! update answers
+
+! Overrides to match results from previous MOM6 version
+! See https://github.com/GEOS-ESM/MOM6/releases/tag/geos%2Fv3.2
+! and https://github.com/mom-ocean/MOM6/pull/1631#issuecomment-2252914251
+
+!!#override USE_HUYNH_STENCIL_BUG = True
+!!#override EPBL_ANSWER_DATE = 20231231
+!!#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.v20141007.nc"
+
+!! New Ocean Bathymetry (OM4)
+
+#override TIDEAMP_FILE = "tidal_amplitude.v20140616.nc"
+#override GEOTHERMAL_FILE = "geothermal_davies2013_v1.nc"
+#override CHL_FILE = "seawifs-clim-1997-2010.1440x1080.v20180328.nc"
+
+!! Updates for MLD  !! SK
+
+#override FOX_KEMPER_ML_RESTRAT_COEF = 1.0 
+#override MLE_FRONT_LENGTH = 500.0
+#override MLE%USE_BODNER23 = True 
+
+
 

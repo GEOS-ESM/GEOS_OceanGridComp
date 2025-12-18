@@ -3,7 +3,7 @@
 #"scalar",   1,"days",1,"days","Time",
 #"layer",    1,"days",1,"days","Time",
 #"prog",     0,"days",1,"days","Time",
-"prog_z",    1,"months",1,"days","Time",
+#"prog_z",    1,"months",1,"days","Time",
 #"ave_prog", 1,"days",1,"days","Time",
 #"tracer",   1,"days",1,"days","Time",
 #"cont",     1,"days",1,"days","Time",
@@ -14,6 +14,9 @@
 #"forcing",   1,"days",1,"days","Time",
 #"surface",  1,"months",1,"days","Time",
 "sfc_ave",   1,"days",1,"days","Time",
+"ocean_daily", 1,"days",1,"days","Time",
+"ocean_daily_2", 1,"days",1,"days","Time",
+"ocean_daily_4D", 1,"days",1,"days","Time",
 #"ocean_static",       -1,"days",1,"days","time",
 #
 #"cmor",               1,"days",1,"days","Time",
@@ -51,6 +54,7 @@
 ##"ocean_model","temp","temp","ave_prog","all",.true.,"none",2
 ##"ocean_model","salt","salt","ave_prog","all",.true.,"none",2
 ##"ocean_model","Rml","Rml","ave_prog","all",.true.,"none",2
+##"ocean_model","rsdo","rsdo","ocean_daily","all",.true.,"none",2
 #
 #"ocean_model","mass_wt","mass_wt","surface","all",.false.,"none",1
 #"ocean_model","opottempmint","opottempmint","surface","all",.false.,"none",1  # GFDL name: temp_int
@@ -65,19 +69,52 @@
 "ocean_model","SSH","SSH","sfc_ave","all",.true.,"none",2
 "ocean_model","SST","SST","sfc_ave","all",.true.,"none",2
 "ocean_model","SSS","SSS","sfc_ave","all",.true.,"none",2
-"ocean_model","speed","speed","sfc_ave","all",.true.,"none",2
 "ocean_model","SSU","SSU","sfc_ave","all",.true.,"none",2
 "ocean_model","SSV","SSV","sfc_ave","all",.true.,"none",2
+"ocean_model","MLD_003","MLD_003","sfc_ave","all",.true.,"none",2
 #
+"ocean_model","taux","taux","ocean_daily","all",.true.,"none",2
+"ocean_model","tauy","tauy","ocean_daily","all",.true.,"none",2
+"ocean_model","SW","SW","ocean_daily","all",.true.,"none",2
+"ocean_model","LW","LW","ocean_daily","all",.true.,"none",2
+"ocean_model","Rd1","Rd1","ocean_daily","all",.true.,"none",2
+"ocean_model","ustar","ustar","ocean_daily","all",.true.,"none",2
+"ocean_model","uhbt","uhbt","ocean_daily","all",.true.,"none",2
+"ocean_model","vhbt","vhbt","ocean_daily","all",.true.,"none",2
+#
+"ocean_model","evap","evap","ocean_daily_2","all",.true.,"none",2
+"ocean_model","PRCmE","PRCmE","ocean_daily_2","all",.true.,"none",2
+"ocean_model","latent","latent","ocean_daily_2","all",.true.,"none",2
+"ocean_model","sensible","sensible","ocean_daily_2","all",.true.,"none",2
+"ocean_model","net_heat_coupler","net_heat_coupler","ocean_daily_2","all",.true.,"none",2
+"ocean_model","net_heat_surface","net_heat_surface","ocean_daily_2","all",.true.,"none",2
+#
+"ocean_model","u","u","ocean_daily_4D","all",.true.,"none",2
+"ocean_model","v","v","ocean_daily_4D","all",.true.,"none",2
+"ocean_model","uh","uh","ocean_daily_4D","all",.true.,"none",2
+"ocean_model","vh","vh","ocean_daily_4D","all",.true.,"none",2
+"ocean_model","h","h","ocean_daily_4D","all",.true.,"none",1
+"ocean_model","e","e","ocean_daily_4D","all",.true.,"none",2
+"ocean_model","e_D","e_D","ocean_daily_4D","all",.true.,"none",2
+"ocean_model","temp","temp","ocean_daily_4D","all",.true.,"none",2
+"ocean_model","salt","salt","ocean_daily_4D","all",.true.,"none",2
+"ocean_model","RV","RV","ocean_daily_4D","all",.true.,"none",2
+"ocean_model","PV","PV","ocean_daily_4D","all",.true.,"none",2
+#
+#"ocean_model","p_surf","p_surf","ocean_daily","all",.true.,"none",2
+#"ocean_model","latent","latent","ocean_daily","all",.true.,"none",2
+#"ocean_model","sensible","sensible","ocean_daily","all",.true.,"none",2
+#"ocean_model","net_heat_coupler","net_heat_coupler","ocean_daily","all",.true.,"none",2
+#"ocean_model","net_heat_surface","net_heat_surface","ocean_daily","all",.true.,"none",2
 #
 ## Z-space fields:
 ##==================
 #"ocean_model_z","u","u","prog_z","all",.true.,"none",2
 #"ocean_model_z","v","v","prog_z","all",.true.,"none",2
-"ocean_model_z","temp","temp","prog_z","all",.true.,"none",2
+#"ocean_model_z","temp","temp","prog_z","all",.true.,"none",2
 #"ocean_model_z","temp_xyave","temp_xyave","prog_z","all",.true.,"none",2
-"ocean_model_z","salt","salt","prog_z","all",.true.,"none",2
-"ocean_model_z","thkcello","thkcello","prog_z","all",.true.,"none",2
+#"ocean_model_z","salt","salt","prog_z","all",.true.,"none",2
+#"ocean_model_z","thkcello","thkcello","prog_z","all",.true.,"none",2
 #
 ## Auxilary Tracers:
 ##==================
