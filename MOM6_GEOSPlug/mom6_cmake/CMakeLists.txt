@@ -566,8 +566,14 @@ target_compile_definitions (${this} PRIVATE use_netCDF)
 # This 'resets' the Intel DEBUG flags for MOM6. The stock debug flags use
 # 'all,noarg_temp_created' which seem to be too aggressive for FMS/MOM6. This
 # moves them back to the 'bounds,uninit' GEOS used to build with.
-if (CMAKE_Fortran_COMPILER_ID MATCHES "Intel" AND CMAKE_BUILD_TYPE MATCHES Debug)
+if (CMAKE_Fortran_COMPILER_ID STREQUAL "Intel" AND CMAKE_BUILD_TYPE MATCHES Debug)
    string(REPLACE "all,noarg_temp_created" "bounds,uninit" _tmp "${GEOS_Fortran_FLAGS_DEBUG}")
+   set (CMAKE_Fortran_FLAGS_DEBUG "${_tmp}")
+endif ()
+
+# We have to do something similar for ifx
+if (CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM" AND CMAKE_BUILD_TYPE MATCHES Debug)
+   string(REPLACE "all,noarg_temp_created" "bounds" _tmp "${GEOS_Fortran_FLAGS_DEBUG}")
    set (CMAKE_Fortran_FLAGS_DEBUG "${_tmp}")
 endif ()
 
