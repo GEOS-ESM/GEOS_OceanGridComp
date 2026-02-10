@@ -55,6 +55,7 @@ module MOM6_GEOSPlugMod
                                       ocean_state_type,                 &
                                       ocean_model_get_UV_surf,          &
                                       ocean_model_get_thickness,        &
+                                      ocean_model_put_prog_tracer,      &
                                       ocean_model_get_prog_tracer,      &
                                       ocean_model_get_prog_tracer_index
 
@@ -82,6 +83,8 @@ module MOM6_GEOSPlugMod
   type MOM_MAPLWrap_Type
      type(MOM_MAPL_Type), pointer :: Ptr
   end type MOM_MAPLWrap_Type
+
+  logical :: DUAL_OCEAN
 
 contains
 
@@ -111,6 +114,8 @@ contains
     character(len=ESMF_MAXSTR)          :: COMP_NAME
 
 ! Locals
+    type (MAPL_MetaComp),  pointer     :: MAPL
+    integer                            :: iDUAL_OCEAN
 !=============================================================================
 
     __Iam__('SetServices')
@@ -123,6 +128,16 @@ contains
     call ESMF_GridCompGet( GC, NAME=COMP_NAME, _RC)
     Iam = trim(COMP_NAME)//'::'//'SetServices'
 
+! Get the MAPL object
+! -------------------
+
+    call MAPL_GetObjectFromGC ( GC, MAPL, RC=STATUS)
+    VERIFY_(STATUS)
+
+    call MAPL_GetResource(MAPL, iDUAL_OCEAN, 'DUAL_OCEAN:', default=0, RC=STATUS )
+    DUAL_OCEAN = iDUAL_OCEAN /= 0
+
+
 ! Set the Initialize, Run, Finalize entry points
 ! ----------------------------------------------
 
@@ -130,6 +145,9 @@ contains
     call MAPL_GridCompSetEntryPoint ( GC, ESMF_Method_Run,          Run,        _RC)
     call MAPL_GridCompSetEntryPoint ( GC, ESMF_Method_Finalize,     Finalize,   _RC)
     call MAPL_GridCompSetEntryPoint ( GC, ESMF_Method_WriteRestart, Record,     _RC)
+    if (dual_ocean) then
+       call MAPL_GridCompSetEntryPoint ( GC, ESMF_Method_Run,    Run2,          _RC)
+    end if
 
 !BOS
 
@@ -146,6 +164,7 @@ contains
 
     call MAPL_TimerAdd(GC,   name="INITIALIZE" , _RC)
     call MAPL_TimerAdd(GC,   name="RUN"        , _RC)
+    call MAPL_TimerAdd(GC,   name="RUN2"        , _RC)
     call MAPL_TimerAdd(GC,   name="FINALIZE"   , _RC)
 
 ! Generic SetServices
@@ -773,6 +792,13 @@ contains
     Boundary%U_flux  (isc:iec,jsc:jec)= real( (U*cos_rot - V*sin_rot), kind=KIND(Boundary%p))
     Boundary%V_flux  (isc:iec,jsc:jec)= real( (U*sin_rot + V*cos_rot), kind=KIND(Boundary%p))
 
+!Calculate the magnitude of the stress on the ocean [Pa]
+!-------------------------------------------------------                                      
+   U = 0.0; V = 0.0
+   U = real ( TAUX*(1.-AICE) - TAUXBOT*AICE )**2
+   V = real ( TAUY*(1.-AICE) - TAUYBOT*AICE )**2
+   Boundary%stress_mag     (isc:iec,jsc:jec)= real( (U+V)**0.5, kind=KIND(Boundary%p) )      
+
 ! Set the time for MOM
 !---------------------
 
@@ -978,6 +1004,149 @@ contains
   end subroutine Run
 
 !BOP
+
+!!###### -- Adopted Run2 for MOM6 -- SK
+! !IROUTINE: Run2  -- Run2 method, needed only when in dual_ocean mode. Apply correction to top-level MOM6 temperature, based on DEL_TEMP
+
+! !INTERFACE:
+
+  subroutine Run2  ( GC, IMPORT, EXPORT, CLOCK, RC )
+
+! !ARGUMENTS:
+
+    type(ESMF_GridComp), intent(INOUT) :: GC     ! Gridded component
+    type(ESMF_State),    intent(INOUT) :: IMPORT ! Import state
+    type(ESMF_State),    intent(INOUT) :: EXPORT ! Export state
+    type(ESMF_Clock),    intent(INOUT) :: CLOCK  ! The supervisor clock
+    integer, optional,   intent(  OUT) :: RC     ! Error code:
+
+    type(ESMF_State)                   :: INTERNAL ! Internal state
+
+!EOP
+
+! ErrLog Variables
+
+    character(len=ESMF_MAXSTR)             :: IAm
+    integer                                :: STATUS
+    character(len=ESMF_MAXSTR)             :: COMP_NAME
+
+! Locals
+
+    integer                                :: IM, JM, LM
+    integer                                :: tracer_index
+    type(ice_ocean_boundary_type), pointer :: Boundary                 => null()
+    type(ocean_public_type),       pointer :: Ocean                    => null()
+    type(ocean_state_type),        pointer :: Ocean_State              => null()
+    type(ocean_grid_type),         pointer :: Ocean_grid               => null()
+
+
+! Imports
+    REAL_, pointer                         :: DEL_TEMP(:,:)
+
+! Temporaries
+
+    real, allocatable                      :: T(:,:,:), tmp3(:,:,:)
+
+! Pointers to export
+    REAL_, pointer                         :: MOM_2D_MASK(:,:)
+    REAL_, pointer                         :: AREA(:,:)
+
+    type(MAPL_MetaComp),           pointer :: MAPL
+    type(MOM_MAPL_Type),           pointer :: MOM_MAPL_internal_state
+    type(MOM_MAPLWrap_Type)                :: wrap
+    integer                                :: isc,iec,jsc,jec
+    integer                                :: isd,ied,jsd,jed
+
+! Begin
+!------
+
+
+! Get the component's name and set-up traceback handle.
+! -----------------------------------------------------
+    Iam = "Run2"
+    call ESMF_GridCompGet( GC, NAME=COMP_NAME, _RC )
+    Iam = trim(COMP_NAME)//'::'//Iam
+
+! Get my internal MAPL_Generic state
+!-----------------------------------
+
+    call MAPL_GetObjectFromGC ( GC, MAPL, _RC)
+
+
+! Profilers
+!----------
+
+    call MAPL_TimerOn (MAPL,"TOTAL")
+    call MAPL_TimerOn (MAPL,"RUN2"  )
+
+! Get the Plug's private internal state
+!--------------------------------------
+
+    CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS )
+    VERIFY_(STATUS)
+
+    MOM_MAPL_internal_state => WRAP%PTR
+! Aliases to MOM types
+!---------------------
+
+
+    Boundary    => MOM_MAPL_internal_state%Ice_ocean_boundary
+    Ocean       => MOM_MAPL_internal_state%Ocean
+    Ocean_State => MOM_MAPL_internal_state%Ocean_State
+
+!    call get_domain_extent(Ocean%Domain, isc, iec, jsc, jec)
+
+    IM=iec-isc+1
+    JM=jec-jsc+1
+    
+    call get_ocean_grid (Ocean_state, Ocean_grid)
+    LM=Ocean_grid%ke
+
+! Temporaries with MOM default reals
+!-----------------------------------
+
+    allocate(T(IM,JM,LM), __STAT__)
+
+! Get IMPORT pointers
+!--------------------
+
+    call MAPL_GetPointer(IMPORT, DEL_TEMP, 'DEL_TEMP', _RC)
+
+! Get EXPORT pointers
+!--------------------
+    ! by now this should be allocated, so 'alloc=.true.' is needed
+
+    call MAPL_GetPointer(EXPORT, MOM_2D_MASK, 'MOM_2D_MASK', _RC)
+    call MAPL_GetPointer(EXPORT, AREA, 'AREA',               _RC)
+
+    call ocean_model_get_prog_tracer_index(Ocean_State,tracer_index,'temp')
+    call ocean_model_get_prog_tracer(Ocean_State,tracer_index, tmp3, isc, jsc)
+    T = real(tmp3,kind=GeosKind)
+
+    !ALT: Note that we modify only top level of T
+    !     we do not need to worry about temperature units
+    !     since we are applying difference
+    !     some relaxation ??? here or in guest ???
+    
+    where(MOM_2D_MASK(:,:) > 0.0)
+       T(:,:,1) = T(:,:,1) + DEL_TEMP
+    end where
+
+    call ocean_model_put_prog_tracer(Ocean_State,tracer_index,T)
+
+    deallocate(T)
+
+    call MAPL_TimerOff(MAPL,"RUN2"  )
+    call MAPL_TimerOff(MAPL,"TOTAL")
+
+! All Done
+!---------
+
+
+    RETURN_(ESMF_SUCCESS)
+  end subroutine Run2
+
+!!###### -- Adopted Run2 for MOM6 -- SK
 
 !====================================================================
 
