@@ -582,6 +582,7 @@ contains
     REAL_, pointer                     :: DRNIR(:,:)         => null()
     REAL_, pointer                     :: DFNIR(:,:)         => null()
     REAL_, pointer                     :: DISCHARGE(:,:)     => null()
+    REAL_, pointer                     :: CALVING(:,:)       => null()
     REAL_, pointer                     :: AICE(:,:)          => null()
     REAL_, pointer                     :: TAUXBOT(:,:)       => null()
     REAL_, pointer                     :: TAUYBOT(:,:)       => null()
@@ -692,6 +693,7 @@ contains
     call MAPL_GetPointer(IMPORT, DRNIR,    'DRNIR'  ,   _RC)
     call MAPL_GetPointer(IMPORT, DFNIR,    'DFNIR'  ,   _RC)
     call MAPL_GetPointer(IMPORT, DISCHARGE,'DISCHARGE', _RC)
+    call MAPL_GetPointer(IMPORT, CALVING,  'CALVING',   _RC)
     call MAPL_GetPointer(IMPORT, AICE,     'AICE',      _RC)
     call MAPL_GetPointer(IMPORT, TAUXBOT,  'TAUXBOT',   _RC)
     call MAPL_GetPointer(IMPORT, TAUYBOT,  'TAUYBOT',   _RC)
@@ -745,6 +747,7 @@ contains
     Boundary%fprec          (isc:iec,jsc:jec)= real(SNOW,          kind=KIND(Boundary%p)) ! Frozen precipitation: both positive down
     Boundary%salt_flux      (isc:iec,jsc:jec)=-real(SFLX,          kind=KIND(Boundary%p)) ! Salt flux: MOM positive up, GEOS positive down
     Boundary%runoff         (isc:iec,jsc:jec)= real(DISCHARGE,     kind=KIND(Boundary%p)) ! mass flux of liquid runoff [kg m-2 s-1]
+    Boundary%calving        (isc:iec,jsc:jec)= real(CALVING,       kind=KIND(Boundary%p)) ! mass flux of solid runoff [kg m-2 s-1]
 
 ! All shortwave components are positive down in MOM and in GEOS
 !--------------------------------------------------------------
@@ -772,6 +775,13 @@ contains
 
     Boundary%U_flux  (isc:iec,jsc:jec)= real( (U*cos_rot - V*sin_rot), kind=KIND(Boundary%p))
     Boundary%V_flux  (isc:iec,jsc:jec)= real( (U*sin_rot + V*cos_rot), kind=KIND(Boundary%p))
+
+!Calculate the magnitude of the stress on the ocean [Pa]
+!-------------------------------------------------------                                      
+   U = 0.0; V = 0.0
+   U = real ( TAUX*(1.-AICE) - TAUXBOT*AICE )**2
+   V = real ( TAUY*(1.-AICE) - TAUYBOT*AICE )**2
+   Boundary%stress_mag     (isc:iec,jsc:jec)= real( (U+V)**0.5, kind=KIND(Boundary%p) )      
 
 ! Set the time for MOM
 !---------------------
@@ -891,9 +901,11 @@ contains
        elsewhere
           FRZMLT = 0.0
        end where
+
        where(MOM_2D_MASK(:,:)>0.0 .and. FRAZIL>0.0)
           FRZMLT = FRAZIL
        end where
+
     end if
 
 !   freezing temperature (deg C)
