@@ -901,9 +901,11 @@ contains
        elsewhere
           FRZMLT = 0.0
        end where
+
        where(MOM_2D_MASK(:,:)>0.0 .and. FRAZIL>0.0)
           FRZMLT = FRAZIL
        end where
+
     end if
 
 !   freezing temperature (deg C)
