@@ -52,3 +52,5 @@ RESTART_CHECKSUMS_REQUIRED = False
 !
 ! update answers
 
+! see https://github.com/GEOS-ESM/MOM6/issues/15
+#override MEKE_POSITIVE = True
