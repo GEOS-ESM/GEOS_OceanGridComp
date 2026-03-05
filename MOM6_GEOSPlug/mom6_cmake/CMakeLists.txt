@@ -577,6 +577,12 @@ if (CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM" AND CMAKE_BUILD_TYPE MATCHES 
    set (CMAKE_Fortran_FLAGS_DEBUG "${_tmp}")
 endif ()
 
+# Flang seems to have random issues with save temps flag and MOM6 with Flang and Debug
+if (CMAKE_Fortran_COMPILER_ID STREQUAL "LLVMFlang" AND CMAKE_BUILD_TYPE MATCHES Debug)
+   string(REPLACE "${SAVE_TEMPS}" "" _tmp "${GEOS_Fortran_FLAGS_DEBUG}")
+   set (CMAKE_Fortran_FLAGS_DEBUG "${_tmp}")
+endif ()
+
 # Specs for r8 version
 string(REPLACE " " ";" tmp ${FREAL8})
 foreach (flag ${tmp})
