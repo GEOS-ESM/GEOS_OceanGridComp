@@ -5,30 +5,31 @@ category: IMPORT
 #------------------------------------------------------------------------------------
 # VARIABLE                 | DIMENSIONS  |          Additional Metadata
 #------------------------------------------------------------------------------------
-NAME        | UNITS        | DIMS | VLOC | LONG_NAME 
+NAME        | UNITS        | DIMS | VLOC | COND         | DATATYPE        | LONG_NAME 
 #------------------------------------------------------------------------------------
-TAUX        | N m-2        | xy   | N    | Agrid_eastward_stress_on_ocean
-TAUY        | N m-2        | xy   | N    | Agrid_northward_stress_on_ocean
-PS          | Pa           | xy   | N    | surface_atmospheric_pressure
-PICE        | Pa           | xy   | N    | pressure_due_to_ice_weight
-SWHEAT      | W m-2        | xyz  | C    | DUMMY_IMPORT_solar_heating_rate
-LWFLX       | W m-2        | xy   | N    | surface_net_downward_longwave_flux
-SHFLX       | W m-2        | xy   | N    | upward_sensible_heat_flux
-QFLUX       | kg m-2 s-1   | xy   | N    | evaporation
-RAIN        | kg m-2 s-1   | xy   | N    | ocean_rainfall
-SNOW        | kg m-2 s-1   | xy   | N    | ocean_snowfall
-SFLX        | kg m-2 s-1   | xy   | N    | salt_flux_from_sea_ice_to_ocean
-PENUVR      | W m-2        | xy   | N    | net_downward_penetrating_direct_UV_flux
-PENPAR      | W m-2        | xy   | N    | net_downward_penetrating_direct_PAR_flux
-PENUVF      | W m-2        | xy   | N    | net_downward_penetrating_diffuse_UV_flux
-PENPAF      | W m-2        | xy   | N    | net_downward_penetrating_diffuse_PAR_flux
-DRNIR       | W m-2        | xy   | N    | net_surface_downwelling_nir_beam_flux
-DFNIR       | W m-2        | xy   | N    | net_surface_downwelling_nir_diffuse_flux
-DISCHARGE   | kg m-2 s-1   | xy   | N    | river_discharge_at_ocean_points
-CALVING     | kg m-2 s-1   | xy   | N    | ice_calving_at_ocean_points
-AICE        | 1            | xy   | N    | ice_concentration_of_grid_cell
-TAUXBOT     | N m-2        | xy   | N    | eastward_stress_at_base_of_ice_Agrid
-TAUYBOT     | N m-2        | xy   | N    | northward_stress_at_base_of_ice_Agrid
+TAUX        | N m-2        | xy   | N    |              |                 | Agrid_eastward_stress_on_ocean
+TAUY        | N m-2        | xy   | N    |              |                 | Agrid_northward_stress_on_ocean
+PS          | Pa           | xy   | N    |              |                 | surface_atmospheric_pressure
+PICE        | Pa           | xy   | N    |              |                 | apressure_due_to_ice_weight
+SWHEAT      | W m-2        | xyz  | C    |              |                 | DUMMY_IMPORT_solar_heating_rate
+LWFLX       | W m-2        | xy   | N    |              |                 | surface_net_downward_longwave_flux
+SHFLX       | W m-2        | xy   | N    |              |                 | upward_sensible_heat_flux
+QFLUX       | kg m-2 s-1   | xy   | N    |              |                 | evaporation
+RAIN        | kg m-2 s-1   | xy   | N    |              |                 | ocean_rainfall
+SNOW        | kg m-2 s-1   | xy   | N    |              |                 | ocean_snowfall
+SFLX        | kg m-2 s-1   | xy   | N    |              |                 | salt_flux_from_sea_ice_to_ocean
+PENUVR      | W m-2        | xy   | N    |              |                 | net_downward_penetrating_direct_UV_flux
+PENPAR      | W m-2        | xy   | N    |              |                 | net_downward_penetrating_direct_PAR_flux
+PENUVF      | W m-2        | xy   | N    |              |                 | net_downward_penetrating_diffuse_UV_flux
+PENPAF      | W m-2        | xy   | N    |              |                 | net_downward_penetrating_diffuse_PAR_flux
+DRNIR       | W m-2        | xy   | N    |              |                 | net_surface_downwelling_nir_beam_flux
+DFNIR       | W m-2        | xy   | N    |              |                 | net_surface_downwelling_nir_diffuse_flux
+DISCHARGE   | kg m-2 s-1   | xy   | N    |              |                 | river_discharge_at_ocean_points
+CALVING     | kg m-2 s-1   | xy   | N    |              |                 | ice_calving_at_ocean_points
+AICE        | 1            | xy   | N    |              |                 | ice_concentration_of_grid_cell
+TAUXBOT     | N m-2        | xy   | N    |              |                 | eastward_stress_at_base_of_ice_Agrid
+TAUYBOT     | N m-2        | xy   | N    |              |                 | northward_stress_at_base_of_ice_Agrid
+DEL_TEMP    | K            | xy   | N    |  DUAL_OCEAN  |                 | temperature correction to top level MOM (Tsst-Tmom)
 
 category: EXPORT
 #------------------------------------------------------------------------------------
