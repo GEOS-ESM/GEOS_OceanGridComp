@@ -32,14 +32,6 @@ module GEOS_OceanGridCompMod
 !
 !EOP
 
-  type :: T_PrivateState
-     type(ESMF_Clock)  :: CLOCK
-  end type T_PrivateState
-
-  type :: T_PrivateState_Wrap
-     type(T_PrivateState), pointer :: ptr
-  end type T_PrivateState_Wrap
-
   integer ::          OCN
   integer ::          OCNd
   logical ::      DUAL_OCEAN
@@ -258,8 +250,6 @@ contains
 
     type (MAPL_MetaComp),     pointer   :: State
     type (ESMF_Grid)                    :: Grid
-    type (T_PrivateState),    pointer   :: PrivateSTATE
-    type (T_PrivateState_Wrap)          :: WRAP
     integer                             :: IM, JM, LM
     real                                :: DT
 
@@ -300,30 +290,6 @@ contains
 !--------------------------------
 
     call MAPL_Get(STATE, GIM=GIM, GEX=GEX, _RC)
-
-! Allocate the private state...
-!------------------------------
-
-    allocate( PrivateSTATE, __STAT__)
-    wrap%ptr => PrivateState
-
-! And put it in the GC
-!---------------------
-
-    CALL ESMF_UserCompSetInternalState( GC, TRIM(OCEAN_NAME)//'_internal_state', WRAP, STATUS )
-    VERIFY_(status)
-
-! Initialize the PrivateState. First the time...
-!-----------------------------------------------
-    call MAPL_GetResource(STATE,DT,  Label="RUN_DT:",    _RC)             ! Get AGCM Heartbeat
-    call MAPL_GetResource(STATE,DT,  Label="OCEAN_DT:",  DEFAULT=DT, _RC) ! set Default OCEAN_DT to AGCM Heartbeat
-
-    CALL ESMF_TimeIntervalSet(timeStep, S=NINT(DT), _RC)
-    call ESMF_ClockGet(CLOCK, currTIME=currTime, _RC)
-
-!ALT: check with Max about moving the clock 1 step forward
-    PrivateState%clock = ESMF_ClockCreate(NAME = TRIM(OCEAN_NAME)//"Clock", &
-                         timeStep=timeStep, startTime=currTime, _RC)
 
 ! Initialize the Ocean Model.
 !
@@ -400,10 +366,6 @@ contains
 ! Local derived type aliases
 
     type (MAPL_MetaComp),     pointer   :: STATE
-    type (ESMF_Time)                    :: EndTime
-    type (ESMF_Time)                    :: MyTime,ct
-    type (T_PrivateState),    pointer   :: PrivateSTATE
-    type (T_PrivateState_Wrap)          :: WRAP
     type (ESMF_GridComp    ), pointer   :: GCS(:)
     type (ESMF_State       ), pointer   :: GIM(:)
     type (ESMF_State       ), pointer   :: GEX(:)
@@ -522,19 +484,19 @@ contains
     if (PHASE >= 10) PHASE = PHASE - 10 ! to be replaced by MAPL get_phase
     Iam = trim(COMP_NAME) // Iam
 
-! Get my internal MAPL_Generic state
-!-----------------------------------
+    ! Get my internal MAPL_Generic state
+    !-----------------------------------
 
     call MAPL_GetObjectFromGC ( GC, STATE, _RC)
 
-! Profilers
-!----------
+    ! Profilers
+    !----------
 
     call MAPL_TimerOn (STATE,"RUN"  )
     call MAPL_TimerOn (STATE,"TOTAL")
 
-! Get child's import ad export to use as a bulletin board
-!--------------------------------------------------------
+    ! Get child's import ad export to use as a bulletin board
+    !--------------------------------------------------------
     call MAPL_Get(STATE,    &
          GCS       = GCS,   &
          GIM       = GIM,   &
@@ -547,364 +509,324 @@ contains
          _RC)
 
 
-! Check the clocks to set set-up the "run-to" time
-!-------------------------------------------------
-
-    call ESMF_ClockGet( CLOCK, currTime=endTime, _RC)
-
-! Get ocean model's private internal state
-!---------------------------------
-
-    CALL ESMF_UserCompGetInternalState( GC, TRIM(OCEAN_NAME)//'_internal_state', WRAP, STATUS )
-    VERIFY_(STATUS)
-
-    PrivateSTATE => WRAP%PTR
-
-    call ESMF_ClockGet( PrivateState%CLOCK, currTime=myTime, _RC)
-
-    if (myTime > EndTime) then
-       call ESMF_ClockSet(PrivateState%Clock,direction=ESMF_DIRECTION_REVERSE, _RC)
-       do
-         call ESMF_ClockAdvance(PrivateState%Clock, _RC)
-         call ESMF_ClockGet(PrivateState%Clock,currTime=ct, _RC)
-         if (ct==endTime) exit
-       enddo
-       call ESMF_ClockSet(PrivateState%Clock, direction=ESMF_DIRECTION_FORWARD, _RC)
-       call ESMF_ClockGet(PrivateState%CLOCK, currTime=myTime, _RC)
+    ! We get the ocean-land mask (now computed in Initialize of Plug)
+    ! ---------------------------------------------------------------
+    if(DO_DATASEA==0) then
+       select case(trim(OCEAN_NAME))
+       case ("MOM", "MIT")
+          call MAPL_GetPointer(GEX(OCN), MASK3D, trim(OCEAN_NAME)//'_3D_MASK', _RC)
+          MASK => MASK3D(:,:,1)
+       case ("MOM6")
+          call MAPL_GetPointer(GEX(OCN), MASK, 'MOM_2D_MASK', _RC)
+       end select
+    else
+       allocate(MASK3D(IM,JM,LM), __STAT__)
+       MASK3D=1.0
+       allocate(MASK(IM,JM), __STAT__)
+       MASK=1.0
     end if
 
-    if( MyTime <= EndTime ) then ! Time to run
+    ! Get ocean time step and misc. parameters
+    !-----------------------------------------
 
-! We get the ocean-land mask (now computed in Initialize of Plug)
-! ---------------------------------------------------------------
-       if(DO_DATASEA==0) then
-          select case(trim(OCEAN_NAME))
-             case ("MOM", "MIT")
-                call MAPL_GetPointer(GEX(OCN), MASK3D, trim(OCEAN_NAME)//'_3D_MASK', _RC)
-                MASK => MASK3D(:,:,1)
-             case ("MOM6")
-                call MAPL_GetPointer(GEX(OCN), MASK, 'MOM_2D_MASK', _RC)
-             end select
-       else
-          allocate(MASK3D(IM,JM,LM), __STAT__)
-          MASK3D=1.0
-          allocate(MASK(IM,JM), __STAT__)
-          MASK=1.0
-       end if
+    call MAPL_GetResource(STATE,DT,  Label="RUN_DT:",    _RC)             ! Get AGCM Heartbeat
+    call MAPL_GetResource(STATE,DT,  Label="OCEAN_DT:",  DEFAULT=DT, _RC) ! set Default OCEAN_DT to AGCM Heartbeat
 
-! Get ocean time step and misc. parameters
-!-----------------------------------------
+    ! Get pointers to imports
+    !--------------------------------------------------------------------------------
+    call MAPL_GetPointer(IMPORT, FROCEAN,    'FROCEAN',   _RC)
+    call MAPL_GetPointer(IMPORT, TAUXi,      'TAUX'   ,   _RC)
+    call MAPL_GetPointer(IMPORT, TAUYi,      'TAUY'   ,   _RC)
+    call MAPL_GetPointer(IMPORT, PENUVRi,    'PENUVR' ,   _RC)
+    call MAPL_GetPointer(IMPORT, PENPARi,    'PENPAR' ,   _RC)
+    call MAPL_GetPointer(IMPORT, PENUVFi,    'PENUVF' ,   _RC)
+    call MAPL_GetPointer(IMPORT, PENPAFi,    'PENPAF' ,   _RC)
+    call MAPL_GetPointer(IMPORT, DRNIRi,     'DRNIR'  ,   _RC)
+    call MAPL_GetPointer(IMPORT, DFNIRi,     'DFNIR'  ,   _RC)
+    call MAPL_GetPointer(IMPORT, HEATi,      'SWHEAT',    _RC)
+    call MAPL_GetPointer(IMPORT, DISCHARGEi, 'DISCHARGE', _RC)
+    call MAPL_GetPointer(IMPORT, LWFLXi,     'LWFLX'  ,   _RC)
+    call MAPL_GetPointer(IMPORT, SHFLXi,     'SHFLX'  ,   _RC)
+    call MAPL_GetPointer(IMPORT, QFLUXi,     'QFLUX'  ,   _RC)
+    call MAPL_GetPointer(IMPORT, SNOWi,      'SNOW'   ,   _RC)
+    call MAPL_GetPointer(IMPORT, RAINi,      'RAIN'   ,   _RC)
+    call MAPL_GetPointer(IMPORT, FHOCN,      'FHOCN'  ,   _RC)
+    call MAPL_GetPointer(IMPORT, FRESH,      'FRESH'  ,   _RC)
+    call MAPL_GetPointer(IMPORT, FSALT,      'FSALT'  ,   _RC)
 
-       call MAPL_GetResource(STATE,DT,  Label="RUN_DT:",    _RC)             ! Get AGCM Heartbeat
-       call MAPL_GetResource(STATE,DT,  Label="OCEAN_DT:",  DEFAULT=DT, _RC) ! set Default OCEAN_DT to AGCM Heartbeat
+    ! Get pointers from ImExState
+    !----------------------------
+    if(DO_DATASEA==0) then
+       call MAPL_GetPointer(GIM(OCN), TAUX,      'TAUX'  ,    _RC)
+       call MAPL_GetPointer(GIM(OCN), TAUY,      'TAUY'  ,    _RC)
+       call MAPL_GetPointer(GIM(OCN), PENUVR,    'PENUVR'  ,  _RC)
+       call MAPL_GetPointer(GIM(OCN), PENPAR,    'PENPAR'  ,  _RC)
+       call MAPL_GetPointer(GIM(OCN), PENUVF,    'PENUVF'  ,  _RC)
+       call MAPL_GetPointer(GIM(OCN), PENPAF,    'PENPAF'  ,  _RC)
+       call MAPL_GetPointer(GIM(OCN), DRNIR,     'DRNIR'  ,   _RC)
+       call MAPL_GetPointer(GIM(OCN), DFNIR,     'DFNIR'  ,   _RC)
+       call MAPL_GetPointer(GIM(OCN), HEAT,      'SWHEAT',    _RC)
+       call MAPL_GetPointer(GIM(OCN), DISCHARGE, 'DISCHARGE', _RC)
+       call MAPL_GetPointer(GIM(OCN), LWFLX,     'LWFLX'  ,   _RC)
+       call MAPL_GetPointer(GIM(OCN), SHFLX,     'SHFLX'  ,   _RC)
+       call MAPL_GetPointer(GIM(OCN), QFLUX,     'QFLUX'  ,   _RC)
+       call MAPL_GetPointer(GIM(OCN), RAIN,      'RAIN'  ,    _RC)
+       call MAPL_GetPointer(GIM(OCN), SNOW,      'SNOW'  ,    _RC)
+       call MAPL_GetPointer(GIM(OCN), SFLX,      'SFLX'  ,    _RC) ! and do not add import of PEN_OCN here since it is not used in the `plug'
+    end if
 
-! Get pointers to imports
-!--------------------------------------------------------------------------------
-       call MAPL_GetPointer(IMPORT, FROCEAN,    'FROCEAN',   _RC)
-       call MAPL_GetPointer(IMPORT, TAUXi,      'TAUX'   ,   _RC)
-       call MAPL_GetPointer(IMPORT, TAUYi,      'TAUY'   ,   _RC)
-       call MAPL_GetPointer(IMPORT, PENUVRi,    'PENUVR' ,   _RC)
-       call MAPL_GetPointer(IMPORT, PENPARi,    'PENPAR' ,   _RC)
-       call MAPL_GetPointer(IMPORT, PENUVFi,    'PENUVF' ,   _RC)
-       call MAPL_GetPointer(IMPORT, PENPAFi,    'PENPAF' ,   _RC)
-       call MAPL_GetPointer(IMPORT, DRNIRi,     'DRNIR'  ,   _RC)
-       call MAPL_GetPointer(IMPORT, DFNIRi,     'DFNIR'  ,   _RC)
-       call MAPL_GetPointer(IMPORT, HEATi,      'SWHEAT',    _RC)
-       call MAPL_GetPointer(IMPORT, DISCHARGEi, 'DISCHARGE', _RC)
-       call MAPL_GetPointer(IMPORT, LWFLXi,     'LWFLX'  ,   _RC)
-       call MAPL_GetPointer(IMPORT, SHFLXi,     'SHFLX'  ,   _RC)
-       call MAPL_GetPointer(IMPORT, QFLUXi,     'QFLUX'  ,   _RC)
-       call MAPL_GetPointer(IMPORT, SNOWi,      'SNOW'   ,   _RC)
-       call MAPL_GetPointer(IMPORT, RAINi,      'RAIN'   ,   _RC)
-       call MAPL_GetPointer(IMPORT, FHOCN,      'FHOCN'  ,   _RC)
-       call MAPL_GetPointer(IMPORT, FRESH,      'FRESH'  ,   _RC)
-       call MAPL_GetPointer(IMPORT, FSALT,      'FSALT'  ,   _RC)
+    call MAPL_GetPointer(IMPORT,   PEN_OCN, 'PEN_OCN', _RC)
 
-! Get pointers from ImExState
-!----------------------------
-       if(DO_DATASEA==0) then
-          call MAPL_GetPointer(GIM(OCN), TAUX,      'TAUX'  ,    _RC)
-          call MAPL_GetPointer(GIM(OCN), TAUY,      'TAUY'  ,    _RC)
-          call MAPL_GetPointer(GIM(OCN), PENUVR,    'PENUVR'  ,  _RC)
-          call MAPL_GetPointer(GIM(OCN), PENPAR,    'PENPAR'  ,  _RC)
-          call MAPL_GetPointer(GIM(OCN), PENUVF,    'PENUVF'  ,  _RC)
-          call MAPL_GetPointer(GIM(OCN), PENPAF,    'PENPAF'  ,  _RC)
-          call MAPL_GetPointer(GIM(OCN), DRNIR,     'DRNIR'  ,   _RC)
-          call MAPL_GetPointer(GIM(OCN), DFNIR,     'DFNIR'  ,   _RC)
-          call MAPL_GetPointer(GIM(OCN), HEAT,      'SWHEAT',    _RC)
-          call MAPL_GetPointer(GIM(OCN), DISCHARGE, 'DISCHARGE', _RC)
-          call MAPL_GetPointer(GIM(OCN), LWFLX,     'LWFLX'  ,   _RC)
-          call MAPL_GetPointer(GIM(OCN), SHFLX,     'SHFLX'  ,   _RC)
-          call MAPL_GetPointer(GIM(OCN), QFLUX,     'QFLUX'  ,   _RC)
-          call MAPL_GetPointer(GIM(OCN), RAIN,      'RAIN'  ,    _RC)
-          call MAPL_GetPointer(GIM(OCN), SNOW,      'SNOW'  ,    _RC)
-          call MAPL_GetPointer(GIM(OCN), SFLX,      'SFLX'  ,    _RC) ! and do not add import of PEN_OCN here since it is not used in the `plug'
-       end if
+    call MAPL_GetPointer(GEX(OCN), TW,   'TW'  , alloc=.true., _RC)
+    call MAPL_GetPointer(GEX(OCN), SW,   'SW'  , alloc=.true., _RC)
 
-       call MAPL_GetPointer(IMPORT,   PEN_OCN, 'PEN_OCN', _RC)
+    if (dual_ocean) then
+       call MAPL_GetPointer(GEX(OCNd), TWd, 'TW'  ,    alloc=.true., _RC)
+       call MAPL_GetPointer(IMPORT,    FId, 'FRACICEd' ,             _RC)
+    endif
 
-       call MAPL_GetPointer(GEX(OCN), TW,   'TW'  , alloc=.true., _RC)
-       call MAPL_GetPointer(GEX(OCN), SW,   'SW'  , alloc=.true., _RC)
-
-       if (dual_ocean) then
-          call MAPL_GetPointer(GEX(OCNd), TWd, 'TW'  ,    alloc=.true., _RC)
-          call MAPL_GetPointer(IMPORT,    FId, 'FRACICEd' ,             _RC)
-       endif
-
-       if(DO_DATASEA==0) then
-          call MAPL_GetPointer(GEX(OCN), FRZMLT,   'FRZMLT', alloc=.true., _RC)
-          if (trim(OCEAN_NAME) == "MOM6") then
-           call MAPL_GetPointer(GEX(OCN), T_Freeze, 'T_Freeze',alloc=.true.,_RC)
-          else
-           nullify(T_Freeze)
-          end if
-       end if
-
-! Get pointers to exports
-!--------------------------------------------------------
-
-       call MAPL_GetPointer(EXPORT, TS_FOUND,'TS_FOUND', _RC)
-       call MAPL_GetPointer(EXPORT, SS_FOUND,'SS_FOUND', _RC)
-       call MAPL_GetPointer(EXPORT, FRZMLTe, 'FRZMLT',   _RC)
-       ! T_Freeze is only MOM6 in the StateSpecs
+    if(DO_DATASEA==0) then
+       call MAPL_GetPointer(GEX(OCN), FRZMLT,   'FRZMLT', alloc=.true., _RC)
        if (trim(OCEAN_NAME) == "MOM6") then
-          call MAPL_GetPointer(EXPORT, T_Freeze_e, 'T_Freeze', _RC)
+          call MAPL_GetPointer(GEX(OCN), T_Freeze, 'T_Freeze',alloc=.true.,_RC)
        else
-          nullify(T_Freeze_e)
+          nullify(T_Freeze)
        end if
+    end if
 
-! Diagnostics exports
-!---------------------------------------------------------
-       call MAPL_GetPointer(EXPORT, RFLUX,      'RFLUX' ,    _RC)
-       call MAPL_GetPointer(EXPORT, FROCEANe,   'FROCEAN',   _RC)
-       call MAPL_GetPointer(EXPORT, TAUXe,      'TAUX'   ,   _RC)
-       call MAPL_GetPointer(EXPORT, TAUYe,      'TAUY'   ,   _RC)
-       call MAPL_GetPointer(EXPORT, HEATe,      'SWHEAT' ,   _RC)
-       call MAPL_GetPointer(EXPORT, DISCHARGEe, 'DISCHARGE', _RC)
-       call MAPL_GetPointer(EXPORT, LWFLXe,     'LWFLX'  ,   _RC)
-       call MAPL_GetPointer(EXPORT, SWFLXe,     'SWFLX'  ,   _RC)
-       call MAPL_GetPointer(EXPORT, SHFLXe,     'SHFLX'  ,   _RC)
-       call MAPL_GetPointer(EXPORT, QFLUXe,     'QFLUX'  ,   _RC)
-       call MAPL_GetPointer(EXPORT, RAINe,      'RAIN'  ,    _RC)
-       call MAPL_GetPointer(EXPORT, SNOWe,      'SNOW'  ,    _RC)
-       call MAPL_GetPointer(EXPORT, SFLXe,      'SFLX'  ,    _RC)
-       call MAPL_GetPointer(EXPORT, PEN_OCNe,   'PEN_OCN',   _RC)
+    ! Get pointers to exports
+    !--------------------------------------------------------
 
-       if(associated(FROCEANe)) FROCEANe = FROCEAN
+    call MAPL_GetPointer(EXPORT, TS_FOUND,'TS_FOUND', _RC)
+    call MAPL_GetPointer(EXPORT, SS_FOUND,'SS_FOUND', _RC)
+    call MAPL_GetPointer(EXPORT, FRZMLTe, 'FRZMLT',   _RC)
+    ! T_Freeze is only MOM6 in the StateSpecs
+    if (trim(OCEAN_NAME) == "MOM6") then
+       call MAPL_GetPointer(EXPORT, T_Freeze_e, 'T_Freeze', _RC)
+    else
+       nullify(T_Freeze_e)
+    end if
 
-! Allocate space for temporary arrays
-!------------------------------------
+    ! Diagnostics exports
+    !---------------------------------------------------------
+    call MAPL_GetPointer(EXPORT, RFLUX,      'RFLUX' ,    _RC)
+    call MAPL_GetPointer(EXPORT, FROCEANe,   'FROCEAN',   _RC)
+    call MAPL_GetPointer(EXPORT, TAUXe,      'TAUX'   ,   _RC)
+    call MAPL_GetPointer(EXPORT, TAUYe,      'TAUY'   ,   _RC)
+    call MAPL_GetPointer(EXPORT, HEATe,      'SWHEAT' ,   _RC)
+    call MAPL_GetPointer(EXPORT, DISCHARGEe, 'DISCHARGE', _RC)
+    call MAPL_GetPointer(EXPORT, LWFLXe,     'LWFLX'  ,   _RC)
+    call MAPL_GetPointer(EXPORT, SWFLXe,     'SWFLX'  ,   _RC)
+    call MAPL_GetPointer(EXPORT, SHFLXe,     'SHFLX'  ,   _RC)
+    call MAPL_GetPointer(EXPORT, QFLUXe,     'QFLUX'  ,   _RC)
+    call MAPL_GetPointer(EXPORT, RAINe,      'RAIN'  ,    _RC)
+    call MAPL_GetPointer(EXPORT, SNOWe,      'SNOW'  ,    _RC)
+    call MAPL_GetPointer(EXPORT, SFLXe,      'SFLX'  ,    _RC)
+    call MAPL_GetPointer(EXPORT, PEN_OCNe,   'PEN_OCN',   _RC)
 
-       allocate(WGHT(IM,JM), __STAT__)
+    if(associated(FROCEANe)) FROCEANe = FROCEAN
 
-! Weight for ocean grid
-!----------------------
-       wght=0.0
-       where(MASK>0 .and. FROCEAN /= MAPL_UNDEF)
-          WGHT = FROCEAN/MASK
-       elsewhere
-          WGHT = 0.0
-       end where
+    ! Allocate space for temporary arrays
+    !------------------------------------
+
+    allocate(WGHT(IM,JM), __STAT__)
+
+    ! Weight for ocean grid
+    !----------------------
+    wght=0.0
+    where(MASK>0 .and. FROCEAN /= MAPL_UNDEF)
+       WGHT = FROCEAN/MASK
+    elsewhere
+       WGHT = 0.0
+    end where
 
 #ifdef BUILD_MIT_OCEAN
-       call MAPL_GetPointer(GIM(OCN), WGHTi, 'WGHT', __RC__)
-       WGHTi = WGHT
+    call MAPL_GetPointer(GIM(OCN), WGHTi, 'WGHT', __RC__)
+    WGHTi = WGHT
 #endif
 
-       if(DO_DATASEA==0) then
-! Copy imports into ImEx variables
-!---------------------------------
-          PENUVR    = PENUVRi    * WGHT
-          PENPAR    = PENPARi    * WGHT
-          PENUVF    = PENUVFi    * WGHT
-          PENPAF    = PENPAFi    * WGHT
-          DRNIR     = DRNIRi     * WGHT
-          DFNIR     = DFNIRi     * WGHT
-          DISCHARGE = DISCHARGEi * WGHT
-          LWFLX     = LWFLXi     * WGHT
-          QFLUX     = QFLUXi     * WGHT
-          SHFLX     = (SHFLXi-FHOCN) * WGHT
-          RAIN      = (RAINi+FRESH)  * WGHT
-          SNOW      = SNOWi      * WGHT
-          SFLX      = FSALT      * WGHT
+    if(DO_DATASEA==0) then
+       ! Copy imports into ImEx variables
+       !---------------------------------
+       PENUVR    = PENUVRi    * WGHT
+       PENPAR    = PENPARi    * WGHT
+       PENUVF    = PENUVFi    * WGHT
+       PENPAF    = PENPAFi    * WGHT
+       DRNIR     = DRNIRi     * WGHT
+       DFNIR     = DFNIRi     * WGHT
+       DISCHARGE = DISCHARGEi * WGHT
+       LWFLX     = LWFLXi     * WGHT
+       QFLUX     = QFLUXi     * WGHT
+       SHFLX     = (SHFLXi-FHOCN) * WGHT
+       RAIN      = (RAINi+FRESH)  * WGHT
+       SNOW      = SNOWi      * WGHT
+       SFLX      = FSALT      * WGHT
 
-! This stress forces the ocean, combined with sea ice bottom stress later
-!------------------------------------------------------------------------
-          TAUX = TAUXi * WGHT
-          TAUY = TAUYi * WGHT
+       ! This stress forces the ocean, combined with sea ice bottom stress later
+       !------------------------------------------------------------------------
+       TAUX = TAUXi * WGHT
+       TAUY = TAUYi * WGHT
 
-! Prepare radiative heating for ocean
-!------------------------------------
+       ! Prepare radiative heating for ocean
+       !------------------------------------
 
-          if(associated(RFLUX )) RFLUX  = 0.0
-          select case (trim(OCEAN_NAME))
-             case ("MOM", "MIT", "DATASEA")
-                do L=1,LM
-                   HEAT(:,:,L) = HEATi(:,:,L)*WGHT
-                   if(associated(RFLUX)) then
-                      RFLUX = RFLUX + (1.0-MASK3D(:,:,L))*HEAT(:,:,L)
-                   end if
-                end do
-             case ("MOM6")
-                ! No 3D Mask from MOM6. Do nothing for now!
-          end select
-
-          if (associated(HEATe)) HEATe = HEAT
-          if (associated(TAUXe)) TAUXe = TAUX
-          if (associated(TAUYe)) TAUYe = TAUY
-          if (associated(DISCHARGEe)) DISCHARGEe = DISCHARGE
-          if (associated(LWFLXe)) LWFLXe = LWFLX
-          if (associated(SWFLXe)) SWFLXe = PENUVR+PENPAR+PENUVF+PENPAF+DRNIR+DFNIR
-          if (associated(SHFLXe)) SHFLXe = SHFLX
-          if (associated(QFLUXe)) QFLUXe = QFLUX
-          if (associated(RAINe)) RAINe = RAIN
-          if (associated(SNOWe)) SNOWe = SNOW
-          if (associated(SFLXe)) SFLXe = SFLX
-          if (associated(PEN_OCNe)) PEN_OCNe = PEN_OCN
-       end if !DO_DATASEA
-
-! Loop the ocean model
-!---------------------
-
-       NUM = 0
-       do while ( MyTime <= endTime )
-
-! Run ocean for one time step (DT)
-!---------------------------------
-
-          call MAPL_TimerOff(STATE,"TOTAL")
-          call MAPL_TimerOn (STATE,"--ModRun")
-
-          if (.not. DUAL_OCEAN) then
-             call MAPL_GenericRunChildren(GC, IMPORT, EXPORT, PrivateState%CLOCK, _RC)
-          else
-             if (PHASE == 1) then
-                ! corrector
-                call ESMF_GridCompRun( GCS(OCNd), importState=GIM(OCNd), &
-                                       exportState=GEX(OCNd), clock=CLOCK, phase=1, userRC=STATUS)
-                VERIFY_(STATUS)
-                call MAPL_GenericRunCouplers( STATE, CHILD=OCNd, CLOCK=CLOCK, _RC )
-                call ESMF_GridCompRun( GCS(OCN), importState=GIM(OCN), &
-                     exportState=GEX(OCN), clock=CLOCK, phase=1, userRC=STATUS)
-                VERIFY_(STATUS)
-                call MAPL_GenericRunCouplers( STATE, CHILD=OCN, CLOCK=CLOCK, _RC )
-                VERIFY_(STATUS)
-             else
-                ! predictor
-                call ESMF_GridCompRun( GCS(OCNd), importState=GIM(OCNd), &
-                     exportState=GEX(OCNd), clock=CLOCK, phase=1, userRC=STATUS)
-                VERIFY_(STATUS)
-                call MAPL_GenericRunCouplers( STATE, CHILD=OCNd, CLOCK=CLOCK, _RC )
+       if(associated(RFLUX )) RFLUX  = 0.0
+       select case (trim(OCEAN_NAME))
+       case ("MOM", "MIT", "DATASEA")
+          do L=1,LM
+             HEAT(:,:,L) = HEATi(:,:,L)*WGHT
+             if(associated(RFLUX)) then
+                RFLUX = RFLUX + (1.0-MASK3D(:,:,L))*HEAT(:,:,L)
              end if
-          end if
+          end do
+       case ("MOM6")
+          ! No 3D Mask from MOM6. Do nothing for now!
+       end select
 
-          if (DUAL_OCEAN .and. PHASE == 1) then
-             ! calculate temperature correction to send back to MOM
-             call MAPL_GetPointer(GIM(OCN), DEL_TEMP, 'DEL_TEMP', _RC)
-             call MAPL_GetPointer(GIM(OCNd), FI ,     'FRACICE' , _RC)
+       if (associated(HEATe)) HEATe = HEAT
+       if (associated(TAUXe)) TAUXe = TAUX
+       if (associated(TAUYe)) TAUYe = TAUY
+       if (associated(DISCHARGEe)) DISCHARGEe = DISCHARGE
+       if (associated(LWFLXe)) LWFLXe = LWFLX
+       if (associated(SWFLXe)) SWFLXe = PENUVR+PENPAR+PENUVF+PENPAF+DRNIR+DFNIR
+       if (associated(SHFLXe)) SHFLXe = SHFLX
+       if (associated(QFLUXe)) QFLUXe = QFLUX
+       if (associated(RAINe)) RAINe = RAIN
+       if (associated(SNOWe)) SNOWe = SNOW
+       if (associated(SFLXe)) SFLXe = SFLX
+       if (associated(PEN_OCNe)) PEN_OCNe = PEN_OCN
+    end if !DO_DATASEA
 
-             call MAPL_GetResource(STATE,TAU_SST,           Label="TAU_SST:",           default=432000.0, _RC)
-             call MAPL_GetResource(STATE,TAU_SST_UNDER_ICE, Label="TAU_SST_UNDER_ICE:", default=86400.0 , _RC)
+    ! Loop the ocean model
+    !---------------------
 
-             ! we should have valid pointers to TW and TWd by now
 
-             DEL_TEMP = 0.0 ! we do not want uninitiazed variables
-             where(MASK > 0.0 .and. FI < 0.05)
-                ! what about relaxation
-                DEL_TEMP = (TWd - TW)*DT/(DT+TAU_SST)
-             end where
+    ! Run ocean for one time step (DT)
+    !---------------------------------
 
-             where(MASK > 0.0 .and. FI >= 0.05 .and. FId > FI)
-                ! 0.054 (C/psu) is the ratio between the freezing temperature and salinity of brine.
-                ! -0.054*SW gives salinity dependent freezing temperature
-                ! ideally this const should be from the ocean model, but doing so is difficult here
-                DEL_TEMP = ((-0.054*SW+MAPL_TICE) - TW)*DT/(DT+TAU_SST_UNDER_ICE)
+    call MAPL_TimerOff(STATE,"TOTAL")
+    call MAPL_TimerOn (STATE,"--ModRun")
 
-             end where
-
-             ! put it back to MOM
-             call ESMF_GridCompRun( GCS(OCN), importState=GIM(OCN), &
-               exportState=GEX(OCN), clock=CLOCK, phase=2, userRC=STATUS )
-             VERIFY_(STATUS)
-          end if
-
-          call MAPL_TimerOff(STATE,"--ModRun")
-          call MAPL_TimerOn (STATE,"TOTAL")
-
-! Bump the time in the internal state
-!------------------------------------
-
-          call ESMF_ClockAdvance( PrivateState%clock,                    _RC)
-          call ESMF_ClockGet    ( PrivateState%clock, currTime= myTime , _RC)
-
-          NUM = NUM + 1
-       end do
-
-       if(associated(SS_FOUND)) then
-          SS_FOUND = OrphanSalinity
-          where(WGHT > 0.0)
-             SS_FOUND = SW
-          end where
+    if (.not. DUAL_OCEAN) then
+       call MAPL_GenericRunChildren(GC, IMPORT, EXPORT, CLOCK, _RC)
+    else
+       if (PHASE == 1) then
+          ! corrector
+          call ESMF_GridCompRun( GCS(OCNd), importState=GIM(OCNd), &
+               exportState=GEX(OCNd), clock=CLOCK, phase=1, userRC=STATUS)
+          VERIFY_(STATUS)
+          call MAPL_GenericRunCouplers( STATE, CHILD=OCNd, CLOCK=CLOCK, _RC )
+          call ESMF_GridCompRun( GCS(OCN), importState=GIM(OCN), &
+               exportState=GEX(OCN), clock=CLOCK, phase=1, userRC=STATUS)
+          VERIFY_(STATUS)
+          call MAPL_GenericRunCouplers( STATE, CHILD=OCN, CLOCK=CLOCK, _RC )
+          VERIFY_(STATUS)
+       else
+          ! predictor
+          call ESMF_GridCompRun( GCS(OCNd), importState=GIM(OCNd), &
+               exportState=GEX(OCNd), clock=CLOCK, phase=1, userRC=STATUS)
+          VERIFY_(STATUS)
+          call MAPL_GenericRunCouplers( STATE, CHILD=OCNd, CLOCK=CLOCK, _RC )
        end if
+    end if
 
-       if(associated(FRZMLTe)) then
-          if(DO_DATASEA == 0) then
-! assume frzmlt filled inside and get from ocean export
-             where(WGHT > 0.0 )
-                FRZMLTe = FRZMLT
-             end where
-          else
-             FRZMLTe = 0.0
-          end if
-       end if
+    if (DUAL_OCEAN .and. PHASE == 1) then
+       ! calculate temperature correction to send back to MOM
+       call MAPL_GetPointer(GIM(OCN), DEL_TEMP, 'DEL_TEMP', _RC)
+       call MAPL_GetPointer(GIM(OCNd), FI ,     'FRACICE' , _RC)
 
-       if(associated(T_Freeze_e)) then
-          if(DO_DATASEA == 0) then
-             where(WGHT > 0.0 )
-                T_Freeze_e = T_Freeze
-             end where
-          else
-             T_Freeze_e = -1.8
-          end if
-       end if
+       call MAPL_GetResource(STATE,TAU_SST,           Label="TAU_SST:",           default=432000.0, _RC)
+       call MAPL_GetResource(STATE,TAU_SST_UNDER_ICE, Label="TAU_SST_UNDER_ICE:", default=86400.0 , _RC)
 
-       if (DUAL_OCEAN) then
-          !ALT we might not have FI yet, so let get it again
-          call MAPL_GetPointer(GIM(OCNd), FI , 'FRACICE'  , _RC)
-          where(WGHT > 0.0)
-             where(FI < 0.05)
-                TS_FOUND = TWd
-             elsewhere
-                TS_FOUND = TW
-             end where
+       ! we should have valid pointers to TW and TWd by now
+
+       DEL_TEMP = 0.0 ! we do not want uninitiazed variables
+       where(MASK > 0.0 .and. FI < 0.05)
+          ! what about relaxation
+          DEL_TEMP = (TWd - TW)*DT/(DT+TAU_SST)
+       end where
+
+       where(MASK > 0.0 .and. FI >= 0.05 .and. FId > FI)
+          ! 0.054 (C/psu) is the ratio between the freezing temperature and salinity of brine.
+          ! -0.054*SW gives salinity dependent freezing temperature
+          ! ideally this const should be from the ocean model, but doing so is difficult here
+          DEL_TEMP = ((-0.054*SW+MAPL_TICE) - TW)*DT/(DT+TAU_SST_UNDER_ICE)
+
+       end where
+
+       ! put it back to MOM
+       call ESMF_GridCompRun( GCS(OCN), importState=GIM(OCN), &
+            exportState=GEX(OCN), clock=CLOCK, phase=2, userRC=STATUS )
+       VERIFY_(STATUS)
+    end if
+
+    call MAPL_TimerOff(STATE,"--ModRun")
+    call MAPL_TimerOn (STATE,"TOTAL")
+
+
+    if(associated(SS_FOUND)) then
+       SS_FOUND = OrphanSalinity
+       where(WGHT > 0.0)
+          SS_FOUND = SW
+       end where
+    end if
+
+    if(associated(FRZMLTe)) then
+       if(DO_DATASEA == 0) then
+          ! assume frzmlt filled inside and get from ocean export
+          where(WGHT > 0.0 )
+             FRZMLTe = FRZMLT
           end where
        else
-          where(WGHT > 0.0)
+          FRZMLTe = 0.0
+       end if
+    end if
+
+    if(associated(T_Freeze_e)) then
+       if(DO_DATASEA == 0) then
+          where(WGHT > 0.0 )
+             T_Freeze_e = T_Freeze
+          end where
+       else
+          T_Freeze_e = -1.8
+       end if
+    end if
+
+    if (DUAL_OCEAN) then
+       !ALT we might not have FI yet, so let get it again
+       call MAPL_GetPointer(GIM(OCNd), FI , 'FRACICE'  , _RC)
+       where(WGHT > 0.0)
+          where(FI < 0.05)
+             TS_FOUND = TWd
+          elsewhere
              TS_FOUND = TW
           end where
-       end if
+       end where
+    else
+       where(WGHT > 0.0)
+          TS_FOUND = TW
+       end where
+    end if
 
-! Update orphan points
-       if(DO_DATASEA == 0) then
-          WGHT=FROCEAN*(1.0-MASK)
-          Tfreeze=MAPL_TICE-0.054*OrphanSalinity ! in K
+    ! Update orphan points
+    if(DO_DATASEA == 0) then
+       WGHT=FROCEAN*(1.0-MASK)
+       Tfreeze=MAPL_TICE-0.054*OrphanSalinity ! in K
 
-          where(wght>0.0)
-             TS_FOUND=TS_FOUND+ &
-                      DT*(LWFLXi+(PENUVRi+PENPARi+PENUVFi+PENPAFi+DRNIRi+DFNIRi - PEN_OCN)-SHFLXi-QFLUXi*MAPL_ALHL-MAPL_ALHF*SNOWi+FHOCN)/(OrphanDepth*MAPL_RHO_SEAWATER*MAPL_CAPWTR) ! explicit update in time
-             FRZMLTe = (Tfreeze - TS_FOUND) * (MAPL_RHO_SEAWATER*MAPL_CAPWTR*OrphanDepth)/DT
-             TS_FOUND=max(TS_FOUND, Tfreeze)
-          end where
-       end if
+       where(wght>0.0)
+          TS_FOUND=TS_FOUND+ &
+               DT*(LWFLXi+(PENUVRi+PENPARi+PENUVFi+PENPAFi+DRNIRi+DFNIRi - PEN_OCN)-SHFLXi-QFLUXi*MAPL_ALHL-MAPL_ALHF*SNOWi+FHOCN)/(OrphanDepth*MAPL_RHO_SEAWATER*MAPL_CAPWTR) ! explicit update in time
+          FRZMLTe = (Tfreeze - TS_FOUND) * (MAPL_RHO_SEAWATER*MAPL_CAPWTR*OrphanDepth)/DT
+          TS_FOUND=max(TS_FOUND, Tfreeze)
+       end where
+    end if
 
-       deallocate(WGHT, __STAT__)
+    deallocate(WGHT, __STAT__)
 
-       if(DO_DATASEA/=0) then
-          deallocate(MASK3D, __STAT__)
-          deallocate(MASK,   __STAT__)
-       end if
-
-    end if ! Time to run
+    if(DO_DATASEA/=0) then
+       deallocate(MASK3D, __STAT__)
+       deallocate(MASK,   __STAT__)
+    end if
 
 ! Profilers
 !----------
