@@ -9,6 +9,7 @@ if ( NOT BUILD_MIT_OCEAN )
     SUBCOMPONENTS MOM6_GEOSPlug MOM_GEOS5PlugMod GEOSdatasea_GridComp
     DEPENDENCIES GEOSdatasea_GridComp MAPL esmf)
 
+
 else()
   add_compile_definitions(BUILD_MIT_OCEAN)
   esma_add_library (${this}
