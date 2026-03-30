@@ -30,7 +30,7 @@ module MOM_GEOS5PlugMod
 !USES:
   use ESMF
   use MAPL
-  use MAPL_ConstantsMod,        only: MAPL_TICE
+  use MAPL_Constants,           only: MAPL_TICE
 
 ! These MOM dependencies are all we are currently using.
 
@@ -50,9 +50,9 @@ module MOM_GEOS5PlugMod
 
   use ocean_model_mod,          only: ocean_model_init, update_ocean_model, ocean_model_end, ocean_model_restart
   use ocean_types_mod,          only: ocean_public_type, ice_ocean_boundary_type
-  
+
 ! MAT ocean_state_type renamed due to GNU build issue with simultaneous MOM5/MOM6 model
-  use ocean_model_mod,          only: get_ocean_domain, mom5_ocean_state_type 
+  use ocean_model_mod,          only: get_ocean_domain, mom5_ocean_state_type
 
 ! mjs added these two
 
@@ -61,8 +61,8 @@ module MOM_GEOS5PlugMod
   use ocean_model_mod,          only: mom4_get_latlon_UVsurf, mom4_get_UVsurfB
   use ocean_model_mod,          only: mom4_get_thickness, mom4_get_tsurf, mom4_get_ssurf
   use ocean_model_mod,          only: mom4_get_pointers_to_variables, mom4_get_streamfunction,  mom4_get_mld
-  use ocean_model_mod,          only: mom4_get_prog_tracer_index, mom4_put_prog_tracer, mom4_get_prog_tracer 
-  use ocean_model_mod,          only: mom4_get_diag_tracer_index, mom4_get_diag_tracer 
+  use ocean_model_mod,          only: mom4_get_prog_tracer_index, mom4_put_prog_tracer, mom4_get_prog_tracer
+  use ocean_model_mod,          only: mom4_get_diag_tracer_index, mom4_get_diag_tracer
   use ocean_model_mod,          only: mom4_get_temperature_index, mom4_get_salinity_index, &
        mom4_get_uv, mom4_get_latlon_uv, mom4_get_density
   use ocean_model_mod,          only: mom4_get_3D_tmask, mom4_set_swheat, mom4_set_swheat_fr
@@ -70,7 +70,7 @@ module MOM_GEOS5PlugMod
 ! This was added for a to b; Balaji was reluctant to expose ice_grid_mod.
 
   use mpp_parameter_mod,          only: AGRID, SCALAR_PAIR
-  use mpp_io_mod,                 only: MPP_RDONLY, MPP_NETCDF 
+  use mpp_io_mod,                 only: MPP_RDONLY, MPP_NETCDF
   use mpp_io_mod,                 only: mpp_open, mpp_close
   use fms_mod,                    only: read_data
 
@@ -114,8 +114,8 @@ contains
     integer, optional                  :: RC  ! return code
 
 ! !DESCRIPTION:  The SetServices for the PhysicsGcm GC needs to register its
-!   Initialize and Run.  It uses the MAPL_Generic construct for defining 
-!   state specs and couplings among its children.  In addition, it creates the   
+!   Initialize and Run.  It uses the MAPL_Generic construct for defining
+!   state specs and couplings among its children.  In addition, it creates the
 !   children GCs (AGCM and OGCM) and runs their
 !   respective SetServices.
 
@@ -130,7 +130,7 @@ contains
     character(len=ESMF_MAXSTR)          :: COMP_NAME
 
 ! Locals
-    type (MAPL_MetaComp),  pointer     :: MAPL  
+    type (MAPL_MetaComp),  pointer     :: MAPL
     integer                            :: iDUAL_OCEAN
 
 !=============================================================================
@@ -203,7 +203,7 @@ contains
 ! --------
 
     RETURN_(ESMF_SUCCESS)
-  
+
   end subroutine SetServices
 
 
@@ -217,7 +217,7 @@ contains
 
 ! !ARGUMENTS:
 
-    type(ESMF_GridComp),     intent(INOUT) :: GC     ! Gridded component 
+    type(ESMF_GridComp),     intent(INOUT) :: GC     ! Gridded component
     type(ESMF_State),        intent(INOUT) :: IMPORT ! Import state
     type(ESMF_State),        intent(INOUT) :: EXPORT ! Export state
     type(ESMF_Clock),        intent(INOUT) :: CLOCK  ! The clock
@@ -243,13 +243,13 @@ contains
 
 ! Locals with MOM types
 
-    type(time_type)                        :: Time        
-    type(time_type)                        :: DT 
+    type(time_type)                        :: Time
+    type(time_type)                        :: DT
 
 ! Locals with ESMF and MAPL types
 
     type(ESMF_VM)                          :: VM
-    type (MAPL_MetaComp), pointer          :: MAPL 
+    type (MAPL_MetaComp), pointer          :: MAPL
     type(ESMF_Grid)                        :: Grid
     type(ESMF_Time)                        :: MyTime
     type(ESMF_TimeInterval)                :: TINT
@@ -259,7 +259,7 @@ contains
     type(ice_ocean_boundary_type), pointer :: boundary
     type(ocean_public_type),       pointer :: Ocean
     type(mom5_ocean_state_type),   pointer :: Ocean_State
-    type(MOM_MAPL_Type),           pointer :: MOM_MAPL_internal_state 
+    type(MOM_MAPL_Type),           pointer :: MOM_MAPL_internal_state
     type(MOM_MAPLWrap_Type)                :: wrap
 
     integer                                :: DT_OCEAN
@@ -277,7 +277,7 @@ contains
     REAL_, pointer, dimension(:, :, :)     :: TL, SL
     integer                                :: i,j
 
-! Begin... 
+! Begin...
 
 ! Get the target components name and set-up traceback handle.
 ! -----------------------------------------------------------
@@ -378,7 +378,7 @@ contains
 
     IM=iec-isc+1
     JM=jec-jsc+1
-    
+
     ASSERT_(counts(1)==IM)
     ASSERT_(counts(2)==JM)
 
@@ -484,7 +484,7 @@ contains
     end where
 
     call mom4_get_salinity_index(i)
-    call mom4_get_prog_tracer(i,fld=Tmp3) 
+    call mom4_get_prog_tracer(i,fld=Tmp3)
     where(MASK > 0.0)
        SL = real(Tmp3,kind=G5KIND)
     elsewhere
@@ -523,33 +523,33 @@ contains
     elsewhere
        TW = MAPL_UNDEF
     end where
-    
+
     call mom4_get_Ssurf(Ocean,Tmp2)
     where(MASK(:,:,1) > 0.0)
        SW = real(Tmp2,kind=G5KIND)
     elsewhere
        SW = MAPL_UNDEF
     end where
- 
+
     if(associated(area)) then
        call ocean_model_data_get(Ocean_State, Ocean, 'area', Tmp2, isc, jsc)
        AREA = real(Tmp2,kind=G5KIND)
-    end if 
+    end if
 
     if(associated(sea_lev)) then
        call ocean_model_data_get(Ocean_State, Ocean, 'sea_lev', Tmp2, isc, jsc)
        sea_lev = real(merge(tsource = tmp2, fsource = real(MAPL_UNDEF), mask = (mask(:, :, 1) > 0.0)), kind=G5KIND)
-    end if 
+    end if
 
     if(associated(ssh)) then
        call ocean_model_data_get(Ocean_State, Ocean, 'eta_t', Tmp2, isc, jsc)
        ssh = real(merge(tsource = tmp2, fsource = real(MAPL_UNDEF), mask = (mask(:, :, 1) > 0.0)), kind=G5KIND)
-    end if 
+    end if
 
     if(associated(pbo)) then
        call ocean_model_data_get(Ocean_State, Ocean, 'pbot_t', tmp2, isc, jsc)
        pbo = real(merge(tsource = 1.0e-04*tmp2, fsource = real(MAPL_UNDEF), mask = (mask(:, :, 1) > 0.0)),kind=G5KIND)
-    end if 
+    end if
 
     tmp2=mom4_get_mld()
     OMLDAMAX   = real(merge(tsource = tmp2, fsource = real(MAPL_UNDEF), mask = (mask(:, :, 1) > 0.0)), kind=G5KIND)
@@ -575,7 +575,7 @@ contains
 
 ! !ARGUMENTS:
 
-    type(ESMF_GridComp), intent(INOUT) :: gc     ! Gridded component 
+    type(ESMF_GridComp), intent(INOUT) :: gc     ! Gridded component
     type(ESMF_State),    intent(INOUT) :: import ! Import state
     type(ESMF_State),    intent(INOUT) :: export ! Export state
     type(ESMF_Clock),    intent(INOUT) :: clock  ! The supervisor clock
@@ -670,8 +670,8 @@ contains
     real, allocatable                      :: sin_rot(:,:)
     real                                   :: EPSLN
 
-    type(MAPL_MetaComp),           pointer :: MAPL 
-    type(MOM_MAPL_Type),           pointer :: MOM_MAPL_internal_state 
+    type(MAPL_MetaComp),           pointer :: MAPL
+    type(MOM_MAPL_Type),           pointer :: MOM_MAPL_internal_state
     type(MOM_MAPLWrap_Type)                :: wrap
     type(ice_ocean_boundary_type), pointer :: boundary
     type(ocean_public_type),       pointer :: Ocean
@@ -681,7 +681,7 @@ contains
     integer                                :: isd,ied,jsd,jed
 
     integer                                :: YEAR,MONTH,DAY,HR,MN,SC
-    type(time_type)                        :: Time        
+    type(time_type)                        :: Time
     type(time_type)                        :: DT
 
     integer                                :: ii, jj
@@ -740,7 +740,7 @@ contains
     CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS )
     VERIFY_(STATUS)
 
-    MOM_MAPL_internal_state => WRAP%PTR 
+    MOM_MAPL_internal_state => WRAP%PTR
 
 ! Aliases to MOM types
 !---------------------
@@ -850,25 +850,25 @@ contains
 
     H = real(HEAT, kind=KIND(H))
 
-! KPP requires fractional shortwave decay (i.e. penetrated shortwave at T levels normalized by surface 
+! KPP requires fractional shortwave decay (i.e. penetrated shortwave at T levels normalized by surface
 ! shortwave flux). We compute it from surface shortwave flux and shotwave heating here.
 !-----------------------------------------------------------------------------------------------------
     U=real(PENUVR+PENPAR+PENUVF+PENPAF+DRNIR+DFNIR, kind=KIND(U))
-    
+
     where(U>0.0)
        V=1.0
        U=1.0/U
     elsewhere
        V=0.0 ! short wave fraction should be 0 when surface flux is 0
     end where
-    
+
     do l=1,LM
        G(:,:,l)=V-0.5*H(:,:,l)*U
        V=V-H(:,:,l)*U
     end do
     G=max(0.0,G) ! this protects from tiny negatives at depth where sw heating is very small
     call mom4_set_swheat_fr(G)
-    
+
     if(associated(SWFRAC)) then
        where(MASK > 0.0)
           SWFRAC = real(G,kind=G5KIND)
@@ -877,7 +877,7 @@ contains
        end where
     end if
 
-! Subtract surface flux from the top level heating rate, because MOM ocean_sbc adds surface sw flux to 
+! Subtract surface flux from the top level heating rate, because MOM ocean_sbc adds surface sw flux to
 ! Tprog(index_temp)%stf (surface temp tracer flux).
 !--------------------------------------------------
     U=real(PENUVR+PENPAR+PENUVF+PENPAF+DRNIR+DFNIR, kind=KIND(U))
@@ -890,7 +890,7 @@ contains
     V = 0.0
     call transformA2B(real(TAUX,kind=kind(U)), real(TAUY,kind=kind(V)), U, V)
 
-! Rotate input stress over water along i,j of tripolar grid, and combine with stress under ice 
+! Rotate input stress over water along i,j of tripolar grid, and combine with stress under ice
 !---------------------------------------------------------------------------------------------
     call ocean_model_data_get(Ocean_State, Ocean, 'cos_rot', cos_rot, isc, jsc)
     call ocean_model_data_get(Ocean_State, Ocean, 'sin_rot', sin_rot, isc, jsc)
@@ -946,7 +946,7 @@ contains
 
     call mapl_getresource(mapl, steady_state_ocean, Label = "steady_state_ocean:", default = 0, rc = status); VERIFY_(status)
     if(steady_state_ocean == 0) call update_ocean_model(Boundary, Ocean_State, Ocean, Time, DT)
-     
+
 ! Copy tracers from MOM internal state to IMPORT bundle
 !------------------------------------------------------
 
@@ -967,7 +967,7 @@ contains
        elsewhere
           TRACER = MAPL_UNDEF
        end where
-       
+
     end do
 
 
@@ -991,13 +991,13 @@ contains
     end where
 
     call mom4_get_salinity_index(i)
-    call mom4_get_prog_tracer(i,fld=H) 
+    call mom4_get_prog_tracer(i,fld=H)
     where(MASK > 0.0)
        SL = real(H,kind=G5KIND)
     elsewhere
        SL = MAPL_UNDEF
     end where
- 
+
 ! Convert conservative temp to potential if necessary
     i=-1
     call mom4_get_diag_tracer_index(i,'pot_temp')
@@ -1045,7 +1045,7 @@ contains
           VW = real(V, kind=G5KIND)
        elsewhere
           VW=0.0
-       end where       
+       end where
     end if
 
 ! Get the B grid currents at MOM precision
@@ -1068,7 +1068,7 @@ contains
           VWB = real(V, kind=G5KIND)
        elsewhere
           VWB=0.0
-       end where       
+       end where
     end if
 
     if(associated(RL  )) then
@@ -1168,7 +1168,7 @@ contains
     endif
 
     if(associated(WRHOT)) then
-       call ocean_model_data_get(Ocean_State, Ocean, 'wrhot', H, isc, jsc) 
+       call ocean_model_data_get(Ocean_State, Ocean, 'wrhot', H, isc, jsc)
        do l=1,LM
           where(MASK(:,:,l) > 0.0)
              WRHOT(:,:,l) = real(H(:,:,l), kind = G5KIND)
@@ -1180,7 +1180,7 @@ contains
     end if
 
     if(associated(WRHOTSQ)) then
-       call ocean_model_data_get(Ocean_State, Ocean, 'wrhot', H, isc, jsc) 
+       call ocean_model_data_get(Ocean_State, Ocean, 'wrhot', H, isc, jsc)
        do l=1,LM
           where(MASK(:,:,l) > 0.0)
              WRHOTSQ(:,:,l) = real(H(:,:,l), kind = G5KIND)
@@ -1193,7 +1193,7 @@ contains
     end if
 
     if(associated(SSH)) then
-       call ocean_model_data_get(Ocean_State, Ocean, 'eta_t', U, isc, jsc) 
+       call ocean_model_data_get(Ocean_State, Ocean, 'eta_t', U, isc, jsc)
        where(MASK(:,:,1) > 0.0)
           SSH = real(U, kind = G5KIND)
        elsewhere
@@ -1202,26 +1202,26 @@ contains
     end if
 
     if(associated(SLV)) then
-       call ocean_model_data_get(Ocean_State, Ocean, 'sea_lev', U, isc, jsc) 
+       call ocean_model_data_get(Ocean_State, Ocean, 'sea_lev', U, isc, jsc)
        where(MASK(:,:,1)>0.0)
           SLV = real(U, kind = G5KIND)
        elsewhere
           SLV=0.0
-       end where       
+       end where
     end if
 
     if(associated(FRZMLT)) then
        ! frazil in mom5 already contains melt potential
-       call ocean_model_data_get(Ocean_State, Ocean, 'frazil', U, isc, jsc) 
+       call ocean_model_data_get(Ocean_State, Ocean, 'frazil', U, isc, jsc)
        where(MASK(:,:,1)>0.0)
           FRZMLT = real(U, kind = G5KIND)
        elsewhere
           FRZMLT = 0.0
-       end where       
+       end where
     end if
-    
+
     if(associated(PBO)) then
-       call ocean_model_data_get(Ocean_State, Ocean, 'pbot_t', U, isc, jsc) 
+       call ocean_model_data_get(Ocean_State, Ocean, 'pbot_t', U, isc, jsc)
        where(MASK(:,:,1) > 0.0)
           PBO = real(U*1e-4, kind = G5KIND)
        elsewhere
@@ -1230,7 +1230,7 @@ contains
     end if
 
     if(associated(DEPTH)) then
-       call ocean_model_data_get(Ocean_State, Ocean, 'geodepth_zt', H, isc, jsc) 
+       call ocean_model_data_get(Ocean_State, Ocean, 'geodepth_zt', H, isc, jsc)
           DEPTH = real(H, kind = G5KIND)
     end if
 
@@ -1276,8 +1276,8 @@ contains
 
       integer              :: i, j
       real, allocatable    :: TX(:,:), TY(:,:)
-      
-      
+
+
       allocate(tx(isd:ied,jsd:jed), stat=STATUS); VERIFY_(STATUS)
       allocate(ty(isd:ied,jsd:jed), stat=STATUS); VERIFY_(STATUS)
 
@@ -1337,7 +1337,7 @@ contains
 
 ! !ARGUMENTS:
 
-    type(ESMF_GridComp), intent(INOUT) :: gc     ! Gridded component 
+    type(ESMF_GridComp), intent(INOUT) :: gc     ! Gridded component
     type(ESMF_State),    intent(INOUT) :: import ! Import state
     type(ESMF_State),    intent(INOUT) :: export ! Export state
     type(ESMF_Clock),    intent(INOUT) :: clock  ! The supervisor clock
@@ -1365,11 +1365,11 @@ contains
 
     real, allocatable                      :: T(:,:,:)
 
-! Pointers to export    
+! Pointers to export
     REAL_, pointer                         :: MASK(:,:,:)
 
-    type(MAPL_MetaComp),           pointer :: MAPL 
-    type(MOM_MAPL_Type),           pointer :: MOM_MAPL_internal_state 
+    type(MAPL_MetaComp),           pointer :: MAPL
+    type(MOM_MAPL_Type),           pointer :: MOM_MAPL_internal_state
     type(MOM_MAPLWrap_Type)                :: wrap
 !    type(ice_ocean_boundary_type), pointer :: boundary
 !    type(ocean_public_type),       pointer :: Ocean
@@ -1408,7 +1408,7 @@ contains
     CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS )
     VERIFY_(STATUS)
 
-    MOM_MAPL_internal_state => WRAP%PTR 
+    MOM_MAPL_internal_state => WRAP%PTR
 
 ! Aliases to MOM types
 !---------------------
@@ -1468,7 +1468,7 @@ contains
   end subroutine Run2
 
 !BOP
-    
+
 ! !IROUTINE: Finalize        -- Finalize method for GuestOcean wrapper
 
 ! !INTERFACE:
@@ -1477,7 +1477,7 @@ contains
 
 ! !ARGUMENTS:
 
-  type(ESMF_GridComp), intent(INOUT) :: gc     ! Gridded component 
+  type(ESMF_GridComp), intent(INOUT) :: gc     ! Gridded component
   type(ESMF_State),    intent(INOUT) :: import ! Import state
   type(ESMF_State),    intent(INOUT) :: export ! Export state
   type(ESMF_Clock),    intent(INOUT) :: clock  ! The supervisor clock
@@ -1485,9 +1485,9 @@ contains
 
 !EOP
 
-    type (MAPL_MetaComp), pointer:: MAPL 
+    type (MAPL_MetaComp), pointer:: MAPL
     type(ESMF_Time)                  :: MyTime
-    type(MOM_MAPL_Type),     pointer :: MOM_MAPL_internal_state 
+    type(MOM_MAPL_Type),     pointer :: MOM_MAPL_internal_state
     type(MOM_MAPLWrap_Type)          :: wrap
     type(ocean_public_type),     pointer :: Ocean
     type(mom5_ocean_state_type), pointer :: Ocean_State
@@ -1500,7 +1500,7 @@ contains
 
 ! Locals with MOM types
 
-    type(time_type)                  :: Time        
+    type(time_type)                  :: Time
     integer                          :: YEAR,MONTH,DAY,HR,MN,SC
 
 ! Get the target components name and set-up traceback handle.
@@ -1529,7 +1529,7 @@ contains
     CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS )
     VERIFY_(STATUS)
 
-    MOM_MAPL_internal_state => WRAP%PTR 
+    MOM_MAPL_internal_state => WRAP%PTR
 
     Ocean => MOM_MAPL_internal_state%Ocean
 
@@ -1538,7 +1538,7 @@ contains
 
     call ESMF_ClockGet( CLOCK, currTime=MyTime, RC=STATUS)
     VERIFY_(status)
-    
+
     call ESMF_TimeGet (MyTime,                    &
          YY=YEAR, MM=MONTH, DD=DAY, &
          H=HR,    M =MN,    S =SC,  &
@@ -1559,7 +1559,7 @@ contains
 
 ! Generic Finalize
 ! ------------------
-    
+
     call MAPL_GenericFinalize( GC, IMPORT, EXPORT, CLOCK, RC=status )
     VERIFY_(STATUS)
 
@@ -1580,7 +1580,7 @@ contains
 
 ! !ARGUMENTS:
 
-  type(ESMF_GridComp), intent(INOUT) :: gc     ! Gridded component 
+  type(ESMF_GridComp), intent(INOUT) :: gc     ! Gridded component
   type(ESMF_State),    intent(INOUT) :: import ! Import state
   type(ESMF_State),    intent(INOUT) :: export ! Export state
   type(ESMF_Clock),    intent(INOUT) :: clock  ! The supervisor clock
@@ -1588,8 +1588,8 @@ contains
 
 !EOP
 
-    type (MAPL_MetaComp), pointer    :: MAPL 
-    type(MOM_MAPL_Type),     pointer :: MOM_MAPL_internal_state 
+    type (MAPL_MetaComp), pointer    :: MAPL
+    type(MOM_MAPL_Type),     pointer :: MOM_MAPL_internal_state
     type(MOM_MAPLWrap_Type)          :: wrap
     type(mom5_ocean_state_type),  pointer :: Ocean_State
 
@@ -1633,7 +1633,7 @@ contains
        CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS )
        VERIFY_(STATUS)
 
-       MOM_MAPL_internal_state => WRAP%PTR 
+       MOM_MAPL_internal_state => WRAP%PTR
 
        call MAPL_DateStampGet(clock, timeStamp, rc=status)
        VERIFY_(STATUS)

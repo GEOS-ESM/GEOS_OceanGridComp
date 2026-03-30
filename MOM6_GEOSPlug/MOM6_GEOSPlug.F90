@@ -24,7 +24,7 @@ module MOM6_GEOSPlugMod
 !USES:
   use ESMF
   use MAPL
-  use MAPL_ConstantsMod,        only: MAPL_TICE
+  use MAPL_Constants,           only: MAPL_TICE
 
 ! FMS dependencies
   use field_manager_mod,        only: field_manager_init, field_manager_end
@@ -328,7 +328,7 @@ contains
 
     Ocean%is_ocean_pe = .true.
     call ocean_model_init  (Ocean, Ocean_state, Time, Time, iwind_stagger)
- 
+
     MOM_MAPL_internal_state%Ocean_State => Ocean_State
 
     call ocean_model_init_sfc(Ocean_state, Ocean)
@@ -362,7 +362,7 @@ contains
     call get_ocean_grid(Ocean_state, Ocean_grid)
     LM=Ocean_grid%ke
 
-! Check run time surface current stagger option set in MOM_input 
+! Check run time surface current stagger option set in MOM_input
 ! to make sure it matches what is expected here
 !---------------------------------------------------------------
 
@@ -777,11 +777,11 @@ contains
     Boundary%V_flux  (isc:iec,jsc:jec)= real( (U*sin_rot + V*cos_rot), kind=KIND(Boundary%p))
 
 !Calculate the magnitude of the stress on the ocean [Pa]
-!-------------------------------------------------------                                      
+!-------------------------------------------------------
    U = 0.0; V = 0.0
    U = real ( TAUX*(1.-AICE) - TAUXBOT*AICE )**2
    V = real ( TAUY*(1.-AICE) - TAUYBOT*AICE )**2
-   Boundary%stress_mag     (isc:iec,jsc:jec)= real( (U+V)**0.5, kind=KIND(Boundary%p) )      
+   Boundary%stress_mag     (isc:iec,jsc:jec)= real( (U+V)**0.5, kind=KIND(Boundary%p) )
 
 ! Set the time for MOM
 !---------------------
@@ -801,7 +801,7 @@ contains
 ! Run MOM for one time step
 !--------------------------
 
-    ! set following to non-zero only if the coupled model becomes unstable 
+    ! set following to non-zero only if the coupled model becomes unstable
     ! (inconsistent atmosphere or bad restart! or some instabilities) - per Atanas T
     call MAPL_GetResource(MAPL, steady_state_ocean, Label = "steady_state_ocean:", default = 0, _RC)
 
