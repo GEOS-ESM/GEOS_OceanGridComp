@@ -1,8 +1,8 @@
 ! Blank file in which we can put "overrides" for parameters
 
 LAYOUT = 24, 24
-#override DT = 600
-#override DT_THERM = 600
+#override DT = 450
+#override DT_THERM = 450
 HFREEZE = 2.0
 
 ! Disable checksums
@@ -49,6 +49,7 @@ RESTART_CHECKSUMS_REQUIRED = False
 #override BBL_THICK_MIN = 10.
 #override BBL_EFFIC = 0.01
 #override PRESSURE_DEPENDENT_FRAZIL = False
+#override USE_RIGID_SEA_ICE = False
 !
 ! update answers
 
@@ -56,8 +57,8 @@ RESTART_CHECKSUMS_REQUIRED = False
 ! See https://github.com/GEOS-ESM/MOM6/releases/tag/geos%2Fv3.2
 ! and https://github.com/mom-ocean/MOM6/pull/1631#issuecomment-2252914251
 
-#override USE_HUYNH_STENCIL_BUG = True
-#override EPBL_ANSWER_DATE = 20231231
+!!#override USE_HUYNH_STENCIL_BUG = True
+!!#override EPBL_ANSWER_DATE = 20231231
 !!#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.v20141007.nc"
 
 !! New Ocean Bathymetry (OM4)
@@ -71,6 +72,9 @@ RESTART_CHECKSUMS_REQUIRED = False
 #override FOX_KEMPER_ML_RESTRAT_COEF = 1.0 
 #override MLE_FRONT_LENGTH = 500.0
 #override MLE%USE_BODNER23 = True 
+#override MLE%CR = 0.038
+#override MLE%BLD_DECAYING_TFILTER = 8.64E+04
+#override MLE%MLD_DECAYING_TFILTER = 2.592E+06
 
 
 
