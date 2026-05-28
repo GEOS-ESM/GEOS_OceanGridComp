@@ -31,3 +31,6 @@
 #override HFREEZE = 10.0
 #override BAD_VAL_SST_MIN = -3.0
 #override BAD_VAL_SSS_MAX = 55.0
+
+! see https://github.com/GEOS-ESM/MOM6/issues/15
+#override MEKE_POSITIVE = True

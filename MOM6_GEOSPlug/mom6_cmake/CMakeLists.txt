@@ -140,6 +140,7 @@ list( APPEND MOM6_SRCS
 #  src/equation_of_state/TEOS10/gsw_t_freezing_exact.f90
 #  src/equation_of_state/TEOS10/gsw_t_freezing_poly.f90
 #  src/equation_of_state/TEOS10/gsw_t_from_ct.f90
+   src/framework/MOM_ANN.F90
    src/framework/MOM_array_transform.F90
    src/framework/MOM_checksums.F90
    src/framework/MOM_coms.F90
