@@ -77,4 +77,5 @@ RESTART_CHECKSUMS_REQUIRED = False
 #override MLE%MLD_DECAYING_TFILTER = 2.592E+06
 
 
-
+! see https://github.com/GEOS-ESM/MOM6/issues/15
+#override MEKE_POSITIVE = True
