@@ -29,6 +29,7 @@ CALVING     | kg m-2 s-1   | xy   | N    | ice_calving_at_ocean_points
 AICE        | 1            | xy   | N    | ice_concentration_of_grid_cell
 TAUXBOT     | N m-2        | xy   | N    | eastward_stress_at_base_of_ice_Agrid
 TAUYBOT     | N m-2        | xy   | N    | northward_stress_at_base_of_ice_Agrid
+DEL_TEMP    | K            | xy   | N    | temperature_difference_btw_model_top_level_and_obs
 
 category: EXPORT
 #------------------------------------------------------------------------------------
