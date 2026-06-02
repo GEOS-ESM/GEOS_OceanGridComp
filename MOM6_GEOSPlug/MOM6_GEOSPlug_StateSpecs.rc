@@ -5,7 +5,7 @@ category: IMPORT
 #------------------------------------------------------------------------------------
 # VARIABLE                 | DIMENSIONS  |          Additional Metadata
 #------------------------------------------------------------------------------------
-NAME        | UNITS        | DIMS | VLOC | COND         | DATATYPE        | LONG_NAME 
+NAME        | UNITS        | DIMS | VLOC | LONG_NAME 
 #------------------------------------------------------------------------------------
 TAUX        | N m-2        | xy   | N    | Agrid_eastward_stress_on_ocean
 TAUY        | N m-2        | xy   | N    | Agrid_northward_stress_on_ocean
