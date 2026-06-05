@@ -123,7 +123,7 @@ contains
           case default
              charbuf_ = "OCEAN_NAME: " // trim(OCEAN_NAME) // " is not implemented, ABORT!"
              call WRITE_PARALLEL(charbuf_)
-             VERIFY_(999)
+             _VERIFY(999)
        end select
     endif
 
@@ -160,7 +160,7 @@ contains
          DIMS               = MAPL_DimsHorzOnly,                   &
          VLOCATION          = MAPL_VLocationNone,                  &
          RC=STATUS  )
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
 ! Exports of (a) child
 
@@ -229,7 +229,7 @@ contains
 
     call MAPL_GenericSetServices (GC, _RC )
 
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
 
   end subroutine SetServices
 
@@ -314,7 +314,7 @@ contains
 !---------------------
 
     CALL ESMF_UserCompSetInternalState( GC, TRIM(OCEAN_NAME)//'_internal_state', WRAP, STATUS )
-    VERIFY_(status)
+    _VERIFY(status)
 
 ! Initialize the PrivateState. First the time...
 !-----------------------------------------------
@@ -372,7 +372,7 @@ contains
     call MAPL_TimerOff(STATE,"TOTAL"     )
     call MAPL_TimerOff(STATE,"INITIALIZE")
 
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
 
   end subroutine Initialize
 
@@ -562,7 +562,7 @@ contains
 !---------------------------------
 
     CALL ESMF_UserCompGetInternalState( GC, TRIM(OCEAN_NAME)//'_internal_state', WRAP, STATUS )
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
     PrivateSTATE => WRAP%PTR
 
@@ -809,18 +809,18 @@ contains
                 ! corrector
                 call ESMF_GridCompRun( GCS(OCNd), importState=GIM(OCNd), &
                                        exportState=GEX(OCNd), clock=CLOCK, phase=1, userRC=STATUS)
-                VERIFY_(STATUS)
+                _VERIFY(STATUS)
                 call MAPL_GenericRunCouplers( STATE, CHILD=OCNd, CLOCK=CLOCK, _RC )
                 call ESMF_GridCompRun( GCS(OCN), importState=GIM(OCN), &
                      exportState=GEX(OCN), clock=CLOCK, phase=1, userRC=STATUS)
-                VERIFY_(STATUS)
+                _VERIFY(STATUS)
                 call MAPL_GenericRunCouplers( STATE, CHILD=OCN, CLOCK=CLOCK, _RC )
-                VERIFY_(STATUS)
+                _VERIFY(STATUS)
              else
                 ! predictor
                 call ESMF_GridCompRun( GCS(OCNd), importState=GIM(OCNd), &
                      exportState=GEX(OCNd), clock=CLOCK, phase=1, userRC=STATUS)
-                VERIFY_(STATUS)
+                _VERIFY(STATUS)
                 call MAPL_GenericRunCouplers( STATE, CHILD=OCNd, CLOCK=CLOCK, _RC )
              end if
           end if
@@ -852,7 +852,7 @@ contains
              ! put it back to MOM
              call ESMF_GridCompRun( GCS(OCN), importState=GIM(OCN), &
                exportState=GEX(OCN), clock=CLOCK, phase=2, userRC=STATUS )
-             VERIFY_(STATUS)
+             _VERIFY(STATUS)
           end if
 
           call MAPL_TimerOff(STATE,"--ModRun")
@@ -942,7 +942,7 @@ contains
 ! All Done
 !---------
 
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
 
   end subroutine Run
 

@@ -116,7 +116,7 @@ module GEOS_DataSeaGridCompMod
 
     call MAPL_GenericSetServices ( GC, _RC)
 
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
   
   end subroutine SetServices
 
@@ -208,7 +208,7 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
      ! Get the SST bcs file name from the resource file
      ! -------------------------------------------------
      call MAPL_GetResource(MAPL,DATASeaFILE,LABEL="DATA_SST_FILE:", RC=STATUS)
-     VERIFY_(STATUS)
+     _VERIFY(STATUS)
    endif
 
 ! In atmospheric forecast mode we do not have future SST and SSS
@@ -335,7 +335,7 @@ subroutine RUN ( GC, IMPORT, EXPORT, CLOCK, RC )
    call MAPL_TimerOff(MAPL,"RUN"  )
    call MAPL_TimerOff(MAPL,"TOTAL")
 
-   RETURN_(ESMF_SUCCESS)
+   _RETURN(ESMF_SUCCESS)
 end subroutine RUN
 
 end module GEOS_DataSeaGridCompMod

@@ -153,7 +153,7 @@ contains
 
     call MAPL_GenericSetServices    ( GC, _RC )
 
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
 
   end subroutine SetServices
 
@@ -500,7 +500,7 @@ contains
     deallocate(Tmp2, __STAT__)
     deallocate(Tmp3, __STAT__)
 
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
   end subroutine Initialize
 
 !=================================================================================
@@ -643,7 +643,7 @@ contains
 ! Get the private internal state
 !-------------------------------
 
-    CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS); VERIFY_(STATUS)
+    CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS); _VERIFY(STATUS)
     MOM_MAPL_internal_state => WRAP%PTR
 
 ! Aliases to MOM types
@@ -986,7 +986,7 @@ contains
     call MAPL_TimerOff(MAPL,"RUN"   )
     call MAPL_TimerOff(MAPL,"TOTAL" )
 
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
   end subroutine Run
 
 !BOP
@@ -1048,7 +1048,7 @@ contains
 ! Get the private internal state
 !-------------------------------
 
-    CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS); VERIFY_(STATUS)
+    CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS); _VERIFY(STATUS)
 
     MOM_MAPL_internal_state => WRAP%PTR
 
@@ -1117,7 +1117,7 @@ contains
 ! All Done
 !---------
 
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
   end subroutine Finalize
 
 !====================================================================
@@ -1176,7 +1176,7 @@ contains
 ! Get the private internal state
 !--------------------------------
 
-       CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS); VERIFY_(STATUS)
+       CALL ESMF_UserCompGetInternalState( GC, 'MOM_MAPL_state', WRAP, STATUS); _VERIFY(STATUS)
 
        MOM_MAPL_internal_state => WRAP%PTR
        Ocean_State             => MOM_MAPL_internal_state%Ocean_State
@@ -1186,12 +1186,12 @@ contains
 ! Write a restart
 !-----------------
 
-       call ocean_model_restart (Ocean_State, timeStamp); VERIFY_(STATUS)
+       call ocean_model_restart (Ocean_State, timeStamp); _VERIFY(STATUS)
 
     end if
 
     call MAPL_TimerOff(MAPL,"TOTAL")
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
 
   end subroutine Record
 

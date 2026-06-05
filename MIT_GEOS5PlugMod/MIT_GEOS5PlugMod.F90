@@ -146,14 +146,14 @@ contains
 
     Iam = 'SetServices'
     call ESMF_GridCompGet( GC, NAME=COMP_NAME, CONFIG=CF, RC=STATUS )
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
     Iam = trim(COMP_NAME) // Iam
 
 ! Get the MAPL object
 ! -------------------
 
     call MAPL_GetObjectFromGC ( GC, MAPL, RC=STATUS)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
     call MAPL_GetResource(MAPL, iDUAL_OCEAN, 'DUAL_OCEAN:', default=0, RC=STATUS )
     DUAL_OCEAN = iDUAL_OCEAN /= 0
@@ -198,7 +198,7 @@ contains
       UNITS      = imports(i)%units,        &
       DIMS       = imports(i)%dims,         &
       VLOCATION  = imports(i)%vlocation,    &
-      RC         =status); VERIFY_(STATUS)
+      RC         =status); _VERIFY(STATUS)
      call WRITE_PARALLEL("MAPL: adding import "//trim(imports(i)%short_name))
 
      ! ALT: Mirroring the Imports to Exports for diagnostic purposes
@@ -208,7 +208,7 @@ contains
       UNITS      = imports(i)%units,        &
       DIMS       = imports(i)%dims,         &
       VLOCATION  = imports(i)%vlocation,    &
-      RC         =status); VERIFY_(STATUS)
+      RC         =status); _VERIFY(STATUS)
      call WRITE_PARALLEL("MAPL: adding export "//trim(imports(i)%short_name))
 
   ENDDO
@@ -223,7 +223,7 @@ contains
          DIMS               = MAPL_DimsHorzOnly,                   &
          VLOCATION          = MAPL_VLocationNone,                  &
          RC=STATUS  )
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
 ! Run1 exports
 
@@ -260,7 +260,7 @@ contains
           DIMS               = exports(i)%dims,                     &
           VLOCATION          = exports(i)%vlocation,                &
           RC=STATUS  )
-     VERIFY_(STATUS)
+     _VERIFY(STATUS)
      call WRITE_PARALLEL("MAPL: adding export "//trim(exports(i)%short_name))
     ENDDO
 
@@ -276,7 +276,7 @@ contains
     DATATYPE           = MAPL_StateItem,                   &
 !    RESTART            = MAPL_RestartSkip,                 &
                                                    RC=STATUS  )
-  VERIFY_(STATUS)
+  _VERIFY(STATUS)
 
 !EOS
 
@@ -284,10 +284,10 @@ contains
 ! ---------------------
 
     call ESMF_ConfigGetAttribute(CF, NUM_ICE_CATEGORIES, Label="CICE_N_ICE_CATEGORIES:" , RC=STATUS)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
     call ESMF_ConfigGetAttribute(CF, NUM_ICE_LAYERS,     Label="CICE_N_ICE_LAYERS:" ,     RC=STATUS)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
     NUM_ICE_LAYERS_ALL  = NUM_ICE_LAYERS  * NUM_ICE_CATEGORIES
     NUM_SNOW_LAYERS_ALL = NUM_SNOW_LAYERS * NUM_ICE_CATEGORIES
@@ -303,7 +303,7 @@ contains
     UNGRIDDED_DIMS     = (/NUM_ICE_CATEGORIES/),              &
     VLOCATION          = MAPL_VLocationNone,                  &
                                                    RC=STATUS  )
-  VERIFY_(STATUS)
+  _VERIFY(STATUS)
 
   call MAPL_AddExportSpec(GC,                            &
     SHORT_NAME         = 'VOLICE',                           &
@@ -320,9 +320,9 @@ contains
        DIMS               = MAPL_DimsHorzOnly,                   &
        UNGRIDDED_DIMS     = (/NUM_ICE_CATEGORIES/),              &
        RC=STATUS  )
-  VERIFY_(STATUS)
+  _VERIFY(STATUS)
 
-  VERIFY_(STATUS)
+  _VERIFY(STATUS)
   call MAPL_AddExportSpec(GC,                                &
     SHORT_NAME         = 'DEL_VOLICE_THERM',                            &
     LONG_NAME          = 'delta_ice_category_volume_per_unit_area_of_grid_cell',&
@@ -331,7 +331,7 @@ contains
     UNGRIDDED_DIMS     = (/NUM_ICE_CATEGORIES/),              &
     VLOCATION          = MAPL_VLocationNone,                  &
                                                        RC=STATUS  )
-  VERIFY_(STATUS)
+  _VERIFY(STATUS)
 
 ! add internal state vars
   call MAPL_AddInternalSpec(GC,                            &
@@ -344,7 +344,7 @@ contains
     RESTART            = MAPL_RestartOptional,                &
     DEFAULT            = 0.0,                                 &
                                                    RC=STATUS  )
-  VERIFY_(STATUS)
+  _VERIFY(STATUS)
 
   call MAPL_AddInternalSpec(GC,                            &
     SHORT_NAME         = 'VOLICE',                           &
@@ -356,44 +356,44 @@ contains
     RESTART            = MAPL_RestartOptional,                &
     DEFAULT            = 0.0,                                 &
                                                    RC=STATUS  )
-  VERIFY_(STATUS)
+  _VERIFY(STATUS)
 
 ! Set the Initialize, Run, Finalize entry points
 ! ----------------------------------------------
 
     call MAPL_GridCompSetEntryPoint ( GC, ESMF_METHOD_INITIALIZE,   Initialize, RC=status)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
     call MAPL_GridCompSetEntryPoint ( GC, ESMF_METHOD_RUN,	    Run,        RC=status)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
     call MAPL_GridCompSetEntryPoint ( GC, ESMF_METHOD_FINALIZE,     Finalize,   RC=status)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
     call MAPL_GridCompSetEntryPoint ( GC, ESMF_METHOD_WRITERESTART, Record,     RC=status)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
     if (dual_ocean) then
        call MAPL_GridCompSetEntryPoint ( GC, ESMF_METHOD_RUN,	    Run2,        RC=status)
-       VERIFY_(STATUS)
+       _VERIFY(STATUS)
     end if
 
 ! Set the Profiling timers
 ! ------------------------
 
     call MAPL_TimerAdd(GC,   name="INITIALIZE" ,RC=STATUS)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
     call MAPL_TimerAdd(GC,   name="RUN"        ,RC=STATUS)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
     call MAPL_TimerAdd(GC,   name="FINALIZE"   ,RC=STATUS)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
 ! Generic SetServices
 ! -------------------
 
     call MAPL_GenericSetServices    ( GC, RC=STATUS )
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
 ! All done
 ! --------
 
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
   
   end subroutine SetServices
 
@@ -460,14 +460,14 @@ contains
 
     Iam = "Initialize"
     call ESMF_GridCompGet( gc, NAME=comp_name, RC=status )
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
     Iam = trim(comp_name) // trim(Iam)
 
 ! Allocate the private state...
 !------------------------------
     
     allocate( PrivateSTATE , stat=STATUS )
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
     wrap%ptr => PrivateState
 
@@ -476,10 +476,10 @@ contains
 
     CALL ESMF_UserCompSetInternalState( GC, trim(comp_name)//'_internal_state',&
          WRAP, STATUS )
-    VERIFY_(status)
+    _VERIFY(status)
 
 !-------------------
-    CALL ESMF_GridCompGet(gc, vm=vm, RC=status); VERIFY_(STATUS)
+    CALL ESMF_GridCompGet(gc, vm=vm, RC=status); _VERIFY(STATUS)
     CALL ESMF_VMGet(VM, mpiCommunicator=Comm, rc=RC)
 
 
@@ -487,7 +487,7 @@ contains
 !-----------------------------------
 
     call MAPL_GetObjectFromGC ( GC, MAPL, RC=STATUS)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
 ! Profilers
 !----------
@@ -498,7 +498,7 @@ contains
 ! Get the grid, configuration
 !----------------------------
 
-    call MAPL_GetResource( MAPL, ocean_dir, label='OCEAN_DIR:', rc=status ) ; VERIFY_(STATUS)
+    call MAPL_GetResource( MAPL, ocean_dir, label='OCEAN_DIR:', rc=status ) ; _VERIFY(STATUS)
     call str4c( iarr, TRIM(ocean_dir) )
 
 ! Now do component specific initialization
@@ -517,18 +517,18 @@ contains
     istate => PrivateState%iState
 
     CALL ESMF_UserCompSetInternalState ( GC, 'MITgcm_istate',wrap,status )
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
 ! Generic initialize
 ! ------------------
 
     call MAPL_GenericInitialize( GC, IMPORT, EXPORT, CLOCK, RC=status )
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
 !   Force allocation of export arrays for this component
 !   ----------------------------------------------------
     call MAPL_GetPointer(EXPORT, DH, 'DH',  alloc=.true., RC=STATUS)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 !!  DH=1000.
 !!  Remove set to 1000 m depths, include info from mitgcm input data file.
 
@@ -551,11 +551,11 @@ contains
     DH(:,:,15:) = 690.
 
     call MAPL_GetPointer(EXPORT, pMASK, trim(COMP_NAME)//'_3D_MASK',  alloc=.true., RC=STATUS)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
     call MAPL_GetPointer(EXPORT, TS,  'TW',  alloc=.true., RC=STATUS)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
     call MAPL_GetPointer(EXPORT, SS,  'SW',  alloc=.true., RC=STATUS)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
     call WRITE_PARALLEL("Calling DRIVER_Get_ExportState")
     CALL DRIVER_GET_EXPORT_STATE(istate, 'MASK', pMASK )
@@ -578,7 +578,7 @@ contains
 ! All Done
 !---------
 
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
   end subroutine Initialize
 
 
@@ -735,14 +735,14 @@ contains
     call WRITE_PARALLEL( ' Starting plug run method ' )
     Iam = "Run"
     call ESMF_GridCompGet( gc, NAME=comp_name, RC=status )
-    VERIFY_(status)
+    _VERIFY(status)
     Iam = trim(comp_name) // Iam
 
 ! Get the wrapped MIT state
 !--------------------------
     call ESMF_UserCompGetInternalState( GC, trim(comp_name)//'_internal_state',&
          WRAP, STATUS )
-    VERIFY_(status)
+    _VERIFY(status)
 
     PrivateState => wrap%ptr
     istate => PrivateState%iState
@@ -754,7 +754,7 @@ contains
 !-----------------------------------
 
     call MAPL_GetObjectFromGC ( GC, MAPL, RC=STATUS)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
 ! Profilers
 !----------
@@ -769,24 +769,24 @@ contains
 
 ! Get IMPORT pointers
 !--------------------
-    call MAPL_GetPointer(IMPORT,   TAUX,      'TAUX' ,     RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   TAUY,      'TAUY' ,     RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   PS,        'PS'   ,     RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   LWFLX,     'LWFLX',     RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   SHFLX,     'SHFLX',     RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   QFLUX,     'QFLUX',     RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   RAIN,      'RAIN',      RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   SNOW,      'SNOW',      RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   DISCHARGE, 'DISCHARGE', RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   SFLX,      'SFLX',      RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   WGHT,      'WGHT',      RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   PENUVR,    'PENUVR',    RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   PENPAR,    'PENPAR',    RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   PENUVF,    'PENUVF',    RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   PENPAF,    'PENPAF',    RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   DRNIR,     'DRNIR',     RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(IMPORT,   DFNIR,     'DFNIR',     RC=STATUS); VERIFY_(STATUS)
-    call MAPL_Get(MAPL, LATS=LATS, LONS=LONS, RC=status); VERIFY_(STATUS)
+    call MAPL_GetPointer(IMPORT,   TAUX,      'TAUX' ,     RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   TAUY,      'TAUY' ,     RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   PS,        'PS'   ,     RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   LWFLX,     'LWFLX',     RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   SHFLX,     'SHFLX',     RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   QFLUX,     'QFLUX',     RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   RAIN,      'RAIN',      RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   SNOW,      'SNOW',      RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   DISCHARGE, 'DISCHARGE', RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   SFLX,      'SFLX',      RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   WGHT,      'WGHT',      RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   PENUVR,    'PENUVR',    RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   PENPAR,    'PENPAR',    RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   PENUVF,    'PENUVF',    RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   PENPAF,    'PENPAF',    RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   DRNIR,     'DRNIR',     RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(IMPORT,   DFNIR,     'DFNIR',     RC=STATUS); _VERIFY(STATUS)
+    call MAPL_Get(MAPL, LATS=LATS, LONS=LONS, RC=status); _VERIFY(STATUS)
 
 ! Sea ice vars
     call MAPL_GetPointer(importSI,     HI,     'HI', __RC__)
@@ -803,19 +803,19 @@ contains
 
 ! Get EXPORT pointers to mirror imports
 !--------------------------------------
-    call MAPL_GetPointer(EXPORT,   TAUXe,      'TAUX',       RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT,   TAUYe,      'TAUY',       RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT,   PSe,        'PS',         RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT,   LWFLXe,     'LWFLX',      RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT,   SWFLX,      'SWFLX',  alloc=.true.,      RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT,   SHFLXe,     'SHFLX',      RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT,   QFLUXe,     'QFLUX',      RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT,   RAINe,      'RAIN',       RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT,   SNOWe,      'SNOW',       RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT,   WGHTe,      'WGHTe',      RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT,   SFLXe,      'SFLX',      RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT,   DISCHARGEe, 'DISCHARGEe', RC=STATUS); VERIFY_(STATUS)
-    call MAPL_GetPointer(EXPORT, MASK, trim(COMP_NAME)//'_3D_MASK',  alloc=.true., RC=STATUS); VERIFY_(STATUS)
+    call MAPL_GetPointer(EXPORT,   TAUXe,      'TAUX',       RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(EXPORT,   TAUYe,      'TAUY',       RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(EXPORT,   PSe,        'PS',         RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(EXPORT,   LWFLXe,     'LWFLX',      RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(EXPORT,   SWFLX,      'SWFLX',  alloc=.true.,      RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(EXPORT,   SHFLXe,     'SHFLX',      RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(EXPORT,   QFLUXe,     'QFLUX',      RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(EXPORT,   RAINe,      'RAIN',       RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(EXPORT,   SNOWe,      'SNOW',       RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(EXPORT,   WGHTe,      'WGHTe',      RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(EXPORT,   SFLXe,      'SFLX',      RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(EXPORT,   DISCHARGEe, 'DISCHARGEe', RC=STATUS); _VERIFY(STATUS)
+    call MAPL_GetPointer(EXPORT, MASK, trim(COMP_NAME)//'_3D_MASK',  alloc=.true., RC=STATUS); _VERIFY(STATUS)
 
     CALL MAPL_GetPointer(export, FRACICEe, 'FRACICE', __RC__)
 !    CALL MAPL_GetPointer(exportSI, TIe,   'TI', __RC__)
@@ -863,14 +863,14 @@ contains
     if (associated(DISCHARGEe)) DISCHARGEe = DISCHARGE
     if (associated(WGHTe)) WGHTe = WGHT
 
-    call MAPL_GetResource( MAPL, ocean_dir, label='OCEAN_DIR:', rc=status ) ; VERIFY_(STATUS)
+    call MAPL_GetResource( MAPL, ocean_dir, label='OCEAN_DIR:', rc=status ) ; _VERIFY(STATUS)
     call str4c( iarr, TRIM(ocean_dir) )
 
     IM = size(DISCHARGE,1)
     JM = size(DISCHARGE,2)
     allocate(HFLX(IM,JM), STAT=status)
     allocate(QFLX(IM,JM), STAT=status)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
 !US MIT gets net upward heat flux without short-wave radiation
     HFLX=-LWFLX+SHFLX+Av*QFLUX
@@ -950,17 +950,17 @@ contains
     CALL DRIVER_SET_IMPORT_STATE( istate,   'SI',  SI )
     CALL DRIVER_SET_IMPORT_STATE( istate,   'HI',  HI )
     call MAPL_GetResource( MAPL, active_ocean, label='ACTIVE_OCEAN:', &
-         default=1, rc=status ) ; VERIFY_(STATUS)
+         default=1, rc=status ) ; _VERIFY(STATUS)
 
     call mysetdir(iarr)
     if (active_ocean /= 0) CALL DRIVER_RUN( istate, 1 )
     deallocate(iarr)
     call popdir
 
-    CALL MAPL_GetPointer(EXPORT,   UW,   'UW', RC=STATUS); VERIFY_(STATUS)
-    CALL MAPL_GetPointer(EXPORT,   VW,   'VW', RC=STATUS); VERIFY_(STATUS)
-    CALL MAPL_GetPointer(EXPORT,   TW,   'TW', RC=STATUS); VERIFY_(STATUS)
-    CALL MAPL_GetPointer(EXPORT,   SW,   'SW', RC=STATUS); VERIFY_(STATUS)
+    CALL MAPL_GetPointer(EXPORT,   UW,   'UW', RC=STATUS); _VERIFY(STATUS)
+    CALL MAPL_GetPointer(EXPORT,   VW,   'VW', RC=STATUS); _VERIFY(STATUS)
+    CALL MAPL_GetPointer(EXPORT,   TW,   'TW', RC=STATUS); _VERIFY(STATUS)
+    CALL MAPL_GetPointer(EXPORT,   SW,   'SW', RC=STATUS); _VERIFY(STATUS)
 
     CALL MAPL_GetPointer(exportSI, DEL_FRACICE,'DEL_FRACICE', alloc=.true., __RC__)
     CALL MAPL_GetPointer(exportSI, DEL_TI,   'DEL_TI', alloc=.true., __RC__)
@@ -1083,7 +1083,7 @@ contains
 ! All Done
 !---------
     call WRITE_PARALLEL( ' Finished plug run method ' )
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
   end subroutine Run
 
 !=================================================================================
@@ -1145,14 +1145,14 @@ contains
 ! -----------------------------------------------------
     Iam = "Run2"
     call ESMF_GridCompGet( gc, NAME=comp_name, RC=status )
-    VERIFY_(status)
+    _VERIFY(status)
     Iam = trim(comp_name) // Iam
 
 ! Get my internal MAPL_Generic state
 !-----------------------------------
 
     call MAPL_GetObjectFromGC ( GC, MAPL, RC=status)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
 
 ! Profilers
@@ -1166,7 +1166,7 @@ contains
 
     call ESMF_UserCompGetInternalState( GC, trim(comp_name)//'_internal_state',&
          WRAP, STATUS )
-    VERIFY_(status)
+    _VERIFY(status)
 
     privateState => WRAP%PTR
     istate => PrivateState%iState
@@ -1175,18 +1175,18 @@ contains
 !----------------------------
 
     call ESMF_GridCompGet( GC, grid=Grid,  RC=status )
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
 ! Get IMPORT pointers
 !--------------------
 
-    call MAPL_GetPointer(IMPORT, DEL_TEMP, 'DEL_TEMP', RC=STATUS); VERIFY_(STATUS)
+    call MAPL_GetPointer(IMPORT, DEL_TEMP, 'DEL_TEMP', RC=STATUS); _VERIFY(STATUS)
 
 ! Get EXPORT pointers
 !--------------------
     ! by now this should be allocated, so 'alloc=.true.' is not needed
     CALL MAPL_GetPointer(EXPORT, MASK, trim(COMP_NAME)//'_3D_MASK', RC=STATUS)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
     call MAPL_GridGet(GRID, localCellCountPerDim=counts, RC=status)
     IM=counts(1)
@@ -1196,7 +1196,7 @@ contains
 !-----------------------------------
 
     call MAPL_GetPointer(EXPORT, T,  'TW', RC=STATUS)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
     where(MASK(:,:,1) > 0.0) ! correct only ocean points
        !ALT: Note that we modify only top level of T
@@ -1215,7 +1215,7 @@ contains
 ! All Done
 !---------
 
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
   end subroutine Run2
 
 !BOP
@@ -1251,14 +1251,14 @@ contains
 
     Iam = "Finalize"
     call ESMF_GridCompGet( gc, NAME=comp_name, RC=status )
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
     Iam = trim(comp_name) // Iam
 
 ! Get my internal MAPL_Generic state
 !-----------------------------------
 
     call MAPL_GetObjectFromGC ( GC, MAPL, RC=status)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
 ! Profilers
 !----------
@@ -1270,7 +1270,7 @@ contains
 ! ------------------
     
     call MAPL_GenericFinalize( GC, IMPORT, EXPORT, CLOCK, RC=status )
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
 !    call MAPL_TimerOff(MAPL,"FINALIZE")
     call MAPL_TimerOff(MAPL,"TOTAL"   )
@@ -1278,7 +1278,7 @@ contains
 ! All Done
 !---------
 
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
   end subroutine Finalize
 
 
@@ -1318,14 +1318,14 @@ contains
 
     Iam = "Record"
     call ESMF_GridCompGet( gc, NAME=comp_name, RC=status )
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
     Iam = trim(comp_name) // Iam
 
 ! Get my internal MAPL_Generic state
 !-----------------------------------
 
     call MAPL_GetObjectFromGC ( GC, MAPL, RC=status)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
 ! Profilers
 !----------
@@ -1333,10 +1333,10 @@ contains
     call MAPL_TimerOn(MAPL,"TOTAL")
 
     doRecord = MAPL_RecordAlarmIsRinging(MAPL, RC=status)
-    VERIFY_(STATUS)
+    _VERIFY(STATUS)
 
     call MAPL_TimerOff(MAPL,"TOTAL")
-    RETURN_(ESMF_SUCCESS)
+    _RETURN(ESMF_SUCCESS)
 
   end subroutine Record
 
