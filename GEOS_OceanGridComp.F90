@@ -32,14 +32,6 @@ module GEOS_OceanGridCompMod
 !
 !EOP
 
-  type :: T_PrivateState
-     type(ESMF_Clock)  :: CLOCK
-  end type T_PrivateState
-
-  type :: T_PrivateState_Wrap
-     type(T_PrivateState), pointer :: ptr
-  end type T_PrivateState_Wrap
-
   integer ::          OCN
   integer ::          OCNd
   logical ::      DUAL_OCEAN
@@ -261,8 +253,6 @@ contains
 
     type (MAPL_MetaComp),     pointer   :: State
     type (ESMF_Grid)                    :: Grid
-    type (T_PrivateState),    pointer   :: PrivateSTATE
-    type (T_PrivateState_Wrap)          :: WRAP
     integer                             :: IM, JM, LM
     real                                :: DT
 
@@ -303,30 +293,6 @@ contains
 !--------------------------------
 
     call MAPL_Get(STATE, GIM=GIM, GEX=GEX, _RC)
-
-! Allocate the private state...
-!------------------------------
-
-    allocate( PrivateSTATE, __STAT__)
-    wrap%ptr => PrivateState
-
-! And put it in the GC
-!---------------------
-
-    CALL ESMF_UserCompSetInternalState( GC, TRIM(OCEAN_NAME)//'_internal_state', WRAP, STATUS )
-    VERIFY_(status)
-
-! Initialize the PrivateState. First the time...
-!-----------------------------------------------
-    call MAPL_GetResource(STATE,DT,  Label="RUN_DT:",    _RC)             ! Get AGCM Heartbeat
-    call MAPL_GetResource(STATE,DT,  Label="OCEAN_DT:",  DEFAULT=DT, _RC) ! set Default OCEAN_DT to AGCM Heartbeat
-
-    CALL ESMF_TimeIntervalSet(timeStep, S=NINT(DT), _RC)
-    call ESMF_ClockGet(CLOCK, currTIME=currTime, _RC)
-
-!ALT: check with Max about moving the clock 1 step forward
-    PrivateState%clock = ESMF_ClockCreate(NAME = TRIM(OCEAN_NAME)//"Clock", &
-                         timeStep=timeStep, startTime=currTime, _RC)
 
 ! Initialize the Ocean Model.
 !
@@ -403,10 +369,6 @@ contains
 ! Local derived type aliases
 
     type (MAPL_MetaComp),     pointer   :: STATE
-    type (ESMF_Time)                    :: EndTime
-    type (ESMF_Time)                    :: MyTime,ct
-    type (T_PrivateState),    pointer   :: PrivateSTATE
-    type (T_PrivateState_Wrap)          :: WRAP
     type (ESMF_GridComp    ), pointer   :: GCS(:)
     type (ESMF_State       ), pointer   :: GIM(:)
     type (ESMF_State       ), pointer   :: GEX(:)
@@ -552,34 +514,6 @@ contains
          LM        = LM,    &
          _RC)
 
-
-! Check the clocks to set set-up the "run-to" time
-!-------------------------------------------------
-
-    call ESMF_ClockGet( CLOCK, currTime=endTime, _RC)
-
-! Get ocean model's private internal state
-!---------------------------------
-
-    CALL ESMF_UserCompGetInternalState( GC, TRIM(OCEAN_NAME)//'_internal_state', WRAP, STATUS )
-    VERIFY_(STATUS)
-
-    PrivateSTATE => WRAP%PTR
-
-    call ESMF_ClockGet( PrivateState%CLOCK, currTime=myTime, _RC)
-
-    if (myTime > EndTime) then
-       call ESMF_ClockSet(PrivateState%Clock,direction=ESMF_DIRECTION_REVERSE, _RC)
-       do
-         call ESMF_ClockAdvance(PrivateState%Clock, _RC)
-         call ESMF_ClockGet(PrivateState%Clock,currTime=ct, _RC)
-         if (ct==endTime) exit
-       enddo
-       call ESMF_ClockSet(PrivateState%Clock, direction=ESMF_DIRECTION_FORWARD, _RC)
-       call ESMF_ClockGet(PrivateState%CLOCK, currTime=myTime, _RC)
-    end if
-
-    if( MyTime <= EndTime ) then ! Time to run
 
 ! We get the ocean-land mask (now computed in Initialize of Plug)
 ! ---------------------------------------------------------------
@@ -793,8 +727,6 @@ contains
 ! Loop the ocean model
 !---------------------
 
-       NUM = 0
-       do while ( MyTime <= endTime )
 
 ! Run ocean for one time step (DT)
 !---------------------------------
@@ -803,7 +735,7 @@ contains
           call MAPL_TimerOn (STATE,"--ModRun")
 
           if (.not. DUAL_OCEAN) then
-             call MAPL_GenericRunChildren(GC, IMPORT, EXPORT, PrivateState%CLOCK, _RC)
+             call MAPL_GenericRunChildren(GC, IMPORT, EXPORT, CLOCK, _RC)
           else
              if (PHASE == 1) then
                 ! corrector
@@ -858,14 +790,6 @@ contains
           call MAPL_TimerOff(STATE,"--ModRun")
           call MAPL_TimerOn (STATE,"TOTAL")
 
-! Bump the time in the internal state
-!------------------------------------
-
-          call ESMF_ClockAdvance( PrivateState%clock,                    _RC)
-          call ESMF_ClockGet    ( PrivateState%clock, currTime= myTime , _RC)
-
-          NUM = NUM + 1
-       end do
 
        if(associated(SS_FOUND)) then
           SS_FOUND = OrphanSalinity
@@ -930,8 +854,6 @@ contains
           deallocate(MASK3D, __STAT__)
           deallocate(MASK,   __STAT__)
        end if
-
-    end if ! Time to run
 
 ! Profilers
 !----------
