@@ -1,6 +1,6 @@
 ! Blank file in which we can put "overrides" for parameters
 
-LAYOUT = 36, 30
+LAYOUT = 36, 20
 #override DT = 450
 #override DT_THERM = 450
 HFREEZE = 2.0
@@ -63,9 +63,9 @@ RESTART_CHECKSUMS_REQUIRED = False
 
 !! New Ocean Bathymetry (OM4)
 
-#override TIDEAMP_FILE = "tidal_amplitude.v20140616.nc"
+#override TIDEAMP_FILE = "tidal_amplitude_TPXO9_OM4p125.v20200922.nc"
 #override GEOTHERMAL_FILE = "geothermal_davies2013_v1.nc"
-#override CHL_FILE = "seawifs-clim-1997-2010.1440x1080.v20180328.nc"
+#override CHL_FILE = "seawifs-clim-1997-2010.2880x2240.v20200921.nc"
 
 !! Updates for MLD  !! SK
 
@@ -75,7 +75,6 @@ RESTART_CHECKSUMS_REQUIRED = False
 #override MLE%CR = 0.038
 #override MLE%BLD_DECAYING_TFILTER = 8.64E+04
 #override MLE%MLD_DECAYING_TFILTER = 2.592E+06
-
 
 
 ! see https://github.com/GEOS-ESM/MOM6/issues/15
