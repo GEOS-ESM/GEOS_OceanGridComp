@@ -5,6 +5,7 @@ set (SRCS
   )
 
 esma_add_subdirectories(
+  stochastic_physics_cmake
   mom6_cmake
   )
 

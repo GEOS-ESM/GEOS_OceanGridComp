@@ -529,9 +529,9 @@ list( APPEND MOM6_SRCS
    # drifters-particles
    config_src/external/drifters/MOM_particles.F90
    config_src/external/drifters/MOM_particles_types.F90
-   # stochastic physics
-   config_src/external/stochastic_physics/get_stochy_pattern.F90
-   config_src/external/stochastic_physics/stochastic_physics.F90
+   # stochastic physics --> Now from the stochastic_physics library
+   #config_src/external/stochastic_physics/get_stochy_pattern.F90
+   #config_src/external/stochastic_physics/stochastic_physics.F90
    # database comms
    config_src/external/database_comms/database_client_interface.F90
    config_src/external/database_comms/MOM_database_comms.F90
@@ -553,7 +553,7 @@ endforeach ()
 
 esma_add_library (${this}
   SRCS ${SRCS}
-  DEPENDENCIES FMS::fms_r8
+  DEPENDENCIES FMS::fms_r8 stochastic_physics
   INCLUDES
   $<BUILD_INTERFACE:${MOM6_path}/config_src/memory/dynamic_nonsymmetric>
 #  choose above set MOM6_infra interface
