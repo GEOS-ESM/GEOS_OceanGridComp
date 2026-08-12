@@ -31,13 +31,16 @@ foreach (file ${_stoch_phys_srcs})
   list (APPEND SRCS ${stochastic_physics_path}/${file})
 endforeach ()
 
+find_package(LAPACK REQUIRED)
+
 esma_add_library (${this}
   SRCS ${SRCS}
-  DEPENDENCIES FMS::fms_r8
+  DEPENDENCIES FMS::fms_r8 LAPACK::LAPACK
   TYPE SHARED
 )
 
-target_compile_definitions (${this} PRIVATE INTERNAL_FILE_NML)
+# The CESMCOUPLED is to prevent it trying to use esmf_dgemm
+target_compile_definitions (${this} PRIVATE INTERNAL_FILE_NML CESMCOUPLED)
 
 # This 'resets' the Intel DEBUG flags for MOM6. The stock debug flags use
 # 'all,noarg_temp_created' which seem to be too aggressive for FMS/MOM6. This
