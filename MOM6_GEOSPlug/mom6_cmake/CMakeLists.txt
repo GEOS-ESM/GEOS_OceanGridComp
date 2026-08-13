@@ -529,9 +529,8 @@ list( APPEND MOM6_SRCS
    # drifters-particles
    config_src/external/drifters/MOM_particles.F90
    config_src/external/drifters/MOM_particles_types.F90
-   # stochastic physics --> Now from the stochastic_physics library
-   #config_src/external/stochastic_physics/get_stochy_pattern.F90
-   #config_src/external/stochastic_physics/stochastic_physics.F90
+   # stochastic physics is supplied by the external library when available.
+   # Otherwise use MOM6's compile-only stubs.
    # database comms
    config_src/external/database_comms/database_client_interface.F90
    config_src/external/database_comms/MOM_database_comms.F90
@@ -540,7 +539,14 @@ list( APPEND MOM6_SRCS
    config_src/external/MARBL/marbl_interface.F90
    config_src/external/MARBL/marbl_interface_public_types.F90
    config_src/external/MARBL/marbl_logging.F90
-)
+ )
+
+if (NOT MOM6_USE_STOCHASTIC_PHYSICS)
+  list (APPEND MOM6_SRCS
+    config_src/external/stochastic_physics/get_stochy_pattern.F90
+    config_src/external/stochastic_physics/stochastic_physics.F90
+    )
+endif ()
 
 
 esma_mepo_style(mom6 MOM6_rel_path REL_PATH ..)
@@ -551,9 +557,14 @@ foreach (file ${MOM6_SRCS})
   list (APPEND SRCS ${MOM6_path}/${file})
 endforeach ()
 
+set (MOM6_DEPENDENCIES FMS::fms_r8)
+if (MOM6_USE_STOCHASTIC_PHYSICS)
+  list (APPEND MOM6_DEPENDENCIES stochastic_physics)
+endif ()
+
 esma_add_library (${this}
   SRCS ${SRCS}
-  DEPENDENCIES FMS::fms_r8 stochastic_physics
+  DEPENDENCIES ${MOM6_DEPENDENCIES}
   INCLUDES
   $<BUILD_INTERFACE:${MOM6_path}/config_src/memory/dynamic_nonsymmetric>
 #  choose above set MOM6_infra interface
