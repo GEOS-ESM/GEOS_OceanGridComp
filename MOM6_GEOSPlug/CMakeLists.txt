@@ -4,7 +4,7 @@ set (SRCS
   MOM6_GEOSPlug.F90
   )
 
-esma_mepo_style(stochastic_physics stochastic_physics_rel_path REL_PATH .. FOUND stochastic_physics_found)
+esma_mepo_style(stochastic_physics stochastic_physics_rel_path FOUND stochastic_physics_found)
 if (stochastic_physics_found)
   esma_add_subdirectories(stochastic_physics_cmake)
   set (MOM6_USE_STOCHASTIC_PHYSICS TRUE)
