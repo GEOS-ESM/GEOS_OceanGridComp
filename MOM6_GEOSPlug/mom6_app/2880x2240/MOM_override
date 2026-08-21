@@ -1,6 +1,6 @@
 ! Blank file in which we can put "overrides" for parameters
 
-LAYOUT = 36, 30
+LAYOUT = 36, 28
 #override DT = 450
 #override DT_THERM = 450
 HFREEZE = 2.0
