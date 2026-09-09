@@ -1,0 +1,5 @@
+! These parameters are used in CORE mode but should not be used in
+! the coupled model. 
+
+ICE_SALT_CONCENTRATION = 0.0    ! default is 0.005, set to 0 to prevent SSH from changing 
+LATENT_HEAT_VAPORIZATION = 2.501E+06 ! this is MOM6 default, required for OMIP models
