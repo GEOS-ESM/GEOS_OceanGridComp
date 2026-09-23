@@ -1,6 +1,6 @@
 ! Blank file in which we can put "overrides" for parameters
 
-LAYOUT = 36, 20
+LAYOUT = 48, 40
 #override DT = 450
 #override DT_THERM = 450
 HFREEZE = 2.0
@@ -69,9 +69,9 @@ RESTART_CHECKSUMS_REQUIRED = False
 
 !! Updates for MLD  !! SK
 
-#override FOX_KEMPER_ML_RESTRAT_COEF = 1.0 
+#override FOX_KEMPER_ML_RESTRAT_COEF = 1.0
 #override MLE_FRONT_LENGTH = 500.0
-#override MLE%USE_BODNER23 = True 
+#override MLE%USE_BODNER23 = True
 #override MLE%CR = 0.038
 #override MLE%BLD_DECAYING_TFILTER = 8.64E+04
 #override MLE%MLD_DECAYING_TFILTER = 2.592E+06
