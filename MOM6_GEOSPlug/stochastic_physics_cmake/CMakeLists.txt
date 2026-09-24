@@ -35,7 +35,7 @@ find_package(LAPACK REQUIRED)
 
 esma_add_library (${this}
   SRCS ${SRCS}
-  DEPENDENCIES FMS::fms_r8 LAPACK::LAPACK
+  DEPENDENCIES FMS::fms LAPACK::LAPACK
   TYPE SHARED
 )
 
