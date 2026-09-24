@@ -6,7 +6,7 @@ option (BUILD_MIT_OCEAN "BUILD_MIT_OCEAN is turned off by default" OFF) #OFF by 
 if ( NOT BUILD_MIT_OCEAN )
   esma_add_library (${this}
     SRCS GEOS_OceanGridComp.F90
-    SUBCOMPONENTS MOM6_GEOSPlug MOM_GEOS5PlugMod GEOSdatasea_GridComp
+    SUBCOMPONENTS MOM6_GEOSPlug GEOSdatasea_GridComp
     DEPENDENCIES GEOSdatasea_GridComp MAPL esmf)
 
 else()

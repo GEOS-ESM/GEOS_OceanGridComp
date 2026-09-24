@@ -557,7 +557,7 @@ foreach (file ${MOM6_SRCS})
   list (APPEND SRCS ${MOM6_path}/${file})
 endforeach ()
 
-set (MOM6_DEPENDENCIES FMS::fms_r8)
+set (MOM6_DEPENDENCIES FMS::fms OpenMP::OpenMP_Fortran)
 if (MOM6_USE_STOCHASTIC_PHYSICS)
   list (APPEND MOM6_DEPENDENCIES stochastic_physics)
 endif ()
