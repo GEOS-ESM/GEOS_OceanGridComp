@@ -47,6 +47,7 @@ list( APPEND MOM6_SRCS
    src/ALE/Recon1d_PLM_CW.F90
    src/ALE/Recon1d_PLM_CWK.F90
    src/ALE/Recon1d_PLM_hybgen.F90
+   src/ALE/Recon1d_PLM_WLS.F90
    src/ALE/Recon1d_PPM_CW.F90
    src/ALE/Recon1d_PPM_CWK.F90
    src/ALE/Recon1d_PPM_H4_2018.F90
@@ -147,6 +148,7 @@ list( APPEND MOM6_SRCS
    src/framework/MOM_coupler_types.F90
    src/framework/MOM_cpu_clock.F90
    src/framework/MOM_data_override.F90
+   src/framework/MOM_diag_buffers.F90
    src/framework/MOM_diag_mediator.F90
    src/framework/MOM_diag_remap.F90
    src/framework/MOM_document.F90
@@ -196,6 +198,7 @@ list( APPEND MOM6_SRCS
    src/parameterizations/lateral/MOM_load_love_numbers.F90
    src/parameterizations/lateral/MOM_MEKE.F90
    src/parameterizations/lateral/MOM_MEKE_types.F90
+   src/parameterizations/lateral/MOM_meso_sfn_ANN.F90
    src/parameterizations/lateral/MOM_mixed_layer_restrat.F90
    src/parameterizations/lateral/MOM_self_attr_load.F90
    src/parameterizations/lateral/MOM_streaming_filter.F90
