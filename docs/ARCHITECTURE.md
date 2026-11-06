@@ -1,18 +1,32 @@
 # GEOS_OceanGridComp Architecture
 
 **Audience:** coding agents and developers working in the `GEOS_OceanGridComp` repository.
-**Describes:** the MAPL2 line, branch `develop`.
-**Verified against:** `GEOS_OceanGridComp` @ `8d91ab7` (2026-11-05).
-**Placement:** as in the GEOSgcm fixture (`components.yaml` @ `0f2e0fb`).
+**Describes:** the MAPL3 line, branch `release/MAPL-v3`.
+**Verified against:** `GEOS_OceanGridComp` @ `253669b` (2026-11-06).
+**Placement:** as in the GEOSgcm fixture (`components.yaml` @ `f50622d`).
 Other fixtures (for example GEOSadas, GEOSldas) may place this repository
 elsewhere; paths inside this repository do not change.
+
+> **Build status on this line:** not built, not ported. On
+> `release/MAPL-v3`, `src/Components/@GEOSgcm_GridComp/CMakeLists.txt` lists
+> `GEOSogcm_GridComp` only as a commented-out entry ("not yet ported to MAPL3 -
+> restore when ported"); the ocean composite `OGCM` (`GEOSogcm_GridComp`) that
+> adds this repository's `OCEAN` component is therefore not compiled, and
+> `GEOS_OceanGridComp` is not built. The code in this repository is the MAPL2
+> code, kept for a later port. Relative to the MAPL2 line, the only source change is the
+> `use MAPL_Constants` import in the `MOM` and `MOM6` plug-ins; this line is also
+> behind `develop` (for example no optional stochastic physics in the MOM6 build
+> and no `mom6_app/common/MOM_dataatm`), and the documents describe this line.
+> The statements below about MAPL internals (`MAPL file`) and the parent `OGCM`
+> describe the MAPL2 code the plug-ins were written for; they were not re-checked
+> against MAPL3.
 
 Paths are relative to this repository's root unless they start with `src/` or `@`
 (fixture-relative). Statements without a label are Verified and carry a
 `(path, routine-or-key)` citation. *Inferred:* and *Unverified:* mark the weaker
 cases. `OGCM file` means `src/Components/@GEOSgcm_GridComp/GEOSogcm_GridComp/GEOS_OgcmGridComp.F90`
 (parent repository `GEOSgcm_GridComp`). `MAPL file` means
-`src/Shared/@MAPL/generic/MAPL_Generic.F90`. Definitions at first use: MOM5 and MOM6 are the
+MAPL2 `generic/MAPL_Generic.F90` (MAPL `release/v2`; not present in this fixture, where MAPL is MAPL3). Definitions at first use: MOM5 and MOM6 are the
 Modular Ocean Model versions 5 and 6 (GFDL); MITgcm is the MIT General Circulation Model;
 FMS is the GFDL Flexible Modeling System library; a *plug-in* here is a MAPL gridded component
 that wraps one ocean model or a data ocean.
@@ -21,8 +35,7 @@ that wraps one ocean model or a data ocean.
 
 - The fixture lists this repository as `GEOS_OceanGridComp` with
   `local: ./src/Components/@GEOSgcm_GridComp/GEOSogcm_GridComp/@GEOS_OceanGridComp`,
-  `tag: v3.13.0`, `develop: develop` (`components.yaml`, `GEOS_OceanGridComp`). This document was
-  checked against the `develop` checkout; the tags below are the pinned versions in `components.yaml`.
+  `branch: release/MAPL-v3`, `develop: develop` (`components.yaml`, `GEOS_OceanGridComp`). The tags below are the pinned versions in `components.yaml` on this line.
 - Parent repository: `GEOSgcm_GridComp`, whose ocean composite `OGCM`
   (`GEOSogcm_GridComp/GEOS_OgcmGridComp.F90`, module `GEOS_OgcmGridCompMod`) adds this
   repository's component as child `OCEAN` (`OGCM file`, `SetServices`:
@@ -31,13 +44,13 @@ that wraps one ocean model or a data ocean.
   marked "not yet documented" there), fixture architecture (`../../../../../../docs/ARCHITECTURE.md` in the fixture),
   application repository (`../../../../../Applications/@GEOSgcm_App/docs/ARCHITECTURE.md` in the fixture)
   (run-time templates and `gcm_setup`).
-- Children (links down, all gitignored here, all listed in `components.yaml`):
+- Children (links down, all gitignored here; all but `stochastic_physics` are listed in `components.yaml`):
 
 | Fixture name | Local path in this repository | `tag:` / `develop:` | Used by |
 |---|---|---|---|
 | `mom` (remote `../MOM5.git`) | `MOM_GEOS5PlugMod/@mom` | `geos/5.1.0+2.1.0` / `geos5` | `MOM_GEOS5PlugMod` |
-| `mom6` (remote `../MOM6.git`, `recurse_submodules`) | `MOM6_GEOSPlug/@mom6` | `geos/v3.9` / `geos/main` | `MOM6_GEOSPlug` |
-| `stochastic_physics` | `MOM6_GEOSPlug/@stochastic_physics` | `geos/v1.0.0` / `geos/master` | `MOM6_GEOSPlug` (optional) |
+| `mom6` (remote `../MOM6.git`, `recurse_submodules`) | `MOM6_GEOSPlug/@mom6` | `geos/v3.8` / `geos/main` | `MOM6_GEOSPlug` |
+| `stochastic_physics` | `MOM6_GEOSPlug/@stochastic_physics` (path ignored by `MOM6_GEOSPlug/.gitignore`) | no entry in `components.yaml` on this line | not used on this line (section 5.3) |
 | `mit` (remote `../MITgcm.git`) | `MIT_GEOS5PlugMod/@mit` | `checkpoint68o` / none | `MIT_GEOS5PlugMod` |
 
 
@@ -49,7 +62,7 @@ that wraps one ocean model or a data ocean.
 | `GEOS_Ocean_StateSpecs.rc` | Import, internal and export specs of `OCEAN` (ACG input) | `CMakeLists.txt`, `mapl_acg` |
 | `GEOSdatasea_GridComp/` | Data ocean plug-in (`DATASEA`) | `GEOS_DataSeaGridCompMod` |
 | `MOM_GEOS5PlugMod/` | Plug-in around MOM5 (`MOM`); `mom_app/mkMAPLTripolar` grid-file scripts | `MOM_GEOS5PlugMod` |
-| `MOM6_GEOSPlug/` | Plug-in around MOM6 (`MOM6`); `mom6_app/` run-time configurations; `mom6_cmake/`, `stochastic_physics_cmake/` build the nested sources | `MOM6_GEOSPlugMod` |
+| `MOM6_GEOSPlug/` | Plug-in around MOM6 (`MOM6`); `mom6_app/` run-time configurations; `mom6_cmake/` builds the nested sources (no `stochastic_physics_cmake/` on this line) | `MOM6_GEOSPlugMod` |
 | `MIT_GEOS5PlugMod/` | Plug-in around MITgcm (`MIT`); `mitgcm_setup/` driver code, `configs/` experiment setups, `instructions/` | `MIT_GEOS5PlugMod` |
 | `.github/`, `.circleci/`, `README.md`, `CONTRIBUTING.md`, licence files | CI, code owners, project files | |
 
@@ -64,7 +77,7 @@ to ocean/data_ocean components", `GEOS_OceanGridComp.F90`). It has exactly one a
 `MAPL_GenericRunChildren` in ordinary mode, or explicitly by phase in dual-ocean mode (`OGCM file`, `Run`).
 It exchanges data with sibling components of `OGCM` (sea ice, ocean radiation, ocean biogeochemistry), not with
 the atmosphere directly: the atmosphere-ocean exchange is made by `GEOS_GcmGridComp.F90` and `OGCM`
-(see the `GEOSgcm_GridComp` architecture (`../../../docs/ARCHITECTURE.md` in the fixture), section 3.3).
+(see the atmosphere-ocean exchange in the `GEOSgcm_GridComp` architecture (`../../../docs/ARCHITECTURE.md` in the fixture)).
 
 ### 3.2 `SetServices` (`GEOS_OceanGridComp.F90`)
 1. Reads `USE_DATASEA:` (default 1), `OGCM_TOP_LAYER:` (default 10.0, called `OrphanDepth`) and
@@ -177,7 +190,7 @@ the atmosphere directly: the atmosphere-ocean exchange is made by `GEOS_GcmGridC
 ### 3.6 Dual-ocean mode (`DUAL_OCEAN: 1`)
 A second data ocean `DATASEA` (`OCNd`) runs beside the real ocean and the real ocean is nudged toward it, for the predictor part
 of regular replay (`REPLAY_MODE: Regular`, asserted in `GEOS_GcmGridComp.F90`; see the
-`GEOSgcm_GridComp` architecture (`../../../docs/ARCHITECTURE.md` in the fixture), section 3.4).
+`GEOSgcm_GridComp` architecture (`../../../docs/ARCHITECTURE.md` in the fixture), replay section).
 - `Run` phase 1 (corrector): run `OCNd` phase 1, its couplers, `OCN` phase 1, its couplers; then
   `DEL_TEMP = (TWd - TW)*DT/(DT + TAU_SST)` where mask > 0 and `FRACICE` of `OCNd` is below 0.05, and
   `DEL_TEMP = ((-0.054*SW + MAPL_TICE) - TW)*DT/(DT + TAU_SST_UNDER_ICE)` where mask > 0, that ice fraction is at least 0.05 and
@@ -192,7 +205,7 @@ Selection is made twice: `OGCM` reads the keys for connections, `OCEAN` for the 
 | | `DATASEA` | `MOM` | `MOM6` | `MIT` |
 |---|---|---|---|---|
 | Directory, module | `GEOSdatasea_GridComp`, `GEOS_DataSeaGridCompMod` | `MOM_GEOS5PlugMod`, `MOM_GEOS5PlugMod` | `MOM6_GEOSPlug`, `MOM6_GEOSPlugMod` | `MIT_GEOS5PlugMod`, `MIT_GEOS5PlugMod` |
-| Wraps | Nothing: reads SST (and optionally SSS) data | MOM5 (`@mom`) with FMS | MOM6 (`@mom6`) with FMS, optional `@stochastic_physics` | MITgcm (`@mit`) through generated driver code |
+| Wraps | Nothing: reads SST (and optionally SSS) data | MOM5 (`@mom`) with FMS | MOM6 (`@mom6`) with FMS; stochastic-physics stubs only | MITgcm (`@mit`) through generated driver code |
 | Selected by | `USE_DATASEA:` /= 0 (default 1) | `USE_DATASEA: 0` and `OCEAN_NAME: MOM` (default) | `USE_DATASEA: 0` and `OCEAN_NAME: MOM6` | `USE_DATASEA: 0`, `OCEAN_NAME: MIT`, and build option `BUILD_MIT_OCEAN` |
 | Added as child | static `SS=DataSeaSetServices` | shared object `libMOM_GEOS5PlugMod.so`, key `MOM_GEOS5PLUGMOD:`, symbol `setservices_` | shared object `libMOM6_GEOSPlug.so`, key `MOM6_GEOSPLUG:`, symbol `setservices_` | static `SS=MITSetServices` |
 | State specs | `GEOS_DataSea_StateSpecs.rc` (ACG) | `MOM_GEOS5PlugMod_StateSpecs.rc` (ACG, import and export only) | `MOM6_GEOSPlug_StateSpecs.rc` (ACG) | hand-written `MAPL_Add*Spec` in `SetServices` |
@@ -274,11 +287,10 @@ Entry points, imports, exports and build details are in section 5 and 8; the `*_
   `io_infra_end`, deallocates `Boundary`. `Record`: `ocean_model_restart(Ocean_State, timeStamp)` on the same alarm as `MOM`.
 - Restarts and configuration: MOM6 writes `RESTART/`; `gcm_run.j` copies `MOM_input` and `MOM_override` into the run directory
   and sets `DT` and `DT_THERM` in `MOM_override` to the heartbeat. `gcm_setup` copies `MOM_input`, `MOM_override`, `input.nml`,
-  `*table` from `$ETCDIR/MOM6/mom6_app/<IM>x<JM>/`, plus `MOM_saltrestore` and `common/MOM_dataatm` if a data atmosphere is
-  used (`CMakeLists.txt` installs `mom6_app` to `etc/MOM6`). Resolutions present: `72x36`, `540x458`, `720x576`, `1440x1080`,
+  `*table` from `$ETCDIR/MOM6/mom6_app/<IM>x<JM>/`, and no `MOM_saltrestore` or `common/MOM_dataatm` (not on this line; the MAPL2 line copies both) (`CMakeLists.txt` installs `mom6_app` to `etc/MOM6`). Resolutions present: `72x36`, `540x458`, `720x576`, `1440x1080`,
   `2880x2240` (`mom6_app/`).
-- Stochastic physics: `@stochastic_physics` is built into the MOM6 library when found, else MOM6's compile-only stubs are used with a warning
-  (`CMakeLists.txt`, `MOM6_USE_STOCHASTIC_PHYSICS`); the plug-in source does not mention it.
+- Stochastic physics: on this line `mom6_cmake/CMakeLists.txt` always compiles MOM6's `config_src/external/stochastic_physics` stubs and depends only on `FMS::fms_r8`;
+  there is no `@stochastic_physics` lookup (`MOM6_USE_STOCHASTIC_PHYSICS`, `stochastic_physics_cmake/`) as on the MAPL2 line; the plug-in source does not mention it.
 
 ### 5.4 `MIT_GEOS5PlugMod` (`MIT`, MITgcm)
 - Purpose: wraps MITgcm (`@mit`) on an `llc` ocean grid (`OGCM_GRID_TYPE = llc` for `MIT` in `gcm_setup`; `OGCM.GRIDSPEC: mit.ascii` in `AGCM.rc.tmpl`). Header: "wrapper for MITgcm" (`MIT_GEOS5PlugMod.F90`). Compiled only with `BUILD_MIT_OCEAN`, and then
@@ -306,9 +318,9 @@ Entry points, imports, exports and build details are in section 5 and 8; the `*_
 
 ## 6. Nested model repositories (link-only)
 
-`@mom`, `@mom6`, `@stochastic_physics` and `@mit` are separate repositories (section 1); this repository holds only their wrappers
+`@mom`, `@mom6` and `@mit` (and, on the MAPL2 line, `@stochastic_physics`) are separate repositories (section 1); this repository holds only their wrappers
 and configuration. Their own documents (present in a fixture checkout): `MOM6_GEOSPlug/@mom6/AGENTS.md`, `MIT_GEOS5PlugMod/@mit/README.md`,
-`MOM_GEOS5PlugMod/@mom/README.md`, `MOM6_GEOSPlug/@stochastic_physics/README.md`. Change them only in their own repository.
+`MOM_GEOS5PlugMod/@mom/README.md`. Change them only in their own repository.
 
 ## 7. Configuration that changes structure
 
@@ -326,11 +338,12 @@ and configuration. Their own documents (present in a fixture checkout): `MOM6_GE
 
 Resource lookup tries the component name as a prefix: `MAPL_GetResource` on a component passes its child name (`MOM`, `MOM6`, `MIT`,
 `OCEAN`, `DATASEA`) and tries `<name>_<label>`, `<type>_<label>`, the bare label, then `<name>.<label>`
-(`src/Shared/@MAPL/generic/MAPL_Generic.F90`, `MAPL_GetResource` with `component_name = state%compname`;
-`src/Shared/@MAPL/base/MAPL_Resource.F90`, `get_labels_with_prefix`).
+(MAPL2 (MAPL `release/v2`, `generic/MAPL_Generic.F90`; not present in this fixture), `MAPL_GetResource` with `component_name = state%compname`;
+MAPL2 (`base/MAPL_Resource.F90`), `get_labels_with_prefix`).
 
 ## 8. Build structure
 
+- Not built on this line: `src/Components/@GEOSgcm_GridComp/CMakeLists.txt` has `GEOSogcm_GridComp` commented out ("not yet ported to MAPL3 - restore when ported"). The items below describe this repository's own `CMakeLists.txt` files, which are not run on this line.
 - `CMakeLists.txt`: option `BUILD_MIT_OCEAN` (default OFF). OFF: library `GEOS_OceanGridComp` from `GEOS_OceanGridComp.F90` with
   `SUBCOMPONENTS MOM6_GEOSPlug MOM_GEOS5PlugMod GEOSdatasea_GridComp`. ON: defines `BUILD_MIT_OCEAN`, subcomponents
   `MIT_GEOS5PlugMod GEOSdatasea_GridComp` only. `mapl_acg` runs on `GEOS_Ocean_StateSpecs.rc`.
@@ -341,7 +354,7 @@ Resource lookup tries the component name as a prefix: `MAPL_GetResource` on a co
 - `MIT_GEOS5PlugMod`: returns early with a message if `MIT_CONFIG_ID` is not defined; depends on custom targets `mitgcmuv` and `mitgcmuv_driver`;
   build options by compiler (`build_options.gnu`, `build_options.intel`).
 - The shared-object plug-ins are also listed as `SUBCOMPONENTS`; whether the executable therefore links them is *Unverified:* in the
-  fixture architecture (`../../../../../../docs/ARCHITECTURE.md` in the fixture), section 3 ("Plug-ins loaded by name").
+  fixture architecture (`../../../../../../docs/ARCHITECTURE.md` in the fixture), the section on plug-ins loaded by name.
 - Tests and CI: no unit-test target in this repository's own `CMakeLists.txt` files. `.github/workflows/workflow.yml`: fixture builds
   (`ifort`, `gfortran-15`, `ifx`, Debug) and a spack build; `.circleci/config.yml`: fixture build, atmosphere-only run, coupled run with `gcm_ocean_type: MOM6`.
 
@@ -352,7 +365,7 @@ Resource lookup tries the component name as a prefix: `MAPL_GetResource` on a co
   asks that they change together.
 - **`OCEAN`'s imports are not only its `.rc` file.** Unconnected child imports are promoted to it (3.3); adding or removing a plug-in
   import changes what `OGCM` must provide, and `OGCM`'s connections to names a child does not have are relaxed rather than failing
-  (`src/Shared/@MAPL/generic/VarConn.F90`, `checkReq`).
+  (MAPL2 (MAPL `release/v2`, `generic/VarConn.F90`; not present in this fixture), `checkReq`).
 - **Module state.** `OCEAN_NAME`, `DO_DATASEA`, `OCN`, `OCNd`, `DUAL_OCEAN`, `OrphanDepth` are module variables (also `DUAL_OCEAN` in each plug-in).
   *Inferred:* one `OCEAN` instance per executable.
 - **Weighting.** Fluxes handed to the real ocean are multiplied by `FROCEAN/MASK` (3.4); exports are written back only where `WGHT > 0`, so

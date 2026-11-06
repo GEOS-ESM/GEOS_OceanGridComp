@@ -1,9 +1,9 @@
 # GEOS_OceanGridComp: previous architectural decisions
 
 **Audience:** coding agents and developers working in the `GEOS_OceanGridComp` repository.
-**Describes:** the MAPL2 line, branch `develop`.
-**Verified against:** `GEOS_OceanGridComp` @ `8d91ab7` (2026-11-05).
-**Placement:** as in the GEOSgcm fixture (`components.yaml` @ `0f2e0fb`).
+**Describes:** the MAPL3 line, branch `release/MAPL-v3`.
+**Verified against:** `GEOS_OceanGridComp` @ `253669b` (2026-11-06).
+**Placement:** as in the GEOSgcm fixture (`components.yaml` @ `f50622d`).
 Other fixtures (for example GEOSadas, GEOSldas) may place this repository
 elsewhere; paths inside this repository do not change.
 
@@ -21,7 +21,7 @@ Only what is easy to see in the code now. Entries grow over time. Context:
 
 ### Ocean models are plug-ins, not part of this wrapper
 - Pattern: each ocean model is wrapped in its own directory and gridded component (`MOM_GEOS5PlugMod`, `MOM6_GEOSPlug`, `MIT_GEOS5PlugMod`); the
-  model source is a separate nested repository cloned beneath it (`components.yaml`: `mom`, `mom6`, `stochastic_physics`, `mit` with `local:` under the plug-in
+  model source is a separate nested repository cloned beneath it (`components.yaml`: `mom`, `mom6`, `mit` (and `stochastic_physics` on the MAPL2 line only) with `local:` under the plug-in
   directory; plug-in `CMakeLists.txt`: `SUBCOMPONENTS @mom`, `esma_mepo_style(mom6 ...)`, `SET (MITGCM_ROOTDIR ... /@mit)`).  [Verified]
 - Likely reason: the models have their own upstream histories and build systems, and the plug-in is the only GEOS-specific code.  [Inferred]
 
