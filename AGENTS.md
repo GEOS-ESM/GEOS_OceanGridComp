@@ -31,8 +31,8 @@ section 5 has one subsection per plug-in. There are no separate component files.
 |---|---|
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Placement, directory map, the `OCEAN` wrapper (selection, run loop, dual ocean), plug-in table and subsections, interface to the `OGCM` parent, nested model repositories, build, configuration keys, traps, observations |
 | [`docs/decisions.md`](docs/decisions.md) | Previous architectural decisions (pattern, likely reason) |
-| [`../../docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) | Parent repository `GEOSgcm_GridComp` (root component tree; `GEOSogcm_GridComp` itself is not yet documented there) |
-| [`../../../../../docs/ARCHITECTURE.md`](../../../../../docs/ARCHITECTURE.md) | The GEOSgcm fixture (repository tree, build, `components.yaml`) |
+| `../../docs/ARCHITECTURE.md` | Parent repository `GEOSgcm_GridComp` (root component tree; `GEOSogcm_GridComp` itself is not yet documented there) |
+| `../../../../../docs/ARCHITECTURE.md` | The GEOSgcm fixture (repository tree, build, `components.yaml`) |
 
 ## Rules
 

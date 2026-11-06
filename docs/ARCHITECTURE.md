@@ -27,9 +27,9 @@ that wraps one ocean model or a data ocean.
   (`GEOSogcm_GridComp/GEOS_OgcmGridComp.F90`, module `GEOS_OgcmGridCompMod`) adds this
   repository's component as child `OCEAN` (`OGCM file`, `SetServices`:
   `OCEAN = MAPL_AddChild(GC, NAME='OCEAN', SS=OceanSetServices)`). Documents:
-  [`GEOSgcm_GridComp` architecture](../../../docs/ARCHITECTURE.md) (the `OGCM` composite itself is
-  marked "not yet documented" there), [fixture architecture](../../../../../../docs/ARCHITECTURE.md),
-  [application repository](../../../../../Applications/@GEOSgcm_App/docs/ARCHITECTURE.md)
+  `GEOSgcm_GridComp` architecture (`../../../docs/ARCHITECTURE.md` in the fixture) (the `OGCM` composite itself is
+  marked "not yet documented" there), fixture architecture (`../../../../../../docs/ARCHITECTURE.md` in the fixture),
+  application repository (`../../../../../Applications/@GEOSgcm_App/docs/ARCHITECTURE.md` in the fixture)
   (run-time templates and `gcm_setup`).
 - Children (links down, all gitignored here, all listed in `components.yaml`):
 
@@ -64,7 +64,7 @@ to ocean/data_ocean components", `GEOS_OceanGridComp.F90`). It has exactly one a
 `MAPL_GenericRunChildren` in ordinary mode, or explicitly by phase in dual-ocean mode (`OGCM file`, `Run`).
 It exchanges data with sibling components of `OGCM` (sea ice, ocean radiation, ocean biogeochemistry), not with
 the atmosphere directly: the atmosphere-ocean exchange is made by `GEOS_GcmGridComp.F90` and `OGCM`
-(see the [`GEOSgcm_GridComp` architecture](../../../docs/ARCHITECTURE.md), section 3.3).
+(see the `GEOSgcm_GridComp` architecture (`../../../docs/ARCHITECTURE.md` in the fixture), section 3.3).
 
 ### 3.2 `SetServices` (`GEOS_OceanGridComp.F90`)
 1. Reads `USE_DATASEA:` (default 1), `OGCM_TOP_LAYER:` (default 10.0, called `OrphanDepth`) and
@@ -177,7 +177,7 @@ the atmosphere directly: the atmosphere-ocean exchange is made by `GEOS_GcmGridC
 ### 3.6 Dual-ocean mode (`DUAL_OCEAN: 1`)
 A second data ocean `DATASEA` (`OCNd`) runs beside the real ocean and the real ocean is nudged toward it, for the predictor part
 of regular replay (`REPLAY_MODE: Regular`, asserted in `GEOS_GcmGridComp.F90`; see the
-[`GEOSgcm_GridComp` architecture](../../../docs/ARCHITECTURE.md), section 3.4).
+`GEOSgcm_GridComp` architecture (`../../../docs/ARCHITECTURE.md` in the fixture), section 3.4).
 - `Run` phase 1 (corrector): run `OCNd` phase 1, its couplers, `OCN` phase 1, its couplers; then
   `DEL_TEMP = (TWd - TW)*DT/(DT + TAU_SST)` where mask > 0 and `FRACICE` of `OCNd` is below 0.05, and
   `DEL_TEMP = ((-0.054*SW + MAPL_TICE) - TW)*DT/(DT + TAU_SST_UNDER_ICE)` where mask > 0, that ice fraction is at least 0.05 and
@@ -341,7 +341,7 @@ Resource lookup tries the component name as a prefix: `MAPL_GetResource` on a co
 - `MIT_GEOS5PlugMod`: returns early with a message if `MIT_CONFIG_ID` is not defined; depends on custom targets `mitgcmuv` and `mitgcmuv_driver`;
   build options by compiler (`build_options.gnu`, `build_options.intel`).
 - The shared-object plug-ins are also listed as `SUBCOMPONENTS`; whether the executable therefore links them is *Unverified:* in the
-  [fixture architecture](../../../../../../docs/ARCHITECTURE.md), section 3 ("Plug-ins loaded by name").
+  fixture architecture (`../../../../../../docs/ARCHITECTURE.md` in the fixture), section 3 ("Plug-ins loaded by name").
 - Tests and CI: no unit-test target in this repository's own `CMakeLists.txt` files. `.github/workflows/workflow.yml`: fixture builds
   (`ifort`, `gfortran-15`, `ifx`, Debug) and a spack build; `.circleci/config.yml`: fixture build, atmosphere-only run, coupled run with `gcm_ocean_type: MOM6`.
 
