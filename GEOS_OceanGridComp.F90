@@ -108,11 +108,8 @@ contains
        OCEAN_NAME="DATASEA"
        OCN = MAPL_AddChild(GC, NAME=OCEAN_NAME, SS=DataSeaSetServices, _RC)
     else
-       call MAPL_GetResource ( MAPL, OCEAN_NAME, Label="OCEAN_NAME:", DEFAULT="MOM", _RC)
+       call MAPL_GetResource ( MAPL, OCEAN_NAME, Label="OCEAN_NAME:", DEFAULT="MOM6", _RC)
        select case (trim(OCEAN_NAME))
-          case ("MOM")
-             call MAPL_GetResource ( MAPL, sharedObj,  Label="MOM_GEOS5PLUGMOD:", DEFAULT="libMOM_GEOS5PlugMod.so", _RC)
-             OCN = MAPL_AddChild(OCEAN_NAME,'setservices_', parentGC=GC, sharedObj=sharedObj,  _RC)
           case ("MOM6")
              call MAPL_GetResource ( MAPL, sharedObj,  Label="MOM6_GEOSPLUG:",    DEFAULT="libMOM6_GEOSPlug.so",    _RC)
              OCN = MAPL_AddChild(OCEAN_NAME,'setservices_', parentGC=GC, sharedObj=sharedObj,  _RC)
@@ -177,10 +174,6 @@ contains
        call MAPL_AddExportSpec (GC, SHORT_NAME = 'T',   CHILD_ID = OCN, _RC)
        call MAPL_AddExportSpec (GC, SHORT_NAME = 'S',   CHILD_ID = OCN, _RC)
 
-       if (trim(OCEAN_NAME) == "MOM") then
-          call MAPL_AddExportSpec (GC, SHORT_NAME = 'SSH', CHILD_ID   = OCN, _RC)
-          call MAPL_AddExportSpec (GC, SHORT_NAME = 'PBO', CHILD_ID   = OCN, _RC)
-       endif
        if (trim(OCEAN_NAME) == "MOM6") then
           call MAPL_AddExportSpec (GC, SHORT_NAME = 'UWC', CHILD_ID   = OCN, _RC)
           call MAPL_AddExportSpec (GC, SHORT_NAME = 'VWC', CHILD_ID   = OCN, _RC)
@@ -360,8 +353,8 @@ contains
        call MAPL_GetPointer(EXPORT, MASKO, 'MASKO'  , alloc=.true., _RC)
 
        select case (trim(OCEAN_NAME))
-          case ("MOM", "MIT")
-             call MAPL_GetPointer(GEX(OCN), MASK3D, trim(OCEAN_NAME)//'_3D_MASK', _RC)
+          case ("MIT")
+             call MAPL_GetPointer(GEX(OCN), MASK3D, 'MIT_3D_MASK', _RC)
              MASK => MASK3D(:,:,1)
           case ("MOM6")
              call MAPL_GetPointer(GEX(OCN), MASK, 'MOM_2D_MASK', _RC)
@@ -585,8 +578,8 @@ contains
 ! ---------------------------------------------------------------
        if(DO_DATASEA==0) then
           select case(trim(OCEAN_NAME))
-             case ("MOM", "MIT")
-                call MAPL_GetPointer(GEX(OCN), MASK3D, trim(OCEAN_NAME)//'_3D_MASK', _RC)
+             case ("MIT")
+                call MAPL_GetPointer(GEX(OCN), MASK3D, 'MIT_3D_MASK', _RC)
                 MASK => MASK3D(:,:,1)
              case ("MOM6")
                 call MAPL_GetPointer(GEX(OCN), MASK, 'MOM_2D_MASK', _RC)
@@ -764,7 +757,7 @@ contains
 
           if(associated(RFLUX )) RFLUX  = 0.0
           select case (trim(OCEAN_NAME))
-             case ("MOM", "MIT", "DATASEA")
+             case ("MIT", "DATASEA")
                 do L=1,LM
                    HEAT(:,:,L) = HEATi(:,:,L)*WGHT
                    if(associated(RFLUX)) then
